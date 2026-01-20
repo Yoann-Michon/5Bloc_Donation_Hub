@@ -8,7 +8,7 @@ const stats = [
         unit: 'ETH',
         change: '+12.4%',
         changeLabel: 'from last month',
-        glowColor: 'rgba(82, 39, 255, 0.4)', // Primary
+        glowColor: 'rgba(82, 39, 255, 0.4)',
         blurColor: 'rgba(82, 39, 255, 0.2)',
     },
     {
@@ -17,7 +17,7 @@ const stats = [
         unit: '',
         change: '+5.2%',
         changeLabel: 'live pools',
-        glowColor: 'rgba(99, 102, 241, 0.4)', // Indigo
+        glowColor: 'rgba(99, 102, 241, 0.4)',
         blurColor: 'rgba(99, 102, 241, 0.2)',
     },
     {
@@ -26,7 +26,7 @@ const stats = [
         unit: '',
         change: '+8.1%',
         changeLabel: 'global wallets',
-        glowColor: 'rgba(168, 85, 247, 0.4)', // Purple
+        glowColor: 'rgba(168, 85, 247, 0.4)',
         blurColor: 'rgba(168, 85, 247, 0.2)',
     },
 ];

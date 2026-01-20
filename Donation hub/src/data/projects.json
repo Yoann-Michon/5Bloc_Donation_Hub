@@ -9,8 +9,12 @@
     "raised": 4.2,
     "goal": 10,
     "daysLeft": 12,
-    "status": "Fundraising",
-    "backers": 156
+    "status": "Approved",
+    "backers": 156,
+    "ownerWallet": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "approvedBy": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "approvedAt": "2024-01-01T00:00:00Z"
   },
   {
     "id": 2,
@@ -22,8 +26,12 @@
     "raised": 8.5,
     "goal": 12,
     "daysLeft": 5,
-    "status": "Fundraising",
-    "backers": 203
+    "status": "Approved",
+    "backers": 203,
+    "ownerWallet": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "approvedBy": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "approvedAt": "2024-01-01T00:00:00Z"
   },
   {
     "id": 3,
@@ -35,8 +43,12 @@
     "raised": 15.2,
     "goal": 50,
     "daysLeft": 24,
-    "status": "Fundraising",
-    "backers": 487
+    "status": "Approved",
+    "backers": 487,
+    "ownerWallet": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "approvedBy": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "approvedAt": "2024-01-01T00:00:00Z"
   },
   {
     "id": 4,
@@ -48,8 +60,12 @@
     "raised": 12.8,
     "goal": 20,
     "daysLeft": 18,
-    "status": "Fundraising",
-    "backers": 324
+    "status": "Approved",
+    "backers": 324,
+    "ownerWallet": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "approvedBy": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "approvedAt": "2024-01-01T00:00:00Z"
   },
   {
     "id": 5,
@@ -61,8 +77,12 @@
     "raised": 6.9,
     "goal": 15,
     "daysLeft": 30,
-    "status": "Fundraising",
-    "backers": 178
+    "status": "Approved",
+    "backers": 178,
+    "ownerWallet": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "approvedBy": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "approvedAt": "2024-01-01T00:00:00Z"
   },
   {
     "id": 6,
@@ -74,8 +94,12 @@
     "raised": 28.5,
     "goal": 35,
     "daysLeft": 8,
-    "status": "Fundraising",
-    "backers": 612
+    "status": "Approved",
+    "backers": 612,
+    "ownerWallet": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "approvedBy": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "approvedAt": "2024-01-01T00:00:00Z"
   },
   {
     "id": 7,
@@ -87,8 +111,12 @@
     "raised": 18.2,
     "goal": 25,
     "daysLeft": 15,
-    "status": "Fundraising",
-    "backers": 445
+    "status": "Approved",
+    "backers": 445,
+    "ownerWallet": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "approvedBy": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "approvedAt": "2024-01-01T00:00:00Z"
   },
   {
     "id": 8,
@@ -100,8 +128,12 @@
     "raised": 45.3,
     "goal": 50,
     "daysLeft": 3,
-    "status": "Fundraising",
-    "backers": 891
+    "status": "Approved",
+    "backers": 891,
+    "ownerWallet": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "approvedBy": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "approvedAt": "2024-01-01T00:00:00Z"
   },
   {
     "id": 9,
@@ -113,8 +145,12 @@
     "raised": 22.1,
     "goal": 40,
     "daysLeft": 21,
-    "status": "Fundraising",
-    "backers": 534
+    "status": "Approved",
+    "backers": 534,
+    "ownerWallet": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "approvedBy": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "approvedAt": "2024-01-01T00:00:00Z"
   },
   {
     "id": 10,
@@ -126,8 +162,12 @@
     "raised": 31.7,
     "goal": 60,
     "daysLeft": 45,
-    "status": "Fundraising",
-    "backers": 723
+    "status": "Approved",
+    "backers": 723,
+    "ownerWallet": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "approvedBy": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "approvedAt": "2024-01-01T00:00:00Z"
   },
   {
     "id": 11,
@@ -139,8 +179,12 @@
     "raised": 52.4,
     "goal": 55,
     "daysLeft": 2,
-    "status": "Fundraising",
-    "backers": 1024
+    "status": "Approved",
+    "backers": 1024,
+    "ownerWallet": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "approvedBy": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "approvedAt": "2024-01-01T00:00:00Z"
   },
   {
     "id": 12,
@@ -152,8 +196,12 @@
     "raised": 14.6,
     "goal": 30,
     "daysLeft": 28,
-    "status": "Fundraising",
-    "backers": 389
+    "status": "Approved",
+    "backers": 389,
+    "ownerWallet": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "approvedBy": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "approvedAt": "2024-01-01T00:00:00Z"
   },
   {
     "id": 13,
@@ -165,8 +213,12 @@
     "raised": 9.3,
     "goal": 18,
     "daysLeft": 19,
-    "status": "Fundraising",
-    "backers": 267
+    "status": "Approved",
+    "backers": 267,
+    "ownerWallet": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "approvedBy": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "approvedAt": "2024-01-01T00:00:00Z"
   },
   {
     "id": 14,
@@ -178,8 +230,12 @@
     "raised": 38.9,
     "goal": 75,
     "daysLeft": 52,
-    "status": "Fundraising",
-    "backers": 856
+    "status": "Approved",
+    "backers": 856,
+    "ownerWallet": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "approvedBy": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "approvedAt": "2024-01-01T00:00:00Z"
   },
   {
     "id": 15,
@@ -191,7 +247,11 @@
     "raised": 26.4,
     "goal": 45,
     "daysLeft": 35,
-    "status": "Fundraising",
-    "backers": 678
+    "status": "Approved",
+    "backers": 678,
+    "ownerWallet": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "approvedBy": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "approvedAt": "2024-01-01T00:00:00Z"
   }
 ]

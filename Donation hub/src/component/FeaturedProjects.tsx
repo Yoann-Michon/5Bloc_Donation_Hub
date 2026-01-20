@@ -8,13 +8,12 @@ import { type Project } from '../types/project';
 const FeaturedProjects = () => {
   const navigate = useNavigate();
 
-  // Get first 3 projects
   const featuredProjects = projectsData.slice(0, 3).map((project) => {
     const p = project as Project;
-    // Determine badge based on funding status
+
     const percentage = (p.raised / p.goal) * 100;
     let badge: 'Legendary' | 'Rare' | 'Epic' | 'Common' | 'New' = 'Common';
-    let accentColor = '#10B981'; // Emerald
+    let accentColor = '#10B981';
 
     if (percentage >= 90) {
       badge = 'Legendary';
@@ -46,7 +45,7 @@ const FeaturedProjects = () => {
       component="section"
       sx={{
         bgcolor: 'background.paper',
-        py: 6,
+        py: 4,
       }}
     >
       <Container maxWidth="xl">
@@ -55,7 +54,7 @@ const FeaturedProjects = () => {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'flex-end',
-            mb: 5,
+            mb: 3,
             flexWrap: 'wrap',
             gap: 2,
           }}

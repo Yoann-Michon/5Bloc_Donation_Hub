@@ -1,7 +1,4 @@
-/**
- * Wallet Connection Modal
- * Beautiful glassmorphic modal for connecting Web3 wallets
- */
+
 
 import { useState } from 'react';
 import {
@@ -49,7 +46,6 @@ const WalletConnectionModal = ({
     const { connect, isConnecting, error, isConnected } = useWallet();
     const [selectedWallet, setSelectedWallet] = useState<WalletProvider | null>(null);
 
-    // Wallet options
     const walletOptions: WalletOption[] = [
         {
             id: 'metamask',
@@ -64,7 +60,7 @@ const WalletConnectionModal = ({
             name: 'WalletConnect',
             icon: 'https://raw.githubusercontent.com/WalletConnect/walletconnect-assets/master/Icon/Gradient/Icon.svg',
             description: 'Connect with mobile wallets',
-            isInstalled: true, // WalletConnect doesn't require installation
+            isInstalled: true,
         },
         {
             id: 'coinbase',
@@ -110,12 +106,12 @@ const WalletConnectionModal = ({
                     background: 'rgba(11, 0, 26, 0.95)',
                     backdropFilter: 'blur(20px)',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: 3,
+                    borderRadius: 2,
                     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
                 },
             }}
         >
-            {/* Header */}
+            
             <DialogTitle
                 sx={{
                     display: 'flex',
@@ -147,7 +143,7 @@ const WalletConnectionModal = ({
             <DialogContent sx={{ pt: 3, pb: 3 }}>
                 <AnimatePresence mode="wait">
                     {isConnected ? (
-                        // Success State
+
                         <motion.div
                             key="success"
                             initial={{ opacity: 0, scale: 0.9 }}
@@ -180,7 +176,7 @@ const WalletConnectionModal = ({
                             </Box>
                         </motion.div>
                     ) : isConnecting ? (
-                        // Loading State
+
                         <motion.div
                             key="loading"
                             initial={{ opacity: 0 }}
@@ -206,14 +202,14 @@ const WalletConnectionModal = ({
                             </Box>
                         </motion.div>
                     ) : (
-                        // Wallet Selection State
+
                         <motion.div
                             key="selection"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                         >
-                            {/* Info Banner */}
+                            
                             <Alert
                                 severity="info"
                                 icon={<Warning />}
@@ -227,7 +223,7 @@ const WalletConnectionModal = ({
                                 Choose a wallet to connect and start making donations
                             </Alert>
 
-                            {/* Error Message */}
+                            
                             {error && (
                                 <Alert
                                     severity="error"
@@ -241,7 +237,7 @@ const WalletConnectionModal = ({
                                 </Alert>
                             )}
 
-                            {/* Wallet Options */}
+                            
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                                 {walletOptions.map((wallet, index) => (
                                     <motion.div
@@ -270,7 +266,7 @@ const WalletConnectionModal = ({
                                                 },
                                             }}
                                         >
-                                            {/* Wallet Icon */}
+                                            
                                             <Box
                                                 component="img"
                                                 src={wallet.icon}
@@ -278,13 +274,13 @@ const WalletConnectionModal = ({
                                                 sx={{
                                                     width: 48,
                                                     height: 48,
-                                                    borderRadius: 1.5,
+                                                    borderRadius: 1,
                                                     background: 'rgba(255, 255, 255, 0.05)',
                                                     p: 1,
                                                 }}
                                             />
 
-                                            {/* Wallet Info */}
+                                            
                                             <Box sx={{ flex: 1 }}>
                                                 <Typography
                                                     variant="body1"
@@ -300,7 +296,7 @@ const WalletConnectionModal = ({
                                                 </Typography>
                                             </Box>
 
-                                            {/* Status Badge */}
+                                            
                                             {!wallet.isInstalled && wallet.downloadUrl && (
                                                 <Box
                                                     sx={{
@@ -329,7 +325,7 @@ const WalletConnectionModal = ({
 
                             <Divider sx={{ my: 3, borderColor: 'rgba(255, 255, 255, 0.08)' }} />
 
-                            {/* Footer Info */}
+                            
                             <Box sx={{ textAlign: 'center' }}>
                                 <Typography
                                     variant="caption"

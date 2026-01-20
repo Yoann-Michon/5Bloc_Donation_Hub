@@ -113,7 +113,7 @@ const BadgeGallery = () => {
     const [collectionOpen, setCollectionOpen] = useState(false);
 
     return (
-        <Box sx={{ mb: 6 }}>
+        <Box sx={{ mb: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
                 <Typography variant="h5" sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1.5, fontFamily: 'Space Grotesk, sans-serif' }}>
                     <MilitaryTech sx={{ color: 'primary.main' }} />

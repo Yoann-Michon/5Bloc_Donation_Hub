@@ -1,7 +1,4 @@
-/**
- * Enhanced Wallet Hook
- * Extends existing useWallet with additional Web3 features
- */
+
 
 import { useState, useCallback, useEffect } from 'react';
 import { getChainConfig, isChainSupported } from '../utils/chainConfig';
@@ -19,14 +16,12 @@ export interface WalletState {
 
 export type WalletProvider = 'metamask' | 'walletconnect' | 'coinbase';
 
-// DEV MODE: Set to true to simulate wallet connection without MetaMask
 const DEV_MODE = true;
 
-// Mock wallet data for development
 const MOCK_WALLET = {
     account: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
-    chainId: 1, // Ethereum Mainnet
-    balance: '0x15af1d78b58c40000', // 1.5 ETH in hex
+    chainId: 1,
+    balance: '0x15af1d78b58c40000',
 };
 
 export const useWallet = () => {
@@ -41,11 +36,9 @@ export const useWallet = () => {
         avatar: null,
     });
 
-    /**
-     * Initialize wallet and listen to events
-     */
+
     useEffect(() => {
-        // Skip MetaMask initialization in DEV_MODE
+
         if (DEV_MODE) {
             console.log('🔧 DEV MODE: Using mock wallet connection');
             return;
@@ -66,7 +59,6 @@ export const useWallet = () => {
                         isConnected: true
                     }));
 
-                    // Fetch balance
                     const balance = await window.ethereum.request({
                         method: 'eth_getBalance',
                         params: [accounts[0], 'latest'],
@@ -108,7 +100,6 @@ export const useWallet = () => {
                         isConnected: true
                     }));
 
-                    // Fetch new balance
                     window.ethereum?.request({
                         method: 'eth_getBalance',
                         params: [accounts[0], 'latest'],
@@ -151,11 +142,9 @@ export const useWallet = () => {
         }
     }, []);
 
-    /**
-     * Connect wallet with provider selection
-     */
+
     const connect = async () => {
-        // In DEV_MODE, wallet is already connected
+
         if (DEV_MODE) {
             console.log('🔧 DEV MODE: Wallet already connected');
             return;
@@ -173,19 +162,18 @@ export const useWallet = () => {
         }
 
         try {
-            // Request account access
+
             const accounts = await window.ethereum.request({
                 method: 'eth_requestAccounts',
             }) as string[];
 
             if (accounts.length > 0) {
-                // Get balance
+
                 const balance = await window.ethereum.request({
                     method: 'eth_getBalance',
                     params: [accounts[0], 'latest'],
                 }) as string;
 
-                // Get chain ID
                 const chainIdHex = await window.ethereum.request({
                     method: 'eth_chainId'
                 }) as string;
@@ -221,11 +209,9 @@ export const useWallet = () => {
         }
     };
 
-    /**
-     * Disconnect wallet
-     */
+
     const disconnect = useCallback(() => {
-        // In DEV_MODE, reset to mock wallet state
+
         if (DEV_MODE) {
             console.log('🔧 DEV MODE: Disconnect simulated (wallet remains connected)');
             return;
@@ -243,9 +229,7 @@ export const useWallet = () => {
         });
     }, []);
 
-    /**
-     * Switch to a different network
-     */
+
     const switchNetwork = async (targetChainId: number) => {
         if (!window.ethereum) {
             setState(prev => ({
@@ -265,7 +249,7 @@ export const useWallet = () => {
         }
 
         try {
-            // Try to switch to the network
+
             await window.ethereum.request({
                 method: 'wallet_switchEthereumChain',
                 params: [{ chainId: chainConfig.chainIdHex }],
@@ -277,7 +261,6 @@ export const useWallet = () => {
         } catch (switchError: unknown) {
             const error = switchError as { code?: number };
 
-            // This error code indicates that the chain has not been added to MetaMask
             if (error.code === 4902) {
                 try {
                     await window.ethereum.request({
@@ -313,23 +296,17 @@ export const useWallet = () => {
         }
     };
 
-    /**
-     * Check if current network is supported
-     */
+
     const isCurrentChainSupported = useCallback(() => {
         return state.chainId ? isChainSupported(state.chainId) : false;
     }, [state.chainId]);
 
-    /**
-     * Get current chain config
-     */
+
     const getCurrentChainConfig = useCallback(() => {
         return state.chainId ? getChainConfig(state.chainId) : null;
     }, [state.chainId]);
 
-    /**
-     * Refresh balance
-     */
+
     const refreshBalance = useCallback(async () => {
         if (!state.account || !window.ethereum) return;
 

@@ -1,8 +1,9 @@
 import { Box, Container, Card, CardContent, Typography } from '@mui/material';
 import { Payment, RocketLaunch, Groups } from '@mui/icons-material';
+import type { ReactNode } from 'react';
 
 interface StatCardProps {
-  icon: React.ReactNode;
+  icon: ReactNode;
   title: string;
   value: string;
   subtitle: string;
@@ -36,7 +37,7 @@ const StatCard = ({
             sx={{
               p: 0.75,
               bgcolor: iconBgColor || 'primary.main',
-              borderRadius: 1.5,
+              borderRadius: 1,
               color: iconColor || 'primary.main',
               display: 'flex',
               alignItems: 'center',
@@ -97,7 +98,7 @@ const Stats = () => {
       component="section"
       sx={{
         bgcolor: 'background.default',
-        py: 6,
+        py: 4,
         borderTop: '1px solid',
         borderBottom: '1px solid',
         borderColor: 'divider',

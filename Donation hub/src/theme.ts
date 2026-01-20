@@ -63,9 +63,10 @@ const theme = createTheme({
     },
   },
   shape: {
-    borderRadius: 8, // Reduced from 16 to 8 for sharper luxury look
+    borderRadius: 8,
   },
-  spacing: 8, // Default MUI spacing, but we'll use smaller multipliers
+  spacing: 8,
+  
   components: {
     MuiCssBaseline: {
       styleOverrides: {
@@ -88,8 +89,8 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 8, // Reduced from 50 for sharper look
-          padding: '8px 20px', // Reduced padding
+          borderRadius: 8,
+          padding: '8px 20px',
           textTransform: 'none',
           backdropFilter: 'blur(4px)',
         },
@@ -108,7 +109,7 @@ const theme = createTheme({
           },
         },
         sizeLarge: {
-          padding: '10px 24px', // Slightly larger but still compact
+          padding: '10px 24px',
         },
       },
     },
@@ -119,16 +120,16 @@ const theme = createTheme({
           backdropFilter: 'blur(10px)',
           border: '1px solid rgba(255, 255, 255, 0.08)',
           boxShadow: 'none',
-          borderRadius: 8, // Consistent sharp radius
+          borderRadius: 16,
         },
       },
     },
     MuiCardContent: {
       styleOverrides: {
         root: {
-          padding: '16px', // Reduced from default 16px
+          padding: '16px',
           '&:last-child': {
-            paddingBottom: '16px', // Consistent padding
+            paddingBottom: '16px',
           },
         },
       },
@@ -146,14 +147,14 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: 'none',
-          borderRadius: 8, // Consistent sharp radius
+          borderRadius: 16,
         },
       },
     },
     MuiContainer: {
       styleOverrides: {
         root: {
-          paddingLeft: '16px', // Tighter container padding
+          paddingLeft: '16px',
           paddingRight: '16px',
         },
       },

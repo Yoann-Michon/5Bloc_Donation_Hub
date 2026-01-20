@@ -4,7 +4,6 @@ import BadgeSelector from '../component/fusion/BadgeSelector';
 import FusionChamber from '../component/fusion/FusionChamber';
 import { AutoFixHigh } from '@mui/icons-material';
 
-// Mock Data
 const MOCK_BADGES = [
     { id: 1, name: 'Eco Starter', tier: 'Common', count: 5, image: 'https://cdn-icons-png.flaticon.com/512/3214/3214746.png' },
     { id: 2, name: 'Governance Novice', tier: 'Common', count: 3, image: 'https://cdn-icons-png.flaticon.com/512/2230/2230606.png' },
@@ -15,13 +14,12 @@ const MOCK_BADGES = [
 type Badge = typeof MOCK_BADGES[number];
 
 const BadgeFusion = () => {
-    // State
+
     const [selectedBadges, setSelectedBadges] = useState<Badge[]>([]);
     const [isFusing, setIsFusing] = useState(false);
 
-    // Handlers
     const handleSelect = (badge: Badge) => {
-        if (selectedBadges.length < 2) {  // Changed from 3 to 2
+        if (selectedBadges.length < 2) {
             setSelectedBadges([...selectedBadges, badge]);
         }
     };
@@ -50,13 +48,12 @@ const BadgeFusion = () => {
         }, 3000);
     };
 
-    // Logic
     const slots = [
         selectedBadges[0] || null,
         selectedBadges[1] || null,
-    ];  // Changed from 3 slots to 2 slots
+    ];
 
-    const canFuse = selectedBadges.length === 2 && selectedBadges.every(b => b.tier === selectedBadges[0].tier);  // Changed from 3 to 2
+    const canFuse = selectedBadges.length === 2 && selectedBadges.every(b => b.tier === selectedBadges[0].tier);
 
     return (
         <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -82,7 +79,7 @@ const BadgeFusion = () => {
             </Box>
 
             <Grid container spacing={4} sx={{ height: 'calc(100vh - 200px)' }}>
-                {/* Fusion Chamber (Left/Top) */}
+
                 <Grid size={{ xs: 12, lg: 7 }}>
                     <FusionChamber
                         slots={slots}
@@ -93,7 +90,7 @@ const BadgeFusion = () => {
                     />
                 </Grid>
 
-                {/* Badge Inventory (Right/Bottom) */}
+
                 <Grid size={{ xs: 12, lg: 5 }}>
                     <BadgeSelector
                         badges={MOCK_BADGES as unknown as Badge[]}

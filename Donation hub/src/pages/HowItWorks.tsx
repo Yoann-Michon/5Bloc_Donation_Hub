@@ -50,8 +50,8 @@ const HowItWorks = () => {
     ];
 
     return (
-        <Container maxWidth="lg" sx={{ py: 8 }}>
-                    <Box sx={{ textAlign: 'center', mb: 8 }}>
+        <Container maxWidth="lg" sx={{ py: 4 }}>
+                    <Box sx={{ textAlign: 'center', mb: 4 }}>
                         <Typography
                             variant="h2"
                             sx={{
@@ -70,8 +70,8 @@ const HowItWorks = () => {
                         </Typography>
                     </Box>
 
-                    <Box sx={{ mb: 12 }}>
-                        <Typography variant="h4" sx={{ fontWeight: 700, mb: 6, textAlign: 'center' }}>
+                    <Box sx={{ mb: 4 }}>
+                        <Typography variant="h4" sx={{ fontWeight: 700, mb: 3, textAlign: 'center' }}>
                             Getting Started in 4 Simple Steps
                         </Typography>
                         <Box sx={{ display: 'grid', gap: 4 }}>
@@ -82,7 +82,7 @@ const HowItWorks = () => {
                                         display: 'flex',
                                         gap: 3,
                                         p: 4,
-                                        borderRadius: 3,
+                                        borderRadius: 2,
                                         bgcolor: 'rgba(255, 255, 255, 0.03)',
                                         border: '1px solid rgba(255, 255, 255, 0.1)',
                                         transition: 'all 0.3s ease',
@@ -133,8 +133,8 @@ const HowItWorks = () => {
                         </Box>
                     </Box>
 
-                    <Box sx={{ mb: 8 }}>
-                        <Typography variant="h4" sx={{ fontWeight: 700, mb: 6, textAlign: 'center' }}>
+                    <Box sx={{ mb: 4 }}>
+                        <Typography variant="h4" sx={{ fontWeight: 700, mb: 3, textAlign: 'center' }}>
                             Platform Features
                         </Typography>
                         <Box
@@ -149,7 +149,7 @@ const HowItWorks = () => {
                                     key={index}
                                     sx={{
                                         p: 4,
-                                        borderRadius: 3,
+                                        borderRadius: 2,
                                         bgcolor: 'rgba(255, 255, 255, 0.03)',
                                         border: '1px solid rgba(255, 255, 255, 0.1)',
                                         transition: 'all 0.3s ease',
@@ -173,8 +173,8 @@ const HowItWorks = () => {
                     <Box
                         sx={{
                             textAlign: 'center',
-                            p: 6,
-                            borderRadius: 3,
+                            p: 3,
+                            borderRadius: 2,
                             bgcolor: 'rgba(82, 39, 255, 0.1)',
                             border: '1px solid rgba(82, 39, 255, 0.3)',
                         }}

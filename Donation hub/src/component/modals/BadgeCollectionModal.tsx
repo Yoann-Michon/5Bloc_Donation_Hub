@@ -9,7 +9,7 @@ interface Badge {
     image: string;
     description?: string;
     unlocked: boolean;
-    progress?: number; // For locked badges, show progress towards unlocking
+    progress?: number;
 }
 
 interface BadgeCollectionModalProps {
@@ -47,7 +47,7 @@ const BadgeCollectionModal = ({ open, onClose, badges }: BadgeCollectionModalPro
                     bgcolor: 'rgba(11, 0, 26, 0.95)',
                     backdropFilter: 'blur(20px)',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: 3,
+                    borderRadius: 2,
                 },
             }}
         >
@@ -90,21 +90,21 @@ const BadgeCollectionModal = ({ open, onClose, badges }: BadgeCollectionModalPro
             </DialogTitle>
 
             <DialogContent sx={{ p: 4 }}>
-                {/* Unlocked Badges Section */}
+                
                 {unlockedBadges.length > 0 && (
-                    <Box sx={{ mb: 6 }}>
+                    <Box sx={{ mb: 3 }}>
                         <Typography variant="h6" sx={{ fontWeight: 700, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
                             <EmojiEvents sx={{ color: 'primary.main' }} />
                             Unlocked Badges ({unlockedBadges.length})
                         </Typography>
                         <Grid container spacing={3}>
                             {unlockedBadges.map((badge) => (
-                                <Grid item xs={12} sm={6} md={4} key={badge.id}>
+                                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={badge.id}>
                                     <Card
                                         sx={{
                                             bgcolor: 'rgba(255, 255, 255, 0.03)',
                                             border: '1px solid rgba(255, 255, 255, 0.1)',
-                                            borderRadius: 3,
+                                            borderRadius: 2,
                                             transition: 'all 0.3s ease',
                                             position: 'relative',
                                             overflow: 'hidden',
@@ -115,7 +115,7 @@ const BadgeCollectionModal = ({ open, onClose, badges }: BadgeCollectionModalPro
                                             },
                                         }}
                                     >
-                                        {/* Tier Gradient Overlay */}
+                                        
                                         <Box
                                             sx={{
                                                 position: 'absolute',
@@ -129,7 +129,7 @@ const BadgeCollectionModal = ({ open, onClose, badges }: BadgeCollectionModalPro
 
                                         <CardContent sx={{ p: 3 }}>
                                             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                                                {/* Badge Image */}
+                                                
                                                 <Box
                                                     sx={{
                                                         width: 80,
@@ -149,7 +149,7 @@ const BadgeCollectionModal = ({ open, onClose, badges }: BadgeCollectionModalPro
                                                         alt={badge.name}
                                                         sx={{ width: 60, height: 60, objectFit: 'contain' }}
                                                     />
-                                                    {/* Count Badge */}
+                                                    
                                                     {badge.count > 1 && (
                                                         <Box
                                                             sx={{
@@ -173,7 +173,7 @@ const BadgeCollectionModal = ({ open, onClose, badges }: BadgeCollectionModalPro
                                                     )}
                                                 </Box>
 
-                                                {/* Badge Info */}
+                                                
                                                 <Box sx={{ textAlign: 'center', width: '100%' }}>
                                                     <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
                                                         {badge.name}
@@ -204,7 +204,7 @@ const BadgeCollectionModal = ({ open, onClose, badges }: BadgeCollectionModalPro
                     </Box>
                 )}
 
-                {/* Locked Badges Section */}
+                
                 {lockedBadges.length > 0 && (
                     <Box>
                         <Typography variant="h6" sx={{ fontWeight: 700, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -213,12 +213,12 @@ const BadgeCollectionModal = ({ open, onClose, badges }: BadgeCollectionModalPro
                         </Typography>
                         <Grid container spacing={3}>
                             {lockedBadges.map((badge) => (
-                                <Grid item xs={12} sm={6} md={4} key={badge.id}>
+                                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={badge.id}>
                                     <Card
                                         sx={{
                                             bgcolor: 'rgba(255, 255, 255, 0.02)',
                                             border: '1px solid rgba(255, 255, 255, 0.05)',
-                                            borderRadius: 3,
+                                            borderRadius: 2,
                                             opacity: 0.6,
                                             position: 'relative',
                                             overflow: 'hidden',
@@ -226,7 +226,7 @@ const BadgeCollectionModal = ({ open, onClose, badges }: BadgeCollectionModalPro
                                     >
                                         <CardContent sx={{ p: 3 }}>
                                             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                                                {/* Locked Badge Image */}
+                                                
                                                 <Box
                                                     sx={{
                                                         width: 80,
@@ -255,7 +255,7 @@ const BadgeCollectionModal = ({ open, onClose, badges }: BadgeCollectionModalPro
                                                     />
                                                 </Box>
 
-                                                {/* Badge Info */}
+                                                
                                                 <Box sx={{ textAlign: 'center', width: '100%' }}>
                                                     <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, color: 'text.secondary' }}>
                                                         {badge.name}
@@ -276,7 +276,7 @@ const BadgeCollectionModal = ({ open, onClose, badges }: BadgeCollectionModalPro
                                                             {badge.description}
                                                         </Typography>
                                                     )}
-                                                    {/* Progress Bar */}
+                                                    
                                                     {badge.progress !== undefined && (
                                                         <Box sx={{ mt: 2 }}>
                                                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
@@ -292,7 +292,7 @@ const BadgeCollectionModal = ({ open, onClose, badges }: BadgeCollectionModalPro
                                                                 value={badge.progress}
                                                                 sx={{
                                                                     height: 6,
-                                                                    borderRadius: 3,
+                                                                    borderRadius: 2,
                                                                     bgcolor: 'rgba(255, 255, 255, 0.05)',
                                                                     '& .MuiLinearProgress-bar': {
                                                                         bgcolor: 'text.secondary',
@@ -311,9 +311,9 @@ const BadgeCollectionModal = ({ open, onClose, badges }: BadgeCollectionModalPro
                     </Box>
                 )}
 
-                {/* Empty State */}
+                
                 {badges.length === 0 && (
-                    <Box sx={{ textAlign: 'center', py: 8 }}>
+                    <Box sx={{ textAlign: 'center', py: 4 }}>
                         <EmojiEvents sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
                         <Typography variant="h6" sx={{ color: 'text.secondary', mb: 1 }}>
                             No Badges Yet

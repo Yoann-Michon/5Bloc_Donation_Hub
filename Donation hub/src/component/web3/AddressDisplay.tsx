@@ -1,7 +1,4 @@
-/**
- * Address Display Component
- * Displays Ethereum address with ENS support and copy functionality
- */
+
 
 import { useState } from 'react';
 import { Box, Typography, Tooltip, IconButton, Chip, Avatar } from '@mui/material';
@@ -49,7 +46,6 @@ const AddressDisplay = ({
 
     const displayText = ensName || formatAddress(address, chars);
 
-    // Chip variant
     if (variant === 'chip') {
         return (
             <Chip
@@ -94,7 +90,6 @@ const AddressDisplay = ({
         );
     }
 
-    // Inline variant
     if (variant === 'inline') {
         return (
             <Box
@@ -142,7 +137,6 @@ const AddressDisplay = ({
         );
     }
 
-    // Default variant
     return (
         <Box
             component={motion.div}
@@ -159,7 +153,7 @@ const AddressDisplay = ({
                 borderRadius: 2,
             }}
         >
-            {/* Avatar */}
+            
             {showAvatar && (
                 <Avatar
                     src={avatar || undefined}
@@ -175,7 +169,7 @@ const AddressDisplay = ({
                 </Avatar>
             )}
 
-            {/* Address/ENS */}
+            
             <Box>
                 {isLoading ? (
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>
@@ -209,7 +203,7 @@ const AddressDisplay = ({
                 )}
             </Box>
 
-            {/* Actions */}
+            
             <Box sx={{ display: 'flex', gap: 0.5, ml: 'auto' }}>
                 {showCopy && (
                     <Tooltip title={copied ? 'Copied!' : 'Copy address'}>

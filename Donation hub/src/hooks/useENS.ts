@@ -1,7 +1,4 @@
-/**
- * ENS Hook
- * Resolves ENS names and avatars for Ethereum addresses
- */
+
 
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
@@ -13,9 +10,6 @@ interface ENSData {
     error: string | null;
 }
 
-/**
- * Hook to resolve ENS name and avatar for an address
- */
 export const useENS = (address: string | null, chainId: number | null): ENSData => {
     const [data, setData] = useState<ENSData>({
         name: null,
@@ -34,15 +28,14 @@ export const useENS = (address: string | null, chainId: number | null): ENSData 
             setData(prev => ({ ...prev, isLoading: true, error: null }));
 
             try {
-                // Use Ethers default provider for ENS lookups
+
                 const provider = new ethers.JsonRpcProvider('https://eth.llamarpc.com');
 
-                // Resolve ENS name
                 const ensName = await provider.lookupAddress(address);
 
                 let avatar = null;
                 if (ensName) {
-                    // Resolve avatar if ENS name exists
+
                     const resolver = await provider.getResolver(ensName);
                     if (resolver) {
                         avatar = await resolver.getAvatar();

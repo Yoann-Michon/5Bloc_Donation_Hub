@@ -14,7 +14,7 @@ const ProjectTimeline = () => {
                 bgcolor: 'rgba(255, 255, 255, 0.03)',
                 backdropFilter: 'blur(12px)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: 3,
+                borderRadius: 2,
                 mt: 4,
             }}
         >
@@ -22,7 +22,7 @@ const ProjectTimeline = () => {
                 Smart Contract Timeline
             </Typography>
 
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 5, pl: 3, borderLeft: '2px solid rgba(255, 255, 255, 0.1)', position: 'relative' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pl: 3, borderLeft: '2px solid rgba(255, 255, 255, 0.1)', position: 'relative' }}>
                 {milestones.map((milestone, index) => (
                     <Box key={index} sx={{ position: 'relative', opacity: milestone.status === 'Locked' ? 0.6 : 1 }}>
                         <Box

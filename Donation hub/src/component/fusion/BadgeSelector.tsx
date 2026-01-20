@@ -29,7 +29,7 @@ const BadgeSelector = ({ badges, selectedBadges, onSelect, onDeselect }: BadgeSe
             sx={{
                 bgcolor: 'rgba(25, 24, 45, 0.6)',
                 backdropFilter: 'blur(12px)',
-                borderRadius: 3,
+                borderRadius: 2,
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 p: 3,
                 height: '100%',

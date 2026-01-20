@@ -49,15 +49,14 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
     }
 
     try {
-      // Convert amount to Wei (1 ETH = 10^18 Wei)
+
       const amountInWei = (parseFloat(amount) * 1e18).toString(16);
 
-      // Send transaction
       const transactionHash = await window.ethereum.request({
         method: 'eth_sendTransaction',
         params: [{
           from: account,
-          to: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb', // Example address - replace with actual project wallet
+          to: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
           value: '0x' + amountInWei,
         }],
       }) as string;
@@ -79,17 +78,15 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
     }
   }, [account, amount, showToast]);
 
-  // Sync wallet error to modal error if step is connecting
   useEffect(() => {
     if (walletError && step === 'connecting') {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+
       setModalError(walletError);
       setStep('error');
       showToast(walletError, 'error');
     }
   }, [walletError, step, showToast]);
 
-  // Handle connection success
   useEffect(() => {
     if (isConnected && step === 'connecting') {
       const timer = setTimeout(() => {
@@ -115,7 +112,7 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
     if (!isConnected) {
       setStep('connecting');
       await connect();
-      // logic continues in useEffect upon connection
+
     } else {
       setStep('confirming');
       await proceedToDonation();
@@ -136,7 +133,7 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
         return (
           <>
             <DialogContent>
-              {/* Project Info */}
+              
               <Box
                 sx={{
                   display: 'flex',
@@ -177,7 +174,7 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
                 </Alert>
               )}
 
-              {/* Amount Input */}
+              
               <Typography variant="body2" sx={{ fontWeight: 600, mb: 1.5 }}>
                 Enter donation amount (ETH)
               </Typography>
@@ -200,7 +197,7 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
                 }}
               />
 
-              {/* Quick Amount Buttons */}
+              
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
                 {quickAmounts.map((quickAmount) => (
                   <Button
@@ -227,7 +224,7 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
 
               <Divider sx={{ my: 2 }} />
 
-              {/* Fee Info */}
+              
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                   Your donation
@@ -296,7 +293,7 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
             {txHash ? (
               <TransactionStatusIndicator
                 txHash={txHash}
-                chainId={1} // Assuming mainnet for now, or use chainId from hook
+                chainId={1}
                 onSuccess={() => setStep('success')}
                 onError={() => {
                   setStep('error');

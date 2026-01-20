@@ -41,7 +41,7 @@ const ProjectView = () => {
 
   if (!project) {
     return (
-      <Container maxWidth="lg" sx={{ py: 8, textAlign: 'center' }}>
+      <Container maxWidth="lg" sx={{ py: 4, textAlign: 'center' }}>
         <Typography variant="h4" sx={{ mb: 2 }}>
           Project not found
         </Typography>

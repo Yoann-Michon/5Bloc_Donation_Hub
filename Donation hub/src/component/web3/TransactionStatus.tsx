@@ -1,8 +1,3 @@
-/**
- * Transaction Status Component
- * Visual feedback for transaction states with animations
- */
-
 import { Box, Typography, CircularProgress, Alert, Button, Collapse } from '@mui/material';
 import {
     CheckCircle,
@@ -11,7 +6,7 @@ import {
     OpenInNew,
     ContentCopy,
 } from '@mui/icons-material';
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
 import {
@@ -43,8 +38,7 @@ const TransactionStatusIndicator = ({
     const [showFullHash, setShowFullHash] = useState(false);
     const [hashCopied, setHashCopied] = useState(false);
 
-    // Trigger confetti on success
-    React.useEffect(() => {
+    useEffect(() => {
         if (transaction?.status === 'confirmed' && onSuccess) {
             confetti({
                 particleCount: 100,
@@ -144,7 +138,7 @@ const TransactionStatusIndicator = ({
                         py: 3,
                     }}
                 >
-                    {/* Status Icon */}
+                    
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2 }}>
                         <motion.div
                             animate={{
@@ -163,7 +157,7 @@ const TransactionStatusIndicator = ({
                         </motion.div>
                     </Box>
 
-                    {/* Status Text */}
+                    
                     <Typography
                         variant="h6"
                         sx={{
@@ -185,7 +179,7 @@ const TransactionStatusIndicator = ({
                         {config.message}
                     </Typography>
 
-                    {/* Transaction Details */}
+                    
                     {showDetails && (
                         <Collapse in={showDetails}>
                             <Box
@@ -197,7 +191,7 @@ const TransactionStatusIndicator = ({
                                     borderRadius: 2,
                                 }}
                             >
-                                {/* Transaction Hash */}
+                                
                                 <Box sx={{ mb: 2 }}>
                                     <Typography
                                         variant="caption"
@@ -231,7 +225,7 @@ const TransactionStatusIndicator = ({
                                     </Box>
                                 </Box>
 
-                                {/* Block Number */}
+                                
                                 {transaction?.blockNumber && (
                                     <Box sx={{ mb: 2 }}>
                                         <Typography
@@ -246,7 +240,7 @@ const TransactionStatusIndicator = ({
                                     </Box>
                                 )}
 
-                                {/* Gas Used */}
+                                
                                 {transaction?.gasUsed && (
                                     <Box sx={{ mb: 2 }}>
                                         <Typography
@@ -261,7 +255,7 @@ const TransactionStatusIndicator = ({
                                     </Box>
                                 )}
 
-                                {/* Confirmations */}
+                                
                                 {transaction?.confirmations !== undefined && (
                                     <Box sx={{ mb: 2 }}>
                                         <Typography
@@ -285,7 +279,7 @@ const TransactionStatusIndicator = ({
                                     </Box>
                                 )}
 
-                                {/* View on Explorer */}
+                                
                                 <Button
                                     variant="outlined"
                                     size="small"

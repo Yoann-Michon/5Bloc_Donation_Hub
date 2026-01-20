@@ -20,7 +20,7 @@ const Hero = () => {
             alignItems: 'center',
           }}
         >
-          {/* Text Content */}
+          
           <Box sx={{ order: { xs: 2, md: 1 } }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -67,7 +67,7 @@ const Hero = () => {
                     minWidth: 140,
                     height: 48,
                     fontSize: '1rem',
-                    borderRadius: 1.5,
+                    borderRadius: 1,
                   }}
                 >
                   Explore Projects
@@ -114,7 +114,7 @@ const Hero = () => {
             </Box>
           </Box>
 
-          {/* Hero Image */}
+          
           <Box sx={{ order: { xs: 1, md: 2 } }}>
             <Box
               sx={{

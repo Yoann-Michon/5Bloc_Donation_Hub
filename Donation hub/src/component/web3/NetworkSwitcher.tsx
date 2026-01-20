@@ -1,9 +1,4 @@
-/**
- * Network Switcher Component
- * Displays current network and allows switching between supported chains
- */
-
-import { useState } from 'react';
+import { useState, type MouseEvent } from 'react';
 import {
     Box,
     Typography,
@@ -45,7 +40,7 @@ const NetworkSwitcher = ({
     const isWrongNetwork = requiredChainId && chainId !== requiredChainId;
     const isUnsupported = chainId && !isCurrentChainSupported();
 
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    const handleClick = (event: MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
 
@@ -63,7 +58,6 @@ const NetworkSwitcher = ({
         }
     };
 
-    // Compact indicator variant (for navbar)
     if (variant === 'compact') {
         return (
             <>
@@ -104,7 +98,6 @@ const NetworkSwitcher = ({
         );
     }
 
-    // Button variant
     if (variant === 'button') {
         return (
             <>
@@ -143,10 +136,9 @@ const NetworkSwitcher = ({
         );
     }
 
-    // Default card variant
     return (
         <Box>
-            {/* Network Display Card */}
+            
             <Box
                 onClick={handleClick}
                 sx={{
@@ -156,8 +148,8 @@ const NetworkSwitcher = ({
                     p: 2,
                     background: 'rgba(255, 255, 255, 0.03)',
                     border: `1px solid ${isUnsupported || isWrongNetwork
-                            ? 'rgba(255, 46, 84, 0.5)'
-                            : 'rgba(255, 255, 255, 0.08)'
+                        ? 'rgba(255, 46, 84, 0.5)'
+                        : 'rgba(255, 255, 255, 0.08)'
                         }`,
                     borderRadius: 2,
                     cursor: 'pointer',
@@ -169,7 +161,7 @@ const NetworkSwitcher = ({
                 }}
             >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    {/* Status Indicator */}
+                    
                     <Box
                         sx={{
                             width: 40,
@@ -188,7 +180,7 @@ const NetworkSwitcher = ({
                         )}
                     </Box>
 
-                    {/* Network Info */}
+                    
                     <Box>
                         <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.5 }}>
                             Current Network
@@ -202,7 +194,7 @@ const NetworkSwitcher = ({
                 <ExpandMore sx={{ color: 'text.secondary' }} />
             </Box>
 
-            {/* Wrong Network Warning */}
+            
             <AnimatePresence>
                 {showWarning && isWrongNetwork && (
                     <motion.div
@@ -253,7 +245,7 @@ const NetworkSwitcher = ({
                 )}
             </AnimatePresence>
 
-            {/* Network Menu */}
+            
             <NetworkMenu
                 anchorEl={anchorEl}
                 open={open}
@@ -266,7 +258,6 @@ const NetworkSwitcher = ({
     );
 };
 
-// Network Selection Menu
 interface NetworkMenuProps {
     anchorEl: null | HTMLElement;
     open: boolean;
@@ -304,7 +295,7 @@ const NetworkMenu = ({
                 },
             }}
         >
-            {/* Mainnets */}
+            
             <Box sx={{ px: 2, py: 1 }}>
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
                     MAINNETS
@@ -335,40 +326,38 @@ const NetworkMenu = ({
                 </MenuItem>
             ))}
 
-            {/* Testnets */}
+            
             {testnets.length > 0 && (
-                <>
-                    <Box sx={{ px: 2, py: 1, mt: 1 }}>
-                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                            TESTNETS
-                        </Typography>
-                    </Box>
-                    {testnets.map((chain) => (
-                        <MenuItem
-                            key={chain.chainId}
-                            onClick={() => onSwitchNetwork(chain.chainId)}
-                            disabled={isSwitching}
-                            sx={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                py: 1.5,
-                                px: 2,
-                                '&:hover': {
-                                    bgcolor: 'rgba(82, 39, 255, 0.1)',
-                                },
-                            }}
-                        >
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                <Circle sx={{ fontSize: 10, color: chain.color }} />
-                                <Typography variant="body2">{chain.displayName}</Typography>
-                            </Box>
-                            {currentChainId === chain.chainId && (
-                                <CheckCircle sx={{ fontSize: 18, color: 'success.main' }} />
-                            )}
-                        </MenuItem>
-                    ))}
-                </>
+                <Box sx={{ px: 2, py: 1, mt: 1 }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                        TESTNETS
+                    </Typography>
+                </Box>
             )}
+            {testnets.length > 0 && testnets.map((chain) => (
+                <MenuItem
+                    key={chain.chainId}
+                    onClick={() => onSwitchNetwork(chain.chainId)}
+                    disabled={isSwitching}
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        py: 1.5,
+                        px: 2,
+                        '&:hover': {
+                            bgcolor: 'rgba(82, 39, 255, 0.1)',
+                        },
+                    }}
+                >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <Circle sx={{ fontSize: 10, color: chain.color }} />
+                        <Typography variant="body2">{chain.displayName}</Typography>
+                    </Box>
+                    {currentChainId === chain.chainId && (
+                        <CheckCircle sx={{ fontSize: 18, color: 'success.main' }} />
+                    )}
+                </MenuItem>
+            ))}
         </Menu>
     );
 };

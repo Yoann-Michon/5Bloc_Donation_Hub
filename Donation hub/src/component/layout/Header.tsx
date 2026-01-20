@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type MouseEvent } from 'react';
 import {
   Box,
   Button,
@@ -23,7 +23,7 @@ const Header = () => {
 
   const { isConnected, account, chainId, disconnect, balance } = useWallet();
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+  const handleMenuOpen = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -72,7 +72,7 @@ const Header = () => {
               px: 3,
               textTransform: 'none',
               fontSize: '0.875rem',
-              borderRadius: 1.5,
+              borderRadius: 1,
             }}
           >
             Connect Wallet
@@ -85,7 +85,7 @@ const Header = () => {
               alignItems: 'center',
               gap: 1,
               bgcolor: 'rgba(255,255,255,0.05)',
-              borderRadius: 12.5,
+              borderRadius: 2,
               pl: 0.5,
               pr: 2,
               py: 0.5,
@@ -108,7 +108,7 @@ const Header = () => {
           </Box>
         )}
 
-        {/* Wallet Dropdown Menu */}
+        
         <Menu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
@@ -125,7 +125,7 @@ const Header = () => {
             },
           }}
         >
-          {/* Balance Display */}
+          
           <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
             <Typography variant="caption" sx={{ color: 'text.secondary' }}>
               Balance
@@ -135,7 +135,7 @@ const Header = () => {
             </Typography>
           </Box>
 
-          {/* Menu Items */}
+          
           <MenuItem
             component={Link}
             to="/dashboard"
@@ -152,7 +152,7 @@ const Header = () => {
         </Menu>
       </Box>
 
-      {/* Wallet Connection Modal */}
+      
       <WalletConnectionModal
         open={walletModalOpen}
         onClose={() => setWalletModalOpen(false)}

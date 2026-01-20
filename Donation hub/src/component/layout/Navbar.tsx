@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type MouseEvent } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -22,20 +22,18 @@ import AddressDisplay from '../web3/AddressDisplay';
 import NetworkSwitcher from '../web3/NetworkSwitcher';
 import { Menu, MenuItem } from '@mui/material';
 
-
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [walletModalOpen, setWalletModalOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  // Web3 Hook
   const { isConnected, account, chainId, disconnect, balance } = useWallet();
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
   };
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+  const handleMenuOpen = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -118,7 +116,7 @@ const Navbar = () => {
       <AppBar position="sticky" color="inherit" elevation={0} sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <Container maxWidth="xl">
           <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
-            {/* Logo */}
+            
             <Link to="/" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '12px' }}>
               <Box sx={{ width: 32, height: 32, color: 'primary.main' }}>
                 <svg className="w-full h-full" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
@@ -136,7 +134,7 @@ const Navbar = () => {
               </GradientText>
             </Link>
 
-            {/* Desktop Menu */}
+            
             <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 4 }}>
               <Box component="nav" sx={{ display: 'flex', gap: 4 }}>
                 {navItems.map((item) => (
@@ -156,7 +154,7 @@ const Navbar = () => {
                 ))}
               </Box>
 
-              {/* Web3 Section */}
+              
               {!isConnected ? (
                 <Button
                   variant="contained"
@@ -177,7 +175,7 @@ const Navbar = () => {
                       alignItems: 'center',
                       gap: 1,
                       bgcolor: 'rgba(255,255,255,0.05)',
-                      borderRadius: 10,
+                      borderRadius: 2,
                       pl: 0.5,
                       pr: 2,
                       py: 0.5,
@@ -228,7 +226,7 @@ const Navbar = () => {
               )}
             </Box>
 
-            {/* Mobile Menu Icon */}
+            
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -242,14 +240,14 @@ const Navbar = () => {
         </Container>
       </AppBar>
 
-      {/* Wallet Connection Modal */}
+      
       <WalletConnectionModal
         open={walletModalOpen}
         onClose={() => setWalletModalOpen(false)}
         onConnect={() => setWalletModalOpen(false)}
       />
 
-      {/* Mobile Drawer */}
+      
       <Box component="nav">
         <Drawer
           variant="temporary"

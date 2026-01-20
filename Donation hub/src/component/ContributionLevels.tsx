@@ -1,9 +1,10 @@
 import { Box, Container, Typography, Card, Divider } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { Verified, Shield, EmojiEvents, Diamond } from '@mui/icons-material';
+import type { ReactNode } from 'react';
 
 interface LevelCardProps {
-  icon: React.ReactNode;
+  icon: ReactNode;
   title: string;
   tier: string;
   benefits: string[];
@@ -163,11 +164,11 @@ const ContributionLevels = () => {
       component="section"
       sx={{
         bgcolor: 'background.paper',
-        py: 6,
+        py: 4,
       }}
     >
       <Container maxWidth="xl">
-        <Box sx={{ textAlign: 'center', mb: 5 }}>
+        <Box sx={{ textAlign: 'center', mb: 3 }}>
           <Typography
             variant="h2"
             sx={{

@@ -8,7 +8,7 @@ const Footer = () => {
       sx={{
         bgcolor: '#111118',
         color: 'white',
-        py: 8,
+        py: 4,
         borderTop: '1px solid #2d2c4e',
       }}
     >
@@ -17,11 +17,11 @@ const Footer = () => {
           sx={{
             display: 'grid',
             gridTemplateColumns: { xs: '1fr', md: '2fr 1fr 1fr 2fr' },
-            gap: 6,
-            mb: 6,
+            gap: 3,
+            mb: 3,
           }}
         >
-          {/* Brand Column */}
+          
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
               <Box
@@ -65,7 +65,7 @@ const Footer = () => {
             </Typography>
           </Box>
 
-          {/* Platform Column */}
+          
           <Box>
             <Typography
               variant="subtitle1"
@@ -151,7 +151,7 @@ const Footer = () => {
             </Box>
           </Box>
 
-          {/* Governance Column */}
+          
           <Box>
             <Typography
               variant="subtitle1"
@@ -194,7 +194,7 @@ const Footer = () => {
             </Box>
           </Box>
 
-          {/* Connect Column */}
+          
           <Box>
             <Typography
               variant="subtitle1"
@@ -253,7 +253,7 @@ const Footer = () => {
           </Box>
         </Box>
 
-        {/* Bottom Bar */}
+        
         <Box
           sx={{
             borderTop: '1px solid #374151',

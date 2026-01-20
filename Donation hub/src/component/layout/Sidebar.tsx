@@ -5,19 +5,26 @@ import {
     Logout,
     AutoFixHigh,
     Lock,
+    AdminPanelSettings,
+    FolderOpen,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useWallet } from '../../hooks/useWallet';
+import { useRole } from '../../context/RoleContext';
+import { type ReactNode } from 'react';
 
 const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { account, balance, disconnect, isConnected } = useWallet();
+    const { isAdmin, isAssociation } = useRole();
 
     const navItems = [
-        { label: 'Dashboard', icon: <Dashboard />, path: '/dashboard', protected: true },
-        { label: 'Explore', icon: <Explore />, path: '/dashboard/projects', protected: false },
-        { label: 'Badge Fusion', icon: <AutoFixHigh />, path: '/dashboard/fusion', protected: true },
+        { label: 'Dashboard', icon: <Dashboard />, path: '/dashboard', protected: true, roles: ['all'] },
+        ...(isAdmin ? [{ label: 'Admin', icon: <AdminPanelSettings />, path: '/admin', protected: true, roles: ['admin'] }] : []),
+        ...(isAdmin || isAssociation ? [{ label: 'My Projects', icon: <FolderOpen />, path: '/my-projects', protected: true, roles: ['admin', 'association'] }] : []),
+        { label: 'Explore', icon: <Explore />, path: '/dashboard/projects', protected: false, roles: ['all'] },
+        { label: 'Badge Fusion', icon: <AutoFixHigh />, path: '/dashboard/fusion', protected: true, roles: ['all'] },
     ];
 
     const NavButton = ({
@@ -25,7 +32,7 @@ const Sidebar = () => {
     }: {
         item: {
             label: string;
-            icon: React.ReactNode;
+            icon: ReactNode;
             path: string;
             protected: boolean;
         }
@@ -89,7 +96,6 @@ const Sidebar = () => {
             </Button>
         );
 
-        // Wrap with tooltip if locked
         if (isLocked) {
             return (
                 <Tooltip
@@ -109,11 +115,11 @@ const Sidebar = () => {
         <Box
             component="aside"
             sx={{
-                width: 280, // Fixed width 280px (was 288px)
+                width: 280,
                 display: { xs: 'none', lg: 'flex' },
                 flexDirection: 'column',
                 m: 2,
-                borderRadius: 3,
+                borderRadius: 2,
                 bgcolor: 'rgba(25, 24, 45, 0.6)',
                 backdropFilter: 'blur(12px)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -124,7 +130,7 @@ const Sidebar = () => {
                 top: 0,
             }}
         >
-            {/* Logo - Clickable, redirects to Dashboard */}
+
             <Box
                 onClick={() => navigate('/dashboard')}
                 sx={{
@@ -161,7 +167,7 @@ const Sidebar = () => {
                 </Typography>
             </Box>
 
-            {/* Navigation - Cleaned up, removed placeholders and Community section */}
+
             <Box sx={{ flex: 1, px: 2, py: 3, overflowY: 'auto' }}>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                     {navItems.map((item) => (
@@ -170,7 +176,7 @@ const Sidebar = () => {
                 </Box>
             </Box>
 
-            {/* User Profile */}
+
             <Box sx={{ p: 2, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
                 <Box
                     sx={{

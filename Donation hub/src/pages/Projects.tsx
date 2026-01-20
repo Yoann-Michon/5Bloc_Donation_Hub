@@ -7,7 +7,6 @@ import ProjectStats from '../component/project/ProjectStats';
 import HorizontalFilterBar from '../component/project/HorizontalFilterBar';
 import VortexProjectCard from '../component/project/VortexProjectCard';
 
-
 const categories = ['Education', 'Environment', 'Health', 'DeFi', 'Gaming', 'Infrastructure'];
 
 const Projects = () => {
@@ -16,22 +15,18 @@ const Projects = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [isLoading, setIsLoading] = useState(true);
 
-  // Simulate loading
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 800);
     return () => clearTimeout(timer);
   }, []);
 
-  // Filter and sort projects
   const filteredProjects = useMemo(() => {
     let filtered = (projectsData as unknown as Project[]);
 
-    // Category filter
     if (selectedCategory !== 'All') {
       filtered = filtered.filter(p => p.category === selectedCategory);
     }
 
-    // Sort
     switch (sortBy) {
       case 'newest':
         filtered = [...filtered].reverse();
@@ -40,7 +35,7 @@ const Projects = () => {
         filtered = [...filtered].sort((a, b) => (b.raised / b.goal) - (a.raised / a.goal));
         break;
       default:
-        // relevant - keep original order
+
         break;
     }
 
@@ -124,7 +119,7 @@ const Projects = () => {
         <Box
           sx={{
             textAlign: 'center',
-            py: 8,
+            py: 4,
           }}
         >
           <Typography variant="h6" sx={{ color: 'text.secondary', mb: 1 }}>

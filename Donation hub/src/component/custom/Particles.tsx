@@ -36,7 +36,7 @@ const hexToRgb = (hex: string): [number, number, number] => {
     return [r, g, b];
 };
 
-const vertex = /* glsl */ `
+const vertex =  `
   attribute vec3 position;
   attribute vec4 random;
   attribute vec3 color;
@@ -76,7 +76,7 @@ const vertex = /* glsl */ `
   }
 `;
 
-const fragment = /* glsl */ `
+const fragment =  `
   precision highp float;
   
   uniform float uTime;
@@ -238,7 +238,7 @@ const Particles: React.FC<ParticlesProps> = ({
                 container.removeChild(gl.canvas);
             }
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, [
         particleCount,
         particleSpread,

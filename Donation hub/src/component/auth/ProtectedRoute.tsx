@@ -8,11 +8,6 @@ interface ProtectedRouteProps {
     children: ReactNode;
 }
 
-/**
- * ProtectedRoute Component
- * Redirects to home if user is not connected
- * Opens WalletConnectionModal automatically
- */
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     const { isConnected } = useWallet();
     const [showModal, setShowModal] = useState(false);

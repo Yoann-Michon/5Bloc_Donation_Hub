@@ -7,20 +7,17 @@ const stats = [
         value: '42.5 ETH',
         change: '+12%',
         isPositive: true,
-        gradient: 'linear-gradient(to right, #5227FF, transparent)', // Primary
     },
     {
         label: 'Impacted Projects',
         value: '128',
         change: '+5',
         isPositive: true,
-        gradient: 'linear-gradient(to right, #00ff88, transparent)', // Emerald
     },
     {
         label: 'Gas Offset',
         value: '0.85 ETH',
         subtext: 'L2 Optimized',
-        gradient: 'linear-gradient(to right, rgba(255, 255, 255, 0.2), transparent)', // White
     },
 ];
 
@@ -64,18 +61,6 @@ const DashboardStats = () => {
                                 </Typography>
                             )}
                         </Box>
-
-                        <Box
-                            sx={{
-                                position: 'absolute',
-                                bottom: 0,
-                                left: 0,
-                                width: '100%',
-                                height: 4,
-                                background: stat.gradient,
-                                opacity: 0.3,
-                            }}
-                        />
                     </Box>
                 </Grid>
             ))}

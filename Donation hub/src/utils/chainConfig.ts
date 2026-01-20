@@ -1,7 +1,4 @@
-/**
- * Chain Configuration
- * Network definitions and utilities for multi-chain support
- */
+
 
 export interface ChainConfig {
     chainId: number;
@@ -113,54 +110,33 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
     },
 };
 
-/**
- * Get chain configuration by chain ID
- */
 export const getChainConfig = (chainId: number | string): ChainConfig | null => {
     const id = typeof chainId === 'string' ? parseInt(chainId, 16) : chainId;
     return SUPPORTED_CHAINS[id] || null;
 };
 
-/**
- * Get chain display name
- */
 export const getChainName = (chainId: number | string): string => {
     const config = getChainConfig(chainId);
     return config?.displayName || 'Unknown Network';
 };
 
-/**
- * Check if chain is supported
- */
 export const isChainSupported = (chainId: number | string): boolean => {
     const id = typeof chainId === 'string' ? parseInt(chainId, 16) : chainId;
     return id in SUPPORTED_CHAINS;
 };
 
-/**
- * Get testnet chains
- */
 export const getTestnetChains = (): ChainConfig[] => {
     return Object.values(SUPPORTED_CHAINS).filter(chain => chain.isTestnet);
 };
 
-/**
- * Get mainnet chains
- */
 export const getMainnetChains = (): ChainConfig[] => {
     return Object.values(SUPPORTED_CHAINS).filter(chain => !chain.isTestnet);
 };
 
-/**
- * Convert chain ID to hex format
- */
 export const chainIdToHex = (chainId: number): string => {
     return `0x${chainId.toString(16)}`;
 };
 
-/**
- * Convert hex chain ID to number
- */
 export const hexToChainId = (hex: string): number => {
     return parseInt(hex, 16);
 };

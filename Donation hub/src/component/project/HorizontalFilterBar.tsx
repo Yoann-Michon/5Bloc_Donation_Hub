@@ -29,7 +29,7 @@ const HorizontalFilterBar = ({
                 mb: 4,
             }}
         >
-            {/* Categories */}
+            
             <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', flex: 1 }}>
                 <Button
                     onClick={() => onCategoryChange('All')}
@@ -81,7 +81,7 @@ const HorizontalFilterBar = ({
                 ))}
             </Box>
 
-            {/* Sort By */}
+            
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 'auto' }}>
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontFamily: 'monospace', fontSize: '0.75rem' }}>
                     SORT BY:
@@ -92,7 +92,7 @@ const HorizontalFilterBar = ({
                     style={{
                         backgroundColor: 'transparent',
                         border: 'none',
-                        color: '#cbd5e1', // slate-300
+                        color: '#cbd5e1',
                         fontSize: '0.875rem',
                         fontWeight: 700,
                         cursor: 'pointer',

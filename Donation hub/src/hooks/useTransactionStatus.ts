@@ -1,7 +1,4 @@
-/**
- * Transaction Status Hook
- * Tracks and monitors transaction status on the blockchain
- */
+
 
 import { useState, useEffect, useCallback } from 'react';
 import { ethers } from 'ethers';
@@ -31,9 +28,6 @@ interface UseTransactionStatusResult {
     refresh: () => Promise<void>;
 }
 
-/**
- * Hook to track transaction status
- */
 export const useTransactionStatus = (
     txHash: string | null,
     requiredConfirmations: number = 1
@@ -54,11 +48,10 @@ export const useTransactionStatus = (
         try {
             const provider = new ethers.BrowserProvider(window.ethereum);
 
-            // Get transaction receipt
             const receipt = await provider.getTransactionReceipt(txHash);
 
             if (!receipt) {
-                // Transaction is still pending
+
                 setTransaction({
                     hash: txHash,
                     status: 'pending',
@@ -70,14 +63,12 @@ export const useTransactionStatus = (
                     error: null,
                 });
             } else {
-                // Get current block number
+
                 const currentBlock = await provider.getBlockNumber();
                 const confirmations = currentBlock - receipt.blockNumber + 1;
 
-                // Get block for timestamp
                 const block = await provider.getBlock(receipt.blockNumber);
 
-                // Determine status
                 let status: TransactionStatus;
                 if (receipt.status === 0) {
                     status = 'failed';
@@ -110,10 +101,8 @@ export const useTransactionStatus = (
     useEffect(() => {
         if (!txHash) return;
 
-        // Initial check
         checkTransaction();
 
-        // Poll for updates every 5 seconds until confirmed
         const interval = setInterval(() => {
             if (!transaction || transaction.status === 'pending' || transaction.status === 'confirming') {
                 checkTransaction();
