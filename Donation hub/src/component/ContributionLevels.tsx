@@ -33,7 +33,7 @@ const LevelCard = ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        p: 3,
+        p: 2,
         border: '1px solid',
         borderColor: borderColor || 'divider',
         bgcolor: bgColor || 'background.paper',
@@ -48,30 +48,17 @@ const LevelCard = ({
         }),
       }}
     >
-      {highlighted && highlightColor && (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: 4,
-            background: `linear-gradient(to right, ${highlightColor}, ${highlightColor}DD)`,
-          }}
-        />
-      )}
-
       <Box
         sx={{
-          width: 64,
-          height: 64,
+          width: 56,
+          height: 56,
           borderRadius: '50%',
           bgcolor: iconBgColor || 'rgba(0, 0, 0, 0.05)',
           color: iconColor || 'text.primary',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          mb: 2,
+          mb: 1.5,
         }}
       >
         {icon}
@@ -92,13 +79,13 @@ const LevelCard = ({
         variant="body2"
         sx={{
           color: 'text.secondary',
-          mb: 2,
+          mb: 1.5,
         }}
       >
         {tier}
       </Typography>
 
-      <Divider sx={{ width: '100%', my: 2 }} />
+      <Divider sx={{ width: '100%', my: 1.5 }} />
 
       <Box
         component="ul"
@@ -109,7 +96,7 @@ const LevelCard = ({
           textAlign: 'center',
           display: 'flex',
           flexDirection: 'column',
-          gap: 1,
+          gap: 0.75,
         }}
       >
         {benefits.map((benefit, index) => (
@@ -176,11 +163,11 @@ const ContributionLevels = () => {
       component="section"
       sx={{
         bgcolor: 'background.paper',
-        py: 10,
+        py: 6,
       }}
     >
       <Container maxWidth="xl">
-        <Box sx={{ textAlign: 'center', mb: 6 }}>
+        <Box sx={{ textAlign: 'center', mb: 5 }}>
           <Typography
             variant="h2"
             sx={{
@@ -189,7 +176,7 @@ const ContributionLevels = () => {
               mb: 2,
             }}
           >
-              Contribution Levels
+            Contribution Levels
           </Typography>
           <Typography
             variant="body1"

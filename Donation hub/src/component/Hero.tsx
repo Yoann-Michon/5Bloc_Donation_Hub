@@ -8,7 +8,7 @@ const Hero = () => {
       component="section"
       sx={{
         bgcolor: 'background.paper',
-        py: { xs: 8, md: 12, lg: 15 },
+        py: { xs: 6, md: 8, lg: 10 },
       }}
     >
       <Container maxWidth="xl">
@@ -67,6 +67,7 @@ const Hero = () => {
                     minWidth: 140,
                     height: 48,
                     fontSize: '1rem',
+                    borderRadius: 1.5,
                   }}
                 >
                   Explore Projects
@@ -120,7 +121,7 @@ const Hero = () => {
                 position: 'relative',
                 width: '100%',
                 aspectRatio: '4/3',
-                borderRadius: 4,
+                borderRadius: 2,
                 overflow: 'hidden',
                 boxShadow: '0 20px 25px -5px rgba(103, 100, 242, 0.2)',
                 '&:hover .hero-image': {

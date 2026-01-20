@@ -45,9 +45,8 @@ const FeaturedProjects = () => {
     <Box
       component="section"
       sx={{
-        // ... unchanged styles
         bgcolor: 'background.paper',
-        py: 10,
+        py: 6,
       }}
     >
       <Container maxWidth="xl">

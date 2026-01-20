@@ -72,6 +72,7 @@ const Header = () => {
               px: 3,
               textTransform: 'none',
               fontSize: '0.875rem',
+              borderRadius: 1.5,
             }}
           >
             Connect Wallet
@@ -84,7 +85,7 @@ const Header = () => {
               alignItems: 'center',
               gap: 1,
               bgcolor: 'rgba(255,255,255,0.05)',
-              borderRadius: 10,
+              borderRadius: 12.5,
               pl: 0.5,
               pr: 2,
               py: 0.5,

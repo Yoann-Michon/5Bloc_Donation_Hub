@@ -20,7 +20,7 @@ import { useWallet } from '../../hooks/useWallet';
 import WalletConnectionModal from '../web3/WalletConnectionModal';
 import AddressDisplay from '../web3/AddressDisplay';
 import NetworkSwitcher from '../web3/NetworkSwitcher';
-import { Menu, MenuItem, Avatar } from '@mui/material';
+import { Menu, MenuItem } from '@mui/material';
 
 
 const Navbar = () => {

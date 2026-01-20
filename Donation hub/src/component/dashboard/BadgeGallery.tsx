@@ -7,25 +7,25 @@ const badges = [
     {
         name: 'Early Supporter',
         tier: 'Rare NFT',
-        icon: <RocketLaunch sx={{ fontSize: 40 }} />,
+        icon: <RocketLaunch sx={{ fontSize: 48 }} />,
         color: '#5227FF',
     },
     {
         name: 'Carbon Neutral',
         tier: 'Legendary',
-        icon: <Forest sx={{ fontSize: 40 }} />,
+        icon: <Forest sx={{ fontSize: 48 }} />,
         color: '#00ff88',
     },
     {
         name: 'Genesis Donor',
         tier: 'Epic',
-        icon: <AccountBalance sx={{ fontSize: 40 }} />,
+        icon: <AccountBalance sx={{ fontSize: 48 }} />,
         color: '#FFCC00',
     },
     {
         name: 'Governance Pro',
         tier: 'Common',
-        icon: <Gavel sx={{ fontSize: 40 }} />,
+        icon: <Gavel sx={{ fontSize: 48 }} />,
         color: '#ffffff',
     },
 ];
@@ -142,7 +142,7 @@ const BadgeGallery = () => {
                         key={index}
                         sx={{
                             flexShrink: 0,
-                            width: 180,
+                            width: 200,
                             perspective: '1000px',
                             cursor: 'pointer',
                             '&:hover .badge-card': {
@@ -155,8 +155,8 @@ const BadgeGallery = () => {
                         <Box
                             className="badge-card"
                             sx={{
-                                p: 2,
-                                borderRadius: 2.5,
+                                p: 2.5,
+                                borderRadius: 2,
                                 bgcolor: 'rgba(40, 40, 57, 0.4)',
                                 backdropFilter: 'blur(20px)',
                                 border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -171,7 +171,7 @@ const BadgeGallery = () => {
                                 sx={{
                                     width: '100%',
                                     aspectRatio: '1',
-                                    borderRadius: 2.5,
+                                    borderRadius: 2,
                                     mb: 1.5,
                                     display: 'flex',
                                     alignItems: 'center',

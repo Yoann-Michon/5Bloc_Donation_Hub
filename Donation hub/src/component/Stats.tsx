@@ -27,9 +27,10 @@ const StatCard = ({
         border: '1px solid',
         borderColor: 'divider',
         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
+        borderRadius: 2,
       }}
     >
-      <CardContent sx={{ p: 3 }}>
+      <CardContent sx={{ p: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
           <Box
             sx={{
@@ -40,8 +41,8 @@ const StatCard = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: 36,
-              height: 36,
+              width: 40,
+              height: 40,
             }}
           >
             <Box sx={{ fontSize: 20 }}>{icon}</Box>
@@ -96,7 +97,7 @@ const Stats = () => {
       component="section"
       sx={{
         bgcolor: 'background.default',
-        py: 8,
+        py: 6,
         borderTop: '1px solid',
         borderBottom: '1px solid',
         borderColor: 'divider',

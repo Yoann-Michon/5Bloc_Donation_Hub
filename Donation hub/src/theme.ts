@@ -4,27 +4,27 @@ const theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#5227FF', // Neon Purple
+      main: '#5227FF',
       light: '#B19EEF',
       dark: '#2c148a',
       contrastText: '#ffffff',
     },
     secondary: {
-      main: '#00E5FF', // Neon Cyan
+      main: '#00E5FF',
       light: '#6effff',
       dark: '#00b2cc',
       contrastText: '#000000',
     },
     background: {
-      default: '#060010', // Deep Space Void
-      paper: '#0b001a',   // Slightly lighter void for cards
+      default: '#060010',
+      paper: '#0b001a',
     },
     text: {
       primary: '#ffffff',
       secondary: '#b0b0b0',
     },
     success: {
-      main: '#00F090', // Neon Green
+      main: '#00F090',
     },
     info: {
       main: '#5227FF',
@@ -63,8 +63,9 @@ const theme = createTheme({
     },
   },
   shape: {
-    borderRadius: 16,
+    borderRadius: 8, // Reduced from 16 to 8 for sharper luxury look
   },
+  spacing: 8, // Default MUI spacing, but we'll use smaller multipliers
   components: {
     MuiCssBaseline: {
       styleOverrides: {
@@ -87,8 +88,8 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 50, // Pill shape for Web3 feel
-          padding: '10px 24px',
+          borderRadius: 8, // Reduced from 50 for sharper look
+          padding: '8px 20px', // Reduced padding
           textTransform: 'none',
           backdropFilter: 'blur(4px)',
         },
@@ -106,15 +107,29 @@ const theme = createTheme({
             backgroundColor: 'rgba(255,255,255,0.05)',
           },
         },
+        sizeLarge: {
+          padding: '10px 24px', // Slightly larger but still compact
+        },
       },
     },
     MuiCard: {
       styleOverrides: {
         root: {
-          background: 'rgba(11, 0, 26, 0.6)', // Glass-like
+          background: 'rgba(11, 0, 26, 0.6)',
           backdropFilter: 'blur(10px)',
           border: '1px solid rgba(255, 255, 255, 0.08)',
           boxShadow: 'none',
+          borderRadius: 8, // Consistent sharp radius
+        },
+      },
+    },
+    MuiCardContent: {
+      styleOverrides: {
+        root: {
+          padding: '16px', // Reduced from default 16px
+          '&:last-child': {
+            paddingBottom: '16px', // Consistent padding
+          },
         },
       },
     },
@@ -130,7 +145,16 @@ const theme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          backgroundImage: 'none', // Remove default MUI overlay
+          backgroundImage: 'none',
+          borderRadius: 8, // Consistent sharp radius
+        },
+      },
+    },
+    MuiContainer: {
+      styleOverrides: {
+        root: {
+          paddingLeft: '16px', // Tighter container padding
+          paddingRight: '16px',
         },
       },
     },

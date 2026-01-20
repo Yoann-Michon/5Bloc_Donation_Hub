@@ -51,7 +51,7 @@ const VortexProjectCard = ({
                 bgcolor: 'rgba(25, 24, 45, 0.6)',
                 backdropFilter: 'blur(12px)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: 3,
+                borderRadius: 2.5,
                 display: 'flex',
                 flexDirection: 'column',
                 transition: 'all 0.3s ease',
@@ -64,7 +64,7 @@ const VortexProjectCard = ({
             }}
         >
             {/* Image Section */}
-            <Box sx={{ position: 'relative', paddingTop: '56.25%', overflow: 'hidden', borderTopLeftRadius: 12, borderTopRightRadius: 12 }}>
+            <Box sx={{ position: 'relative', paddingTop: '56.25%', overflow: 'hidden', borderRadius: '20px 20px 0 0' }}>
                 <Box
                     component="img"
                     src={image}
@@ -96,8 +96,8 @@ const VortexProjectCard = ({
                         top: 12,
                         right: 12,
                         px: 1.5,
-                        py: 0.5,
-                        borderRadius: 10,
+                        py: 0.75,
+                        borderRadius: 12.5,
                         bgcolor: 'rgba(54, 37, 244, 0.2)', // Primary/20
                         border: '1px solid rgba(54, 37, 244, 0.5)',
                         backdropFilter: 'blur(4px)',
@@ -185,9 +185,9 @@ const VortexProjectCard = ({
                                 color: 'white',
                                 fontWeight: 700,
                                 fontSize: '0.75rem',
-                                px: 2.5,
-                                py: 1,
-                                borderRadius: 2,
+                                px: 3,
+                                py: 1.5,
+                                borderRadius: 1.5,
                                 boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                                 '&:hover': {
                                     bgcolor: config.color,

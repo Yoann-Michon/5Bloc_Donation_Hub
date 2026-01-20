@@ -9,9 +9,9 @@ const DashboardProfile = () => {
         <Box
             sx={{
                 position: 'relative',
-                p: { xs: 3, md: 4 },
-                mb: 4,
-                borderRadius: 3,
+                p: { xs: 2, md: 3 },
+                mb: 3,
+                borderRadius: 2,
                 bgcolor: 'rgba(40, 40, 57, 0.4)',
                 backdropFilter: 'blur(20px)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -53,8 +53,8 @@ const DashboardProfile = () => {
                 <Avatar
                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuCp0yD1RdlMSdQ517ts7BtXeTMnQpsIWjCnUH-r3Zdm08EPJgtXjoqDNVCp6zBo48uUP7NZ2WDqbh8gkz2qhYoXzK489Mne78VC93oh_-U6ogPG8HiXFfTzIfx5ArIfSzl-1EiW8EzrA8sDs9Y_Oa4Oo7fMal6_kd-4EKKyV4fFzdpttI9qmVf_qxN1JyqYIZPgdirxcneovMBVUTuHuYgiem6EYBZFKdWxxevJUVr1UAdMoJTxM_zBmJ8QnIowEPP2uyp0eQx4IDch"
                     sx={{
-                        width: 160,
-                        height: 160,
+                        width: 120,
+                        height: 120,
                         border: '2px solid rgba(255, 255, 255, 0.2)',
                         filter: 'blur(0.5px)',
                     }}
@@ -76,7 +76,7 @@ const DashboardProfile = () => {
                         border: '1px solid rgba(255, 215, 0, 0.5)',
                     }}
                 >
-                    <WorkspacePremium sx={{ fontSize: 16 }} />
+                    <WorkspacePremium sx={{ fontSize: 14 }} />
                     <Typography sx={{ fontSize: '0.75rem', fontWeight: 700 }}>BENEFACTOR</Typography>
                 </Box>
             </Box>
@@ -104,11 +104,11 @@ const DashboardProfile = () => {
 
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, justifyContent: { xs: 'center', md: 'flex-start' }, flexWrap: 'wrap' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#9d9db9' }}>
-                        <CalendarToday sx={{ fontSize: 18, color: 'primary.main' }} />
+                        <CalendarToday sx={{ fontSize: 16, color: 'primary.main' }} />
                         <Typography variant="body2">Joined Nov 2021</Typography>
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#9d9db9' }}>
-                        <Verified sx={{ fontSize: 18, color: '#00ff88' }} />
+                        <Verified sx={{ fontSize: 16, color: '#00ff88' }} />
                         <Typography variant="body2">KYC Verified (ZKP)</Typography>
                     </Box>
                 </Box>
@@ -123,7 +123,7 @@ const DashboardProfile = () => {
                         color: 'white',
                         bgcolor: 'rgba(255, 255, 255, 0.1)',
                         fontWeight: 700,
-                        py: 1.5,
+                        py: 1,
                         '&:hover': {
                             bgcolor: 'rgba(255, 255, 255, 0.2)',
                             borderColor: 'white',
@@ -139,7 +139,7 @@ const DashboardProfile = () => {
                         bgcolor: 'primary.main',
                         color: 'white',
                         fontWeight: 700,
-                        py: 1.5,
+                        py: 1,
                         '&:hover': {
                             bgcolor: 'primary.dark',
                             filter: 'brightness(1.1)',

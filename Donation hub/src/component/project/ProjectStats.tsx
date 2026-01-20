@@ -40,8 +40,8 @@ const ProjectStats = () => {
                         className="group"
                         sx={{
                             position: 'relative',
-                            p: 2.5,
-                            borderRadius: 3,
+                            p: 3,
+                            borderRadius: 2,
                             bgcolor: 'rgba(25, 24, 45, 0.6)',
                             backdropFilter: 'blur(12px)',
                             border: '1px solid rgba(255, 255, 255, 0.1)',
