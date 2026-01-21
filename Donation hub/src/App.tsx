@@ -20,6 +20,10 @@ const BadgeFusion = lazy(() => import('./pages/BadgeFusion'));
 const Admin = lazy(() => import('./pages/Admin'));
 const MyProjects = lazy(() => import('./pages/MyProjects'));
 const ProjectForm = lazy(() => import('./pages/ProjectForm'));
+const ApplyAssociation = lazy(() => import('./pages/ApplyAssociation'));
+const AssociationRequests = lazy(() => import('./pages/admin/AssociationRequests'));
+const ProjectVote = lazy(() => import('./pages/ProjectVote'));
+const ProjectVotes = lazy(() => import('./pages/ProjectVotes'));
 
 const LoadingFallback = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
@@ -54,7 +58,7 @@ function App() {
                     }
                   />
                   <Route
-                    path="/admin"
+                    path="/dashboard/admin"
                     element={
                       <ProtectedRoute>
                         <Admin />
@@ -62,7 +66,7 @@ function App() {
                     }
                   />
                   <Route
-                    path="/admin/projects/new"
+                    path="/dashboard/admin/projects/new"
                     element={
                       <ProtectedRoute>
                         <ProjectForm />
@@ -70,7 +74,7 @@ function App() {
                     }
                   />
                   <Route
-                    path="/admin/projects/:id/edit"
+                    path="/dashboard/admin/projects/:id/edit"
                     element={
                       <ProtectedRoute>
                         <ProjectForm />
@@ -78,7 +82,7 @@ function App() {
                     }
                   />
                   <Route
-                    path="/my-projects"
+                    path="/dashboard/association/projects"
                     element={
                       <ProtectedRoute>
                         <MyProjects />
@@ -86,7 +90,7 @@ function App() {
                     }
                   />
                   <Route
-                    path="/my-projects/new"
+                    path="/dashboard/association/projects/new"
                     element={
                       <ProtectedRoute>
                         <ProjectForm />
@@ -94,7 +98,7 @@ function App() {
                     }
                   />
                   <Route
-                    path="/my-projects/:id/edit"
+                    path="/dashboard/association/projects/:id/edit"
                     element={
                       <ProtectedRoute>
                         <ProjectForm />
@@ -108,6 +112,38 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <BadgeFusion />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/governance/apply-association"
+                    element={
+                      <ProtectedRoute>
+                        <ApplyAssociation />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/governance/admin/association-requests"
+                    element={
+                      <ProtectedRoute>
+                        <AssociationRequests />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/governance/project/:id/vote"
+                    element={
+                      <ProtectedRoute>
+                        <ProjectVote />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/governance/project-votes"
+                    element={
+                      <ProtectedRoute>
+                        <ProjectVotes />
                       </ProtectedRoute>
                     }
                   />

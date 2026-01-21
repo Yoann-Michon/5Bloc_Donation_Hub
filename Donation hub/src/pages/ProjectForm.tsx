@@ -25,7 +25,7 @@ const ProjectForm = () => {
     const navigate = useNavigate();
     const { showToast } = useToast();
     const { getProjectById, createProject, updateProject, canEdit } = useProjects();
-    const { isAdmin, requiresApproval } = useRole();
+    const { isAdmin, currentRole } = useRole();
 
     const [formData, setFormData] = useState({
         title: '',
@@ -48,7 +48,7 @@ const ProjectForm = () => {
             if (project) {
                 if (!canEdit(project)) {
                     showToast('You do not have permission to edit this project', 'error');
-                    navigate('/my-projects');
+                    navigate('/dashboard/association/projects');
                     return;
                 }
 
@@ -94,14 +94,14 @@ const ProjectForm = () => {
             if (isEditMode) {
                 await updateProject(Number(id), projectData);
                 showToast('Project updated successfully!', 'success');
-                navigate('/my-projects');
+                navigate('/dashboard/association/projects');
             } else {
                 await createProject(projectData);
                 const message = isAdmin
                     ? 'Project created and approved!'
                     : 'Project submitted for review!';
                 showToast(message, 'success');
-                navigate(isAdmin ? '/admin' : '/my-projects');
+                navigate(isAdmin ? '/dashboard/admin' : '/dashboard/association/projects');
             }
         } catch (error) {
             showToast('Failed to save project', 'error');
@@ -121,7 +121,7 @@ const ProjectForm = () => {
                 </Typography>
             </Box>
 
-            {!isAdmin && requiresApproval() && !isEditMode && (
+            {!isAdmin && currentRole === 'ASSOCIATION' && !isEditMode && (
                 <Alert severity="info" sx={{ mb: 3 }}>
                     Your project will be submitted for admin approval before going live.
                 </Alert>
@@ -255,7 +255,7 @@ const ProjectForm = () => {
                                 <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
                                     <Button
                                         variant="outlined"
-                                        onClick={() => navigate(isAdmin ? '/admin' : '/my-projects')}
+                                        onClick={() => navigate(isAdmin ? '/dashboard/admin' : '/dashboard/association/projects')}
                                         disabled={isLoading}
                                     >
                                         Cancel

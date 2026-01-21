@@ -2,8 +2,12 @@ import { Box } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Particles from '../custom/Particles';
+import DevRoleSelector from '../dev/DevRoleSelector';
+import { useRole } from '../../context/RoleContext';
 
 const Layout = () => {
+  const { currentRole, setDevRole } = useRole();
+
   return (
     <Box
       sx={{
@@ -62,6 +66,8 @@ const Layout = () => {
           <Outlet />
         </Box>
       </Box>
+
+      <DevRoleSelector currentRole={currentRole} onRoleChange={setDevRole} />
     </Box>
   );
 };

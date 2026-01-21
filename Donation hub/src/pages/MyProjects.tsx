@@ -87,7 +87,7 @@ const MyProjects = () => {
                 <Button
                     variant="contained"
                     startIcon={<Add />}
-                    onClick={() => navigate('/my-projects/new')}
+                    onClick={() => navigate('/dashboard/association/projects/new')}
                 >
                     New Project
                 </Button>
@@ -186,7 +186,7 @@ const MyProjects = () => {
                         <Button
                             variant="contained"
                             startIcon={<Add />}
-                            onClick={() => navigate('/my-projects/new')}
+                            onClick={() => navigate('/dashboard/association/projects/new')}
                             sx={{ mt: 2 }}
                         >
                             Create Your First Project
@@ -199,7 +199,7 @@ const MyProjects = () => {
                             project={project}
                             onApprove={async () => { }}
                             onReject={async () => { }}
-                            onEdit={(id) => navigate(`/my-projects/${id}/edit`)}
+                            onEdit={(id) => navigate(`/dashboard/association/projects/${id}/edit`)}
                             onDelete={deleteProject}
                         />
                     ))

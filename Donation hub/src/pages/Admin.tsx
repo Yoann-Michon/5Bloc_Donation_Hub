@@ -71,7 +71,7 @@ const Admin = () => {
                 <Button
                     variant="contained"
                     startIcon={<Add />}
-                    onClick={() => navigate('/admin/projects/new')}
+                    onClick={() => navigate('/dashboard/admin/projects/new')}
                 >
                     Create Project
                 </Button>
@@ -130,7 +130,7 @@ const Admin = () => {
                             project={project}
                             onApprove={approveProject}
                             onReject={rejectProject}
-                            onEdit={(id) => navigate(`/admin/projects/${id}/edit`)}
+                            onEdit={(id) => navigate(`/dashboard/admin/projects/${id}/edit`)}
                             onDelete={deleteProject}
                         />
                     ))

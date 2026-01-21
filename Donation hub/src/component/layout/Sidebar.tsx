@@ -1,4 +1,4 @@
-import { Box, Typography, Button, Avatar, Tooltip } from '@mui/material';
+import { Box, Typography, Button, Avatar, Tooltip, Divider } from '@mui/material';
 import {
     Dashboard,
     Explore,
@@ -7,6 +7,9 @@ import {
     Lock,
     AdminPanelSettings,
     FolderOpen,
+    HowToVote,
+    Gavel,
+    GroupAdd,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useWallet } from '../../hooks/useWallet';
@@ -18,13 +21,20 @@ const Sidebar = () => {
     const location = useLocation();
     const { account, balance, disconnect, isConnected } = useWallet();
     const { isAdmin, isAssociation } = useRole();
+    const isUser = !isAdmin && !isAssociation;
 
-    const navItems = [
-        { label: 'Dashboard', icon: <Dashboard />, path: '/dashboard', protected: true, roles: ['all'] },
-        ...(isAdmin ? [{ label: 'Admin', icon: <AdminPanelSettings />, path: '/admin', protected: true, roles: ['admin'] }] : []),
-        ...(isAdmin || isAssociation ? [{ label: 'My Projects', icon: <FolderOpen />, path: '/my-projects', protected: true, roles: ['admin', 'association'] }] : []),
-        { label: 'Explore', icon: <Explore />, path: '/dashboard/projects', protected: false, roles: ['all'] },
-        { label: 'Badge Fusion', icon: <AutoFixHigh />, path: '/dashboard/fusion', protected: true, roles: ['all'] },
+    const mainNavItems = [
+        { label: 'Dashboard', icon: <Dashboard />, path: '/dashboard', protected: true },
+        ...(isAdmin ? [{ label: 'Admin', icon: <AdminPanelSettings />, path: '/dashboard/admin', protected: true }] : []),
+        ...(isAssociation ? [{ label: 'My Projects', icon: <FolderOpen />, path: '/dashboard/association/projects', protected: true }] : []),
+        { label: 'Explore', icon: <Explore />, path: '/dashboard/projects', protected: false },
+        ...(!isAssociation ? [{ label: 'Badge Fusion', icon: <AutoFixHigh />, path: '/dashboard/fusion', protected: true }] : []),
+    ];
+
+    const governanceNavItems = [
+        ...(isUser ? [{ label: 'Apply for Association', icon: <GroupAdd />, path: '/dashboard/governance/apply-association', protected: true }] : []),
+        ...(isAdmin ? [{ label: 'Association Requests', icon: <Gavel />, path: '/dashboard/governance/admin/association-requests', protected: true }] : []),
+        ...(isUser ? [{ label: 'Project Votes', icon: <HowToVote />, path: '/dashboard/governance/project-votes', protected: true }] : []),
     ];
 
     const NavButton = ({
@@ -170,7 +180,18 @@ const Sidebar = () => {
 
             <Box sx={{ flex: 1, px: 2, py: 3, overflowY: 'auto' }}>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    {navItems.map((item) => (
+                    {mainNavItems.map((item) => (
+                        <NavButton key={item.label} item={item} />
+                    ))}
+                </Box>
+
+                <Divider sx={{ my: 2, borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+
+                <Typography variant="caption" sx={{ px: 3, color: 'text.secondary', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Governance
+                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1 }}>
+                    {governanceNavItems.map((item) => (
                         <NavButton key={item.label} item={item} />
                     ))}
                 </Box>
