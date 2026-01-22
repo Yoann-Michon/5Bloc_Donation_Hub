@@ -60,31 +60,29 @@ const BadgeGallery = () => {
                     let metadata: any = { name: `Badge #${tokenId}`, type: 'Unknown', value: '0' };
                     
                     if (tokenURI.startsWith('ipfs://')) {
-                         // Real IPFS fetch would go here using gateway
-                         // const cid = tokenURI.replace('ipfs://', '');
-                         // const response = await fetch(`https://ipfs.io/ipfs/${cid}`);
-                         // metadata = await response.json();
-
-                         // SIMULATION: 
-                         // Check if it's one of our "mock" URIs we generated in DonationModal
-                         // The format was `ipfs://Qm...MOCK` 
-                         // Since we can't actually fetch it, we will simulate the metadata based on the request requirements
-                         // In a real app, this metadata COMES from the JSON.
-                         
-                         console.log(`Fetching metadata for ${tokenURI}`);
-                         
-                         // Mocking the result of "fetch(tokenURI)"
-                         metadata = {
-                            name: `Donation Project #${tokenId}`,
-                            type: 'Gold', // dynamic fallback
-                            value: '1.5',
-                            hash: tokenURI.replace('ipfs://', ''),
-                            previousOwners: [],
-                            createdAt: new Date().toISOString()
-                         };
-                         
-                         // Try to intuit 'Silver'/'Bronze' from some randomness or just default
-                         if (Number(tokenId) % 2 === 0) metadata.type = 'Silver';
+                         // Real IPFS Fetch Logic
+                         const hash = tokenURI.replace('ipfs://', '');
+                         try {
+                              // Using a public gateway. In production, use a dedicated gateway.
+                              const response = await fetch(`https://ipfs.io/ipfs/${hash}`);
+                              if (!response.ok) throw new Error("IPFS fetch failed");
+                              const json = await response.json();
+                              
+                              metadata = {
+                                  name: json.name || `Donation Project #${tokenId}`,
+                                  type: json.type || 'Bronze',
+                                  value: json.value || '0',
+                                  hash: hash,
+                                  previousOwners: json.previousOwners || [],
+                                  createdAt: json.createdAt || new Date().toISOString(),
+                                  // Add any other fields from JSON
+                              };
+                         } catch (ipfsError) {
+                              console.warn(`Failed to fetch IPFS metadata for ${hash}`, ipfsError);
+                              // Fallback if IPFS fetch fails (e.g. gateway timeout)
+                              metadata.hash = hash;
+                              metadata.name = `Verify on IPFS (${hash.substring(0,6)}...)`;
+                         }
                     }
 
                     // Map Tier to Icon/Color

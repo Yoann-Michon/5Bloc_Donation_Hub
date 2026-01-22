@@ -1,5 +1,6 @@
 
 import { useState, useCallback, useEffect } from 'react';
+import { formatEther } from 'ethers';
 import { useWallet } from './useWallet';
 
 // Matches the interface in TransactionHistory.tsx
@@ -43,24 +44,11 @@ export const useDonationHistory = () => {
             for (const event of sortedEvents) {
                 try {
                     const block = await event.getBlock();
-                    const tokenId = (event as any).args[2];
+                    // const tokenId = (event as any).args[2];
                     
-                    // Fetch metadata to get the value
-                    const tokenURI = await contract.tokenURI(tokenId);
-                    let value = '0';
-                    
-                    if (tokenURI.startsWith('ipfs://')) {
-                         // Simulation logic matching BadgeGallery
-                         // In real app: fetch(https://ipfs.io/ipfs/...)
-                         // Here we assume standard mock metadata
-                         // const hash = tokenURI.replace('ipfs://', '');
-                         // Check if we can extract value from hash or if we need to mock it
-                         // For now, consistent mock:
-                         value = (Number(tokenId) % 2 === 0) ? '0.5' : '1.5'; 
-                         
-                         // If we preserved the value in the hash, we could extract it, but we didn't.
-                         // However, the user flow mocks 1.5 for Gold and <1 for Bronze.
-                    }
+                    // Get transaction details to retrieve the real ETH value sent
+                    const tx = await event.getTransaction();
+                    const value = formatEther(tx.value);
 
                     txs.push({
                         hash: event.transactionHash,
