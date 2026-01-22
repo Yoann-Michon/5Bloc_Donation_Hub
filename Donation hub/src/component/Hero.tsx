@@ -1,8 +1,11 @@
 import { Box, Container, Typography, Button } from '@mui/material';
 import { CheckCircle } from '@mui/icons-material';
 import GradientText from './custom/GradientText';
+import { useNavigate } from 'react-router-dom';
 
 const Hero = () => {
+  const navigate = useNavigate();
+
   return (
     <Box
       component="section"
@@ -60,7 +63,7 @@ const Hero = () => {
               </Box>
 
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, pt: 1 }}>
-                <Button
+                <Button 
                   variant="contained"
                   size="large"
                   sx={{
@@ -69,6 +72,7 @@ const Hero = () => {
                     fontSize: '1rem',
                     borderRadius: 1.5,
                   }}
+                 onClick={() => navigate('/projects')}
                 >
                   Explore Projects
                 </Button>

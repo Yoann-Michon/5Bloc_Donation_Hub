@@ -20,14 +20,22 @@ import TransactionStatusIndicator from './web3/TransactionStatus';
 import NetworkSwitcher from './web3/NetworkSwitcher';
 import { parseEther } from 'ethers';
 
-// Helper to simulate IPFS upload
-const uploadToIPFS = async (metadata: unknown): Promise<string> => {
+// Helper to simulate IPFS upload using LocalStorage
+const uploadToIPFS = async (metadata: any): Promise<string> => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      console.log("Mock IPFS Upload:", metadata);
-      // Generate a mock hash based on timestamp
-      const hash = "QmMockHash" + Date.now();
-      resolve(`ipfs://${hash}`);
+      // 1. Generate Fake unique CID
+      const fakeCID = 'Qm' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      
+      // 2. Add the hash to the metadata itself (optional but good for consistency)
+      const finalMetadata = { ...metadata, hash: fakeCID };
+      
+      console.log("Mock IPFS Upload (saving to localStorage):", fakeCID, finalMetadata);
+
+      // 3. Save to Local Storage to mimic IPFS persistence
+      localStorage.setItem(fakeCID, JSON.stringify(finalMetadata));
+      
+      resolve(`ipfs://${fakeCID}`);
     }, 1000);
   });
 };
@@ -103,18 +111,23 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
       const type = isGold ? "Gold" : "Bronze";
 
       // 1. Prepare Metadata (Strict Format)
+      const nowTimestamp = Math.floor(Date.now() / 1000); // Seconds
+
+      // Note: "hash" will be overwritten/assigned by uploadToIPFS with the actual CID
       const metadata = {
-        name: project.title,
+        name: `Badge de don - ${project.title}`,
         type: type,
-        value: amount,
-        hash: `Qm${Date.now()}MOCK`, // Mock CID as requested
+        value: `${amount} ETH`, // Strict: "0.1 ETH"
+        hash: "", // Will be filled by upload logic
         previousOwners: [],
-        createdAt: new Date().toISOString()
+        createdAt: nowTimestamp,
+        lastTransferAt: nowTimestamp, 
+        minter: account
       };
 
-      console.log('Generating metadata:', metadata);
+      console.log('Generating metadata payload:', metadata);
 
-      // 2. Upload to IPFS (Simulated)
+      // 2. Upload to IPFS (Simulated via LocalStorage)
       const tokenURI = await uploadToIPFS(metadata);
       
       setStep('confirming');

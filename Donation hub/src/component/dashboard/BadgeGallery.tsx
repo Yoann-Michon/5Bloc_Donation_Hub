@@ -60,28 +60,46 @@ const BadgeGallery = () => {
                     let metadata: any = { name: `Badge #${tokenId}`, type: 'Unknown', value: '0' };
                     
                     if (tokenURI.startsWith('ipfs://')) {
-                         // Real IPFS Fetch Logic
                          const hash = tokenURI.replace('ipfs://', '');
-                         try {
-                              // Using a public gateway. In production, use a dedicated gateway.
-                              const response = await fetch(`https://ipfs.io/ipfs/${hash}`);
-                              if (!response.ok) throw new Error("IPFS fetch failed");
-                              const json = await response.json();
-                              
-                              metadata = {
-                                  name: json.name || `Donation Project #${tokenId}`,
-                                  type: json.type || 'Bronze',
-                                  value: json.value || '0',
-                                  hash: hash,
-                                  previousOwners: json.previousOwners || [],
-                                  createdAt: json.createdAt || new Date().toISOString(),
-                                  // Add any other fields from JSON
-                              };
-                         } catch (ipfsError) {
-                              console.warn(`Failed to fetch IPFS metadata for ${hash}`, ipfsError);
-                              // Fallback if IPFS fetch fails (e.g. gateway timeout)
-                              metadata.hash = hash;
-                              metadata.name = `Verify on IPFS (${hash.substring(0,6)}...)`;
+                         
+                         // 1. Try Local Storage first (Mock IPFS)
+                         const localData = localStorage.getItem(hash);
+                         if (localData) {
+                             console.log(`Loaded metadata from LocalStorage for ${hash}`);
+                             try {
+                                 const json = JSON.parse(localData);
+                                 metadata = {
+                                     name: json.name || `Donation Project #${tokenId}`,
+                                     type: json.type || 'Bronze',
+                                     value: json.value || '0',
+                                     hash: hash,
+                                     previousOwners: json.previousOwners || [],
+                                     createdAt: json.createdAt || new Date().toISOString(),
+                                 };
+                             } catch (e) {
+                                 console.error("Error parsing local metadata", e);
+                             }
+                         } else {
+                             // 2. Fallback to Real IPFS Fetch (only if not in local storage)
+                             try {
+                                  const response = await fetch(`https://ipfs.io/ipfs/${hash}`);
+                                  if (!response.ok) throw new Error("IPFS fetch failed");
+                                  const json = await response.json();
+                                  
+                                  metadata = {
+                                      name: json.name || `Donation Project #${tokenId}`,
+                                      type: json.type || 'Bronze',
+                                      value: json.value || '0',
+                                      hash: hash,
+                                      previousOwners: json.previousOwners || [],
+                                      createdAt: json.createdAt || new Date().toISOString(),
+                                  };
+                             } catch (ipfsError) {
+                                  console.warn(`Failed to fetch IPFS metadata for ${hash}`, ipfsError);
+                                  // Fallback: don't break the UI, just show basic info
+                                  metadata.hash = hash;
+                                  metadata.name = `Badge #${tokenId} (Metadata Unavailable)`;
+                             }
                          }
                     }
 
