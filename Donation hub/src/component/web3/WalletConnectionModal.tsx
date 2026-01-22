@@ -3,7 +3,7 @@
  * Beautiful glassmorphic modal for connecting Web3 wallets
  */
 
-import { useState } from 'react';
+// import { useState } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -47,7 +47,7 @@ const WalletConnectionModal = ({
     onConnect
 }: WalletConnectionModalProps) => {
     const { connect, isConnecting, error, isConnected } = useWallet();
-    const [selectedWallet, setSelectedWallet] = useState<WalletProvider | null>(null);
+    // const [selectedWallet, setSelectedWallet] = useState<WalletProvider | null>(null);
 
     // Wallet options
     const walletOptions: WalletOption[] = [
@@ -56,7 +56,7 @@ const WalletConnectionModal = ({
             name: 'MetaMask',
             icon: 'https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg',
             description: 'Most popular Ethereum wallet',
-            isInstalled: typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask,
+            isInstalled: typeof window.ethereum !== 'undefined' && !!window.ethereum.isMetaMask,
             downloadUrl: 'https://metamask.io/download/',
         },
         {
@@ -84,8 +84,7 @@ const WalletConnectionModal = ({
             return;
         }
 
-        setSelectedWallet(walletId);
-        await connect(walletId);
+        await connect();
 
         if (onConnect) {
             onConnect();
@@ -94,7 +93,6 @@ const WalletConnectionModal = ({
 
     const handleClose = () => {
         if (!isConnecting) {
-            setSelectedWallet(null);
             onClose();
         }
     };

@@ -28,9 +28,20 @@ const DEV_MODE = false;
 // Mock wallet data for development
 const MOCK_WALLET = {
     account: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
-    chainId: 1, // Ethereum Mainnet
+    chainId: 31337, // Hardhat Local
     balance: '0x15af1d78b58c40000', // 1.5 ETH in hex
 };
+
+const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // TO BE FILLED WITH DEPLOYED CONTRACT ADDRESS E.G. "0x..."
+
+const DONATION_BADGE_ABI = [
+  "function donate(uint256 projectId, string memory tokenURI) external payable",
+  "function balanceOf(address owner) view returns (uint256)",
+  "function lastActionTimestamp(address user) view returns (uint256)",
+  "function tokenURI(uint256 tokenId) view returns (string)",
+  "function ownerOf(uint256 tokenId) view returns (address)",
+  "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
+];
 
 export const useWallet = () => {
     const [state, setState] = useState<WalletState>({
@@ -362,6 +373,19 @@ export const useWallet = () => {
         }
     }, [state.signer]);
 
+    /**
+     * Get donation badge contract instance
+     */
+    const getBadgeContract = useCallback(() => {
+        if (!state.signer || !CONTRACT_ADDRESS) return null;
+        try {
+            return new Contract(CONTRACT_ADDRESS, DONATION_BADGE_ABI, state.signer);
+        } catch (error) {
+            console.error("Failed to create badge contract instance", error);
+            return null;
+        }
+    }, [state.signer]);
+
     return {
         ...state,
         connect,
@@ -371,5 +395,6 @@ export const useWallet = () => {
         getCurrentChainConfig,
         refreshBalance,
         getContract,
+        getBadgeContract,
     };
 };

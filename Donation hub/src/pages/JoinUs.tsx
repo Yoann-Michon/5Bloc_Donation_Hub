@@ -162,7 +162,7 @@ const JoinUs = () => {
                             <CardContent sx={{ p: 4 }}>
                                 <Grid container spacing={2}>
                                     {requirements.map((req, index) => (
-                                        <Grid item xs={12} md={6} key={index}>
+                                        <Grid size={{ xs: 12, md: 6 }} key={index}>
                                             <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
                                                 <CheckCircle sx={{ color: 'primary.main', fontSize: 24, mt: 0.5 }} />
                                                 <Typography variant="body1" sx={{ color: 'text.secondary' }}>
@@ -189,7 +189,7 @@ const JoinUs = () => {
                             <CardContent sx={{ p: 4 }}>
                                 <form onSubmit={handleSubmit}>
                                     <Grid container spacing={3}>
-                                        <Grid item xs={12} md={6}>
+                                        <Grid size={{ xs: 12, md: 6 }}>
                                             <TextField
                                                 fullWidth
                                                 required
@@ -200,7 +200,7 @@ const JoinUs = () => {
                                                 variant="outlined"
                                             />
                                         </Grid>
-                                        <Grid item xs={12} md={6}>
+                                        <Grid size={{ xs: 12, md: 6 }}>
                                             <TextField
                                                 fullWidth
                                                 required
@@ -211,7 +211,7 @@ const JoinUs = () => {
                                                 variant="outlined"
                                             />
                                         </Grid>
-                                        <Grid item xs={12} md={6}>
+                                        <Grid size={{ xs: 12, md: 6 }}>
                                             <TextField
                                                 fullWidth
                                                 required
@@ -223,7 +223,7 @@ const JoinUs = () => {
                                                 variant="outlined"
                                             />
                                         </Grid>
-                                        <Grid item xs={12} md={6}>
+                                        <Grid size={{ xs: 12, md: 6 }}>
                                             <TextField
                                                 fullWidth
                                                 required
@@ -234,7 +234,7 @@ const JoinUs = () => {
                                                 variant="outlined"
                                             />
                                         </Grid>
-                                        <Grid item xs={12} md={6}>
+                                        <Grid size={{ xs: 12, md: 6 }}>
                                             <TextField
                                                 fullWidth
                                                 required
@@ -246,7 +246,7 @@ const JoinUs = () => {
                                                 placeholder="Ex: Education, Environment, Health..."
                                             />
                                         </Grid>
-                                        <Grid item xs={12} md={6}>
+                                        <Grid size={{ xs: 12, md: 6 }}>
                                             <TextField
                                                 fullWidth
                                                 required
@@ -258,7 +258,7 @@ const JoinUs = () => {
                                                 type="number"
                                             />
                                         </Grid>
-                                        <Grid item xs={12} md={6}>
+                                        <Grid size={{ xs: 12, md: 6 }}>
                                             <TextField
                                                 fullWidth
                                                 required
@@ -270,7 +270,7 @@ const JoinUs = () => {
                                                 type="number"
                                             />
                                         </Grid>
-                                        <Grid item xs={12} md={6}>
+                                        <Grid size={{ xs: 12, md: 6 }}>
                                             <TextField
                                                 fullWidth
                                                 label="Site Web (optionnel)"
@@ -280,7 +280,7 @@ const JoinUs = () => {
                                                 variant="outlined"
                                             />
                                         </Grid>
-                                        <Grid item xs={12}>
+                                        <Grid size={{ xs: 12 }}>
                                             <TextField
                                                 fullWidth
                                                 required
@@ -294,7 +294,7 @@ const JoinUs = () => {
                                                 placeholder="Décrivez votre projet en détail : objectifs, impact attendu, utilisation des fonds, jalons..."
                                             />
                                         </Grid>
-                                        <Grid item xs={12}>
+                                        <Grid size={{ xs: 12 }}>
                                             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
                                                 <Button
                                                     type="submit"

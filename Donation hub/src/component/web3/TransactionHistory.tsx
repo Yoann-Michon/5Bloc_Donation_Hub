@@ -29,7 +29,7 @@ import {
 import { formatBalance, formatTimeAgo, formatTxHash, getExplorerUrl } from '../../utils/web3Utils';
 import { motion, AnimatePresence } from 'motion/react';
 
-interface Transaction {
+export interface Transaction {
     hash: string;
     type: 'send' | 'receive' | 'approve' | 'mint' | 'other';
     amount: string;

@@ -111,6 +111,21 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
         color: '#0052FF',
         isTestnet: false,
     },
+    31337: {
+        chainId: 31337,
+        chainIdHex: '0x7a69',
+        name: 'hardhat',
+        displayName: 'Hardhat Local',
+        nativeCurrency: {
+            name: 'Hardhat Ether',
+            symbol: 'ETH',
+            decimals: 18,
+        },
+        rpcUrls: ['http://127.0.0.1:8545'],
+        blockExplorerUrls: [],
+        color: '#F6851B',
+        isTestnet: true,
+    },
 };
 
 /**

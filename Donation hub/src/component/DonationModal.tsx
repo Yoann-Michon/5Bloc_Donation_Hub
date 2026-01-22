@@ -45,13 +45,9 @@ interface DonationModalProps {
 
 type DonationStep = 'amount' | 'connecting' | 'uploading' | 'confirming' | 'success' | 'error';
 
-// Contract ABI for donate function
-const DONATION_ABI = [
-  "function donate(uint256 projectId, string memory tokenURI) external payable"
-];
+// Contract interaction now handled by useWallet hook
+// const CONTRACT_ADDRESS = ...;
 
-// Deployed contract address (from local deployment)
-const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
 const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
   const [amount, setAmount] = useState('');
@@ -59,7 +55,7 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
   const [modalError, setModalError] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string>('');
 
-  const { connect, account, isConnected, error: walletError, getContract } = useWallet();
+  const { connect, account, isConnected, error: walletError, getBadgeContract } = useWallet();
   const { showToast } = useToast();
 
   const proceedToDonation = useCallback(async () => {
@@ -70,18 +66,53 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
     }
 
     try {
+      // 0. Pre-validation checks
+      const contract = getBadgeContract();
+      if (!contract) throw new Error("Contract not initialized. Please checking wallet connection.");
+
+      // Check badge balance
+      // Note: We catch the error from the contract call or separate check
+      try {
+          const balance = await contract.balanceOf(account);
+          if (Number(balance) >= 4) {
+            throw new Error("Limite de 4 badges atteinte");
+          }
+      } catch (e: any) {
+           if (e.message.includes("Limite de 4 badges atteinte")) throw e;
+           // If logic is complicated, we might just let the main transaction fail, 
+           // but the prompt asks to handle/display these errors. 
+           // Re-throwing if it matches our custom error.
+      }
+
+      // Check cooldown
+      const lastAction = await contract.lastActionTimestamp(account);
+      const lastActionDate = new Date(Number(lastAction) * 1000);
+      const now = new Date();
+      // 5 minutes in ms
+      const diffMs = now.getTime() - lastActionDate.getTime();
+      const diffMinutes = diffMs / 1000 / 60;
+      
+      if (Number(lastAction) > 0 && diffMinutes < 5) {
+         throw new Error(`Cooldown de 5 minutes actif`);
+      }
+
       setStep('uploading');
 
-      // 1. Prepare Metadata
+      const amountVal = parseFloat(amount);
+      const isGold = amountVal >= 1.0;
+      const type = isGold ? "Gold" : "Bronze";
+
+      // 1. Prepare Metadata (Strict Format)
       const metadata = {
-        name: `Donation Badge - ${project.title}`,
-        type: "DonationBadge",
-        value: amount, // ETH amount
-        hash: `hash_${Date.now()}`, // unique hash
+        name: project.title,
+        type: type,
+        value: amount,
+        hash: `Qm${Date.now()}MOCK`, // Mock CID as requested
         previousOwners: [],
-        createdAt: new Date().toISOString(),
-        lastTransferAt: null
+        createdAt: new Date().toISOString()
       };
+
+      console.log('Generating metadata:', metadata);
 
       // 2. Upload to IPFS (Simulated)
       const tokenURI = await uploadToIPFS(metadata);
@@ -89,9 +120,6 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
       setStep('confirming');
 
       // 3. Interact with Smart Contract
-      const contract = getContract(CONTRACT_ADDRESS, DONATION_ABI);
-      if (!contract) throw new Error("Failed to get contract instance");
-
       const amountInWei = parseEther(amount);
       
       const tx = await contract.donate(project.id, tokenURI, {
@@ -100,11 +128,6 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
       
       setTxHash(tx.hash);
       
-      // Wait for transaction to be mined (optional, or let TransactionStatusIndicator handle it if we pass tx object)
-      // For now, we set success immediately after send to show the 'confirming' step which uses TransactionStatusIndicator
-      // But TransactionStatusIndicator expects a hash and monitors it.
-      
-      // We'll let the user see the confirming/mining screen
       setStep('confirming'); 
       showToast('Transaction submitted!', 'info');
 
@@ -112,18 +135,22 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
       console.error(err);
       setStep('error');
       
-      const error = err as { code?: number; info?: { error?: { code?: number } }; reason?: string; message?: string };
+      const error = err as { code?: number; reason?: string; message?: string };
+      let errorMessage = 'Failed to process donation';
 
-      if (error.code === 4001 || (error.info && error.info.error && error.info.error.code === 4001)) {
-        setModalError('Transaction rejected by user');
-      } else if (error.reason) { // Ethers error reason
-         setModalError(error.reason);
-      } else {
-        setModalError(error.message || 'Failed to process donation');
+      if (error.message && (error.message.includes("Limite de 4 badges atteinte") || error.message.includes("Cooldown"))) {
+          errorMessage = error.message;
+      } else if (error.reason) {
+          errorMessage = error.reason;
+      } else if (error.message) {
+          // Clean up common ethers error prefixes if needed
+           errorMessage = error.message;
       }
+
+      setModalError(errorMessage);
       showToast('Donation failed', 'error');
     }
-  }, [account, amount, getContract, project.id, project.title, showToast]);
+  }, [account, amount, getBadgeContract, project.id, project.title, showToast]);
 
   // Sync wallet error to modal error if step is connecting
   useEffect(() => {

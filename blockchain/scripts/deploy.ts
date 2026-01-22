@@ -1,15 +1,13 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
+  const DonationBadge = await ethers.getContractFactory("DonationBadge");
+  const donationBadge = await DonationBadge.deploy();
 
-  const context = await ethers.deployContract("DonationBadge");
-
-  await context.waitForDeployment();
+  await donationBadge.waitForDeployment();
 
   console.log(
-    `DonationBadge deployed to ${context.target}`
+    `DonationBadge deployed to: ${await donationBadge.getAddress()}`
   );
 }
 
