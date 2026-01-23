@@ -52,7 +52,6 @@ const MyProjects = () => {
     const draftProjects = myProjects.filter(p => p.status === 'Draft');
     const pendingProjects = myProjects.filter(p => p.status === 'Pending');
     const approvedProjects = myProjects.filter(p => p.status === 'Approved' || p.status === 'Fundraising');
-    const rejectedProjects = myProjects.filter(p => p.status === 'Rejected');
 
     const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
         setCurrentTab(newValue);
@@ -71,6 +70,10 @@ const MyProjects = () => {
             default:
                 return myProjects;
         }
+    };
+
+    const handleDelete = async (id: number): Promise<void> => {
+        await deleteProject(id);
     };
 
     return (
@@ -200,7 +203,7 @@ const MyProjects = () => {
                             onApprove={async () => { }}
                             onReject={async () => { }}
                             onEdit={(id) => navigate(`/dashboard/association/projects/${id}/edit`)}
-                            onDelete={deleteProject}
+                            onDelete={handleDelete}
                         />
                     ))
                 )}

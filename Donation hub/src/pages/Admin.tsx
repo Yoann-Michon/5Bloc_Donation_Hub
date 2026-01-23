@@ -57,6 +57,18 @@ const Admin = () => {
         }
     };
 
+    const handleApprove = async (id: number): Promise<void> => {
+        await approveProject(id);
+    };
+
+    const handleReject = async (id: number): Promise<void> => {
+        await rejectProject(id);
+    };
+
+    const handleDelete = async (id: number): Promise<void> => {
+        await deleteProject(id);
+    };
+
     return (
         <Container maxWidth="xl" sx={{ py: 4 }}>
             <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -128,10 +140,10 @@ const Admin = () => {
                         <ProjectApprovalCard
                             key={project.id}
                             project={project}
-                            onApprove={approveProject}
-                            onReject={rejectProject}
+                            onApprove={handleApprove}
+                            onReject={handleReject}
                             onEdit={(id) => navigate(`/dashboard/admin/projects/${id}/edit`)}
-                            onDelete={deleteProject}
+                            onDelete={handleDelete}
                         />
                     ))
                 )}
