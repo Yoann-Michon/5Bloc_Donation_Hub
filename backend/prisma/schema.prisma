@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  ASSOCIATION
+  USER
+}
+
+enum ProjectStatus {
+  PENDING
+  APPROVED
+  FUNDRAISING
+  COMPLETED
+  REJECTED
+}
+
+model User {
+  id               String    @id @default(uuid())
+  walletAddress    String    @unique @db.VarChar(42)
+  role             UserRole  @default(USER)
+  organizationName String?
+  email            String?
+
+  // Relations
+  projects         Project[]
+  donations        Donation[]
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@map("users")
+}
+
+model Project {
+  id          Int           @id @default(autoincrement())
+  title       String
+  description String        @db.Text
+  goal        Decimal       @db.Decimal(18, 4)
+  raised      Decimal       @default(0) @db.Decimal(18, 4)
+  category    String
+  image       String?
+  status      ProjectStatus @default(PENDING)
+
+  // Wallet owner
+  ownerWallet String        @db.VarChar(42)
+  owner       User          @relation(fields: [ownerWallet], references: [walletAddress])
+
+  // Approbation
+  approvedBy  String?       @db.VarChar(42)
+  approvedAt  DateTime?
+
+  // Relations
+  donations   Donation[]
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("projects")
+}
+
+model Donation {
+  id              String   @id @default(uuid())
+  amount          Decimal  @db.Decimal(18, 4)
+  txHash          String   @unique
+
+  // Donateur
+  donorWallet     String   @db.VarChar(42)
+  donor           User     @relation(fields: [donorWallet], references: [walletAddress])
+
+  // Projet
+  projectId       Int
+  project         Project  @relation(fields: [projectId], references: [id])
+
+  createdAt       DateTime @default(now())
+
+  @@map("donations")
+}
+
+model RoleChangeLog {
+  id            String   @id @default(uuid())
+  targetWallet  String   @db.VarChar(42)
+  adminWallet   String   @db.VarChar(42)
+  oldRole       UserRole
+  newRole       UserRole
+  reason        String?
+  timestamp     DateTime @default(now())
+
+  @@map("role_change_logs")
+}
