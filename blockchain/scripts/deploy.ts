@@ -6,9 +6,11 @@ async function main() {
 
   await donationBadge.waitForDeployment();
 
-  console.log(
-    `DonationBadge deployed to: ${await donationBadge.getAddress()}`
-  );
+  const address = await donationBadge.getAddress();
+  console.log(`DonationBadge deployed to: ${address}`);
+
+  // Small delay to allow logging to flush
+  await new Promise((resolve) => setTimeout(resolve, 2000));
 }
 
 // We recommend this pattern to be able to use async/await everywhere

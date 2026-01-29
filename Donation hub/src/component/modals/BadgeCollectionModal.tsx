@@ -160,14 +160,14 @@ const BadgeCollectionModal = ({ open, onClose, badges }: BadgeCollectionModalPro
                                                         }}
                                                     >
                                                         {badge.image ? (
-                                                          <Box
-                                                            component="img"
-                                                            src={badge.image}
-                                                            alt={badge.name}
-                                                            sx={{ width: 60, height: 60, objectFit: 'contain' }}
-                                                          />
+                                                            <Box
+                                                                component="img"
+                                                                src={badge.image}
+                                                                alt={badge.name}
+                                                                sx={{ width: 60, height: 60, objectFit: 'contain' }}
+                                                            />
                                                         ) : (
-                                                          <EmojiEvents sx={{ fontSize: 40, color: getTierColor(badge.tier) }} />
+                                                            <EmojiEvents sx={{ fontSize: 40, color: getTierColor(badge.tier) }} />
                                                         )}
                                                     </Box>
                                                     <Chip
@@ -194,31 +194,37 @@ const BadgeCollectionModal = ({ open, onClose, badges }: BadgeCollectionModalPro
                                                     <Divider sx={{ my: 1.5, borderColor: 'rgba(255,255,255,0.05)' }} />
 
                                                     {/* Certificate Section */}
-                                                    <Box sx={{ 
-                                                        p: 1.5, 
-                                                        bgcolor: 'rgba(0,0,0,0.2)', 
-                                                        borderRadius: 2, 
-                                                        border: '1px solid rgba(255,255,255,0.05)' 
+                                                    <Box sx={{
+                                                        p: 1.5,
+                                                        bgcolor: 'rgba(0,0,0,0.2)',
+                                                        borderRadius: 2,
+                                                        border: '1px solid rgba(255,255,255,0.05)'
                                                     }}>
                                                         <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 0.5, mb: 1, textTransform: 'uppercase', letterSpacing: 1 }}>
                                                             <Verified sx={{ fontSize: 12 }} />
                                                             Blockchain Metadata
                                                         </Typography>
-                                                        
+
                                                         {/* Resource Type */}
                                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
                                                             <Typography variant="caption" sx={{ color: 'text.secondary' }}>Type</Typography>
                                                             <Typography variant="caption" sx={{ color: 'white', fontWeight: 600 }}>{badge.type || badge.tier}</Typography>
                                                         </Box>
 
+                                                        {/* Blockchain Proof (Token ID) */}
+                                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                                                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>Preuve Blockchain</Typography>
+                                                            <Typography variant="caption" sx={{ color: 'white', fontWeight: 600, fontFamily: 'monospace' }}>Token ID #{badge.id}</Typography>
+                                                        </Box>
+
                                                         {/* Created Date */}
                                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                                                             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                                                            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'flex', gap: 0.5, alignItems: 'center' }}>
                                                                 <CalendarMonth sx={{ fontSize: 10 }} /> Created
-                                                             </Typography>
-                                                             <Typography variant="caption" sx={{ color: 'white' }}>
-                                                                 {badge.createdAt ? new Date(badge.createdAt).toLocaleDateString() : 'N/A'}
-                                                             </Typography>
+                                                            </Typography>
+                                                            <Typography variant="caption" sx={{ color: 'white' }}>
+                                                                {badge.createdAt ? new Date(typeof badge.createdAt === 'number' ? badge.createdAt * 1000 : badge.createdAt).toLocaleDateString() : 'N/A'}
+                                                            </Typography>
                                                         </Box>
 
                                                         {/* IPFS Hash */}
@@ -226,17 +232,17 @@ const BadgeCollectionModal = ({ open, onClose, badges }: BadgeCollectionModalPro
                                                             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'flex', gap: 0.5, alignItems: 'center' }}>
                                                                 <Fingerprint sx={{ fontSize: 10 }} /> IPFS Hash
                                                             </Typography>
-                                                            <Typography 
-                                                                variant="caption" 
-                                                                component="a" 
-                                                                href={badge.hash ? `https://ipfs.io/ipfs/${badge.hash}` : '#'}
+                                                            <Typography
+                                                                variant="caption"
+                                                                component="a"
+                                                                href={badge.hash ? `https://gateway.pinata.cloud/ipfs/${badge.hash}` : '#'}
                                                                 target="_blank"
-                                                                sx={{ 
-                                                                    display: 'block', 
-                                                                    fontFamily: 'monospace', 
-                                                                    color: 'primary.main', 
+                                                                sx={{
+                                                                    display: 'block',
+                                                                    fontFamily: 'monospace',
+                                                                    color: 'primary.main',
                                                                     textDecoration: 'none',
-                                                                    overflow: 'hidden', 
+                                                                    overflow: 'hidden',
                                                                     textOverflow: 'ellipsis',
                                                                     whiteSpace: 'nowrap',
                                                                     maxWidth: 200,
@@ -253,8 +259,8 @@ const BadgeCollectionModal = ({ open, onClose, badges }: BadgeCollectionModalPro
                                                                 <History sx={{ fontSize: 10 }} /> History
                                                             </Typography>
                                                             <Typography variant="caption" sx={{ color: 'text.secondary', fontStyle: 'italic' }}>
-                                                                {badge.previousOwners && badge.previousOwners.length > 0 
-                                                                    ? `${badge.previousOwners.length} previous owners` 
+                                                                {badge.previousOwners && badge.previousOwners.length > 0
+                                                                    ? `${badge.previousOwners.length} previous owners`
                                                                     : 'Original Owner (Minted)'}
                                                             </Typography>
                                                         </Box>
@@ -306,7 +312,7 @@ const BadgeCollectionModal = ({ open, onClose, badges }: BadgeCollectionModalPro
                                                     }}
                                                 >
                                                     {badge.image ? (
-                                                       <Box
+                                                        <Box
                                                             component="img"
                                                             src={badge.image}
                                                             alt={badge.name}

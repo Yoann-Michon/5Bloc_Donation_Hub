@@ -27,7 +27,27 @@ contract DonationBadge is ERC721URIStorage, Ownable {
     function donate(uint256 projectId, string memory metadataURI) external payable {
         // Enforce a donation amount (implied by context, though prompt didn't explicitly specify error message for this)
         require(msg.value > 0, "Donation must be greater than 0");
-        
+
         mintBadge(msg.sender, metadataURI);
+    }
+
+    /**
+     * @dev Returns an array of token IDs owned by `owner`.
+     * This eliminates the need for ERC721Enumerable or event filtering on the frontend.
+     */
+    function getTokensByOwner(address owner) external view returns (uint256[] memory) {
+        uint256 balance = balanceOf(owner);
+        uint256[] memory tokens = new uint256[](balance);
+        uint256 currentIndex = 0;
+
+        // Loop through all minted tokens to find those owned by `owner`
+        // Note: _tokenIds is the counter for the total number of minted tokens
+        for (uint256 i = 1; i <= _tokenIds; i++) {
+            if (_ownerOf(i) == owner) {
+                tokens[currentIndex] = i;
+                currentIndex++;
+            }
+        }
+        return tokens;
     }
 }

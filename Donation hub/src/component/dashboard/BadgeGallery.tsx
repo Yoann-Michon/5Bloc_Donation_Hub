@@ -21,10 +21,88 @@ export interface Badge {
     value?: string;
 }
 
+// Default images for fallback
+const DEFAULT_IMAGES = {
+    Bronze: 'https://img.freepik.com/vecteurs-premium/medaille-bronze-realiste-rubans-rouges-coupe-du-gagnant-gravee-badge-premium-pour-gagnants-realisations_88188-4035.jpg',
+    Silver: 'https://img.freepik.com/vecteurs-premium/medaille-argent-realiste-rubans-rouges-coupe-du-gagnant-gravee-badge-premium-pour-gagnants-realisations_88188-4037.jpg',
+    Gold: 'https://img.freepik.com/vecteurs-premium/medaille-or-realiste-rubans-rouges-coupe-du-vainqueur-gravee-badge-premium-pour-gagnants-realisations_88188-4043.jpg?w=996',
+    Unknown: 'https://placehold.co/200/808080/FFFFFF/png?text=Badge'
+};
+
+const getMetadata = async (tokenId: string, tokenURI: string): Promise<any> => {
+    // 1. Initialize with default/fallback data including the Hash
+    let hash = '';
+    if (tokenURI.startsWith('ipfs://')) {
+        hash = tokenURI.replace('ipfs://', '');
+    }
+
+    let metadata: any = {
+        name: `Badge #${tokenId}`,
+        type: 'Unknown',
+        value: '0',
+        hash: hash,
+        image: DEFAULT_IMAGES.Unknown,
+        description: hash ? `Metadata unavailable. IPFS Hash: ${hash}` : undefined
+    };
+
+    if (hash) {
+        // 2. Try Local Storage first
+        const localData = localStorage.getItem(hash);
+
+        if (localData) {
+            console.log(`Loaded metadata from LocalStorage for ${hash}`);
+            try {
+                const json = JSON.parse(localData);
+                // Merge local data into our default object
+                metadata = {
+                    ...metadata,
+                    ...json, // Overwrite defaults with local data
+                    // Ensure critical fields are present if missing in JSON
+                    name: json.name || metadata.name,
+                    image: json.image || DEFAULT_IMAGES[json.type as keyof typeof DEFAULT_IMAGES] || metadata.image,
+                    hash: hash // Ensure the URI hash is preserved
+                };
+            } catch (e) {
+                console.error("Error parsing local metadata", e);
+            }
+        } else {
+            // 3. Optional: Real IPFS Fetch (only if not in local storage)
+            // User requested strict localStorage logic, but keeping fetch as a secondary layer is good practice.
+            // However, to strictly follow "Correction MetaData" request: "Si les données n'existent pas, crée un objet par défaut incluant le hash"
+            // The default object created at the start satisfies this.
+
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+                const response = await fetch(`https://gateway.pinata.cloud/ipfs/${hash}`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                if (response.ok) {
+                    const json = await response.json();
+                    metadata = {
+                        ...metadata,
+                        ...json,
+                        name: json.name || metadata.name,
+                        image: json.image || DEFAULT_IMAGES[json.type as keyof typeof DEFAULT_IMAGES] || metadata.image,
+                        description: json.description || metadata.description,
+                        hash: hash // Ensure the URI hash is preserved
+                    };
+                }
+            } catch (ipfsError) {
+                console.warn(`Failed to fetch IPFS metadata for ${hash}`, ipfsError);
+                // We typically just keep the default metadata here
+            }
+        }
+    }
+
+    return metadata;
+};
+
 const BadgeGallery = () => {
     const [collectionOpen, setCollectionOpen] = useState(false);
     const { account, isConnected, getBadgeContract } = useWallet();
-    const [badges, setBadges] = useState<Badge[]>([]);
+    const [realBadges, setRealBadges] = useState<Badge[]>([]);
     const [loading, setLoading] = useState(false);
 
     const fetchBadges = useCallback(async () => {
@@ -34,18 +112,13 @@ const BadgeGallery = () => {
         try {
             const contract = getBadgeContract();
             if (!contract) return;
-            
+
             // Query Transfer events to find tokens owned by the user
             const filter = contract.filters.Transfer(null, account);
             const events = await contract.queryFilter(filter);
 
             const fetchedBadges: Badge[] = [];
 
-            // We iterate over events to find ALL tokens ever transferred to user
-            // In a production app, we would verify current ownership with ownerOf(tokenId)
-            // But for this demo, we assume incoming transfer usually means ownership unless burned/sent away
-            // To be safer, we can check ownerOf for each found ID.
-            
             // Deduplicate token IDs from events
             const tokenIds = Array.from(new Set(events.map(e => (e as any).args[2].toString())));
 
@@ -56,62 +129,20 @@ const BadgeGallery = () => {
                     if (owner.toLowerCase() !== account.toLowerCase()) continue;
 
                     const tokenURI = await contract.tokenURI(tokenId);
-                    
-                    let metadata: any = { name: `Badge #${tokenId}`, type: 'Unknown', value: '0' };
-                    
-                    if (tokenURI.startsWith('ipfs://')) {
-                         const hash = tokenURI.replace('ipfs://', '');
-                         
-                         // 1. Try Local Storage first (Mock IPFS)
-                         const localData = localStorage.getItem(hash);
-                         if (localData) {
-                             console.log(`Loaded metadata from LocalStorage for ${hash}`);
-                             try {
-                                 const json = JSON.parse(localData);
-                                 metadata = {
-                                     name: json.name || `Donation Project #${tokenId}`,
-                                     type: json.type || 'Bronze',
-                                     value: json.value || '0',
-                                     hash: hash,
-                                     previousOwners: json.previousOwners || [],
-                                     createdAt: json.createdAt || new Date().toISOString(),
-                                 };
-                             } catch (e) {
-                                 console.error("Error parsing local metadata", e);
-                             }
-                         } else {
-                             // 2. Fallback to Real IPFS Fetch (only if not in local storage)
-                             try {
-                                  const response = await fetch(`https://ipfs.io/ipfs/${hash}`);
-                                  if (!response.ok) throw new Error("IPFS fetch failed");
-                                  const json = await response.json();
-                                  
-                                  metadata = {
-                                      name: json.name || `Donation Project #${tokenId}`,
-                                      type: json.type || 'Bronze',
-                                      value: json.value || '0',
-                                      hash: hash,
-                                      previousOwners: json.previousOwners || [],
-                                      createdAt: json.createdAt || new Date().toISOString(),
-                                  };
-                             } catch (ipfsError) {
-                                  console.warn(`Failed to fetch IPFS metadata for ${hash}`, ipfsError);
-                                  // Fallback: don't break the UI, just show basic info
-                                  metadata.hash = hash;
-                                  metadata.name = `Badge #${tokenId} (Metadata Unavailable)`;
-                             }
-                         }
-                    }
+                    const metadata = await getMetadata(tokenId, tokenURI);
 
                     // Map Tier to Icon/Color
-                    let tierConfig = { icon: <RocketLaunch sx={{ fontSize: 48 }} />, color: '#CD7F32' }; // Bronze default
-                    
+                    let tierConfig = { icon: <RocketLaunch sx={{ fontSize: 48 }} />, color: '#CD7F32' }; // Common/Unknown default
+
                     if (metadata.type === 'Gold') {
-                         tierConfig = { icon: <RocketLaunch sx={{ fontSize: 48 }} />, color: '#FFCC00' };
+                        tierConfig = { icon: <RocketLaunch sx={{ fontSize: 48 }} />, color: '#FFCC00' };
                     } else if (metadata.type === 'Silver') {
-                         tierConfig = { icon: <AccountBalance sx={{ fontSize: 48 }} />, color: '#C0C0C0' }; // Silver
+                        tierConfig = { icon: <AccountBalance sx={{ fontSize: 48 }} />, color: '#C0C0C0' };
                     } else if (metadata.type === 'Bronze') {
-                         tierConfig = { icon: <Forest sx={{ fontSize: 48 }} />, color: '#CD7F32' }; // Bronze
+                        tierConfig = { icon: <Forest sx={{ fontSize: 48 }} />, color: '#CD7F32' };
+                    } else {
+                        // Default / Unknown
+                        tierConfig = { icon: <MilitaryTech sx={{ fontSize: 48 }} />, color: '#808080' };
                     }
 
                     fetchedBadges.push({
@@ -120,7 +151,8 @@ const BadgeGallery = () => {
                         tier: metadata.type || 'Common',
                         icon: tierConfig.icon,
                         color: tierConfig.color,
-                        description: `Donation: ${metadata.value || '?'} ETH`,
+                        image: metadata.image,
+                        description: metadata.description || `Donation: ${metadata.value || '?'} ETH`,
                         hash: metadata.hash,
                         type: metadata.type,
                         createdAt: metadata.createdAt,
@@ -132,8 +164,8 @@ const BadgeGallery = () => {
                     console.error(`Error fetching data for token ${tokenId}`, err);
                 }
             }
-            
-            setBadges(fetchedBadges);
+
+            setRealBadges(fetchedBadges);
 
         } catch (error) {
             console.error("Error fetching badges", error);
@@ -146,32 +178,32 @@ const BadgeGallery = () => {
         if (isConnected && account) {
             fetchBadges();
         } else {
-            setBadges([]);
+            setRealBadges([]);
         }
     }, [isConnected, account, fetchBadges]);
 
 
     // Data for the modal
-    const COLLECTION_VIEW = badges.map(b => ({
-         id: Number(b.id),
-         name: b.name,
-         tier: b.tier as any,
-         count: 1,
-         image: '', 
-         description: b.description || '',
-         unlocked: true,
-         // Pass through metadata for the modal to display
-         hash: b.hash,
-         type: b.type,
-         createdAt: b.createdAt,
-         previousOwners: b.previousOwners,
-         value: b.value
+    const COLLECTION_VIEW = realBadges.map(b => ({
+        id: Number(b.id),
+        name: b.name,
+        tier: b.tier as any,
+        count: 1,
+        image: b.image || '',
+        description: b.description || '',
+        unlocked: true,
+        // Pass through metadata for the modal to display
+        hash: b.hash,
+        type: b.type,
+        createdAt: b.createdAt,
+        previousOwners: b.previousOwners,
+        value: b.value
     }));
 
     const openIPFS = (e: React.MouseEvent, hash?: string) => {
         e.stopPropagation();
         if (hash) {
-            window.open(`https://ipfs.io/ipfs/${hash}`, '_blank');
+            window.open(`https://gateway.pinata.cloud/ipfs/${hash}`, '_blank');
         }
     };
 
@@ -184,7 +216,7 @@ const BadgeGallery = () => {
                 </Typography>
                 <Box>
                     <Button onClick={fetchBadges} disabled={loading} startIcon={<Refresh />}>
-                       Refresh
+                        Refresh
                     </Button>
                     <Button
                         onClick={() => setCollectionOpen(true)}
@@ -200,13 +232,13 @@ const BadgeGallery = () => {
                     <Typography>Connect wallet to view your badges</Typography>
                 </Box>
             ) : loading ? (
-                 <Box sx={{ display: 'flex', gap: 2, overflowX: 'auto', pb: 2 }}>
-                    {[1,2,3].map(i => (
+                <Box sx={{ display: 'flex', gap: 2, overflowX: 'auto', pb: 2 }}>
+                    {[1, 2, 3].map(i => (
                         <Skeleton key={i} variant="rectangular" width={200} height={200} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.1)' }} />
                     ))}
-                 </Box>
-            ) : badges.length === 0 ? (
-                 <Box sx={{ p: 4, textAlign: 'center', bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+                </Box>
+            ) : realBadges.length === 0 ? (
+                <Box sx={{ p: 4, textAlign: 'center', bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
                     <Typography>No badges found. Donate to earn your first badge!</Typography>
                 </Box>
             ) : (
@@ -220,7 +252,7 @@ const BadgeGallery = () => {
                         '::-webkit-scrollbar-thumb': { bgcolor: 'rgba(255, 255, 255, 0.1)', borderRadius: 2 },
                     }}
                 >
-                    {badges.map((badge, index) => (
+                    {realBadges.map((badge, index) => (
                         <Box
                             key={index}
                             sx={{
@@ -287,16 +319,17 @@ const BadgeGallery = () => {
                                 <Typography variant="caption" sx={{ color: badge.color, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '0.65rem', mb: 1 }}>
                                     {badge.tier}
                                 </Typography>
-                                
-                                {badge.hash && (
-                                    <Tooltip title="View on IPFS">
-                                        <Button 
-                                            size="small" 
+
+                                <Tooltip title={badge.hash ? "View on IPFS" : "No IPFS Hash"}>
+                                    <span>
+                                        <Button
+                                            size="small"
                                             onClick={(e) => openIPFS(e, badge.hash)}
                                             startIcon={<OpenInNew sx={{ fontSize: 12 }} />}
-                                            sx={{ 
-                                                minWidth: 0, 
-                                                p: 0.5, 
+                                            disabled={!badge.hash}
+                                            sx={{
+                                                minWidth: 0,
+                                                p: 0.5,
                                                 fontSize: '0.6rem',
                                                 color: 'text.secondary',
                                                 '&:hover': { color: 'primary.main', bgcolor: 'transparent' }
@@ -304,8 +337,8 @@ const BadgeGallery = () => {
                                         >
                                             IPFS
                                         </Button>
-                                    </Tooltip>
-                                )}
+                                    </span>
+                                </Tooltip>
                             </Box>
                         </Box>
                     ))}

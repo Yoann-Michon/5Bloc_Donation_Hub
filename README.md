@@ -6,11 +6,22 @@ A decentralized application (DApp) for community donations with NFT badges.
 
 -   [Node.js](https://nodejs.org/) (v16 or higher)
 -   [MetaMask](https://metamask.io/) browser extension
+-   [Pinata]- (https://pinata.cloud/)A Pinata Account (for IPFS)
 
 ## Project Structure
 
 -   `blockchain/`: Smart Contract (Hardhat)
 -   `Donation hub/`: Frontend Application (React/Vite)
+
+## IMPORTANT
+Create a `.env` file in the `Donation hub` directory:
+
+```env
+# Donation hub/.env
+VITE_PINATA_JWT=your_pinata_jwt_token_here
+```
+
+> **Note:** The variable MUST start with `VITE_` to be visible to the frontend application.
 
 ## Step 1: Start the Blockchain (Localhost)
 

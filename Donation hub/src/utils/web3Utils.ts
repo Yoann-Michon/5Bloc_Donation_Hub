@@ -32,7 +32,13 @@ export const formatBalance = (
 ): string => {
     try {
         const balanceStr = balance.toString();
-        const formatted = ethers.formatUnits(balanceStr, decimals);
+        let formatted = balanceStr;
+
+        // If it doesn't have a decimal point, assume it's in Wei and needs formatting
+        if (!balanceStr.includes('.')) {
+            formatted = ethers.formatUnits(balanceStr, decimals);
+        }
+
         const num = parseFloat(formatted);
 
         if (num === 0) return '0';

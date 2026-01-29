@@ -7,7 +7,7 @@ import {
   Button,
 } from '@mui/material';
 import ProjectViewSkeleton from '../component/skeletons/ProjectViewSkeleton';
-import projectsData from '../data/projects.json';
+import { getProject } from '../utils/api';
 import DonationModal from '../component/DonationModal';
 import type { Project } from '../types/project';
 import ProjectHero from '../component/project/ProjectHero';
@@ -28,12 +28,22 @@ const ProjectView = () => {
   const isDashboard = location.pathname.startsWith('/dashboard');
   const projectsPath = isDashboard ? '/dashboard/projects' : '/projects';
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(timer);
-  }, []);
+  const [project, setProject] = useState<Project | undefined>();
 
-  const project = projectsData.find((p) => p.id === Number(id)) as Project | undefined;
+  useEffect(() => {
+    const fetchProject = async () => {
+      if (!id) return;
+      try {
+        const data = await getProject(Number(id));
+        setProject(data);
+      } catch (error) {
+        console.error("Failed to fetch project", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProject();
+  }, [id]);
 
   if (isLoading) {
     return <ProjectViewSkeleton />;

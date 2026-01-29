@@ -12,6 +12,10 @@ import {
   Alert,
   CircularProgress,
   Divider,
+<<<<<<< HEAD
+=======
+  Tooltip,
+>>>>>>> fc0bba6cc18f157f15023de4bcfd70cbc8119062
 } from '@mui/material';
 import { Close, AccountBalanceWallet, CheckCircle } from '@mui/icons-material';
 import { useWallet } from '../hooks/useWallet';
@@ -20,6 +24,7 @@ import TransactionStatusIndicator from './web3/TransactionStatus';
 import NetworkSwitcher from './web3/NetworkSwitcher';
 import { parseEther } from 'ethers';
 
+<<<<<<< HEAD
 // Helper to simulate IPFS upload using LocalStorage
 const uploadToIPFS = async (metadata: any): Promise<string> => {
   return new Promise((resolve) => {
@@ -38,6 +43,50 @@ const uploadToIPFS = async (metadata: any): Promise<string> => {
       resolve(`ipfs://${fakeCID}`);
     }, 1000);
   });
+=======
+// Replace with your real Pinata JWT
+const PINATA_JWT = import.meta.env.VITE_PINATA_JWT;
+
+// Upload metadata to Pinata (IPFS)
+const uploadToIPFS = async (metadata: any): Promise<string> => {
+  try {
+    if (!PINATA_JWT) {
+        throw new Error("Pinata JWT not found. Check .env file.");
+    }
+
+    console.log("Uploading to Pinata... JWT present:", !!PINATA_JWT);
+
+    const response = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${PINATA_JWT}`
+      },
+      body: JSON.stringify({
+        pinataContent: metadata,
+        pinataMetadata: {
+          name: metadata.name || "Donation Badge Metadata"
+        }
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Pinata upload failed: ${response.status} ${response.statusText} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log("Pinata Upload Success:", data);
+    
+    // Also save to localStorage for immediate UI availability before IPFS propagates
+    localStorage.setItem(data.IpfsHash, JSON.stringify(metadata));
+
+    return `ipfs://${data.IpfsHash}`;
+  } catch (error) {
+    console.error("IPFS Upload Error Details:", error);
+    throw error;
+  }
+>>>>>>> fc0bba6cc18f157f15023de4bcfd70cbc8119062
 };
 
 interface DonationModalProps {
@@ -66,6 +115,15 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
   const { connect, account, isConnected, error: walletError, getBadgeContract } = useWallet();
   const { showToast } = useToast();
 
+<<<<<<< HEAD
+=======
+const DEFAULT_IMAGES = {
+    Bronze: 'https://img.freepik.com/vecteurs-premium/medaille-bronze-realiste-rubans-rouges-coupe-du-gagnant-gravee-badge-premium-pour-gagnants-realisations_88188-4035.jpg',   
+    Silver: 'https://img.freepik.com/vecteurs-premium/medaille-argent-realiste-rubans-rouges-coupe-du-gagnant-gravee-badge-premium-pour-gagnants-realisations_88188-4037.jpg',
+    Gold: 'https://img.freepik.com/vecteurs-premium/medaille-or-realiste-rubans-rouges-coupe-du-vainqueur-gravee-badge-premium-pour-gagnants-realisations_88188-4043.jpg?w=996',
+    Unknown: 'https://placehold.co/200/808080/FFFFFF/png?text=Badge'
+};
+>>>>>>> fc0bba6cc18f157f15023de4bcfd70cbc8119062
   const proceedToDonation = useCallback(async () => {
     if (!account) {
       setModalError("Wallet not connected correctly");
@@ -107,8 +165,24 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
       setStep('uploading');
 
       const amountVal = parseFloat(amount);
+<<<<<<< HEAD
       const isGold = amountVal >= 1.0;
       const type = isGold ? "Gold" : "Bronze";
+=======
+      let type: "Bronze" | "Silver" | "Gold" | "Unknown" = "Unknown";
+      let imageUrl = DEFAULT_IMAGES.Unknown;
+      
+      if (amountVal < 0.5) {
+          type = "Bronze";
+          imageUrl = DEFAULT_IMAGES.Bronze;
+      } else if (amountVal >= 0.5 && amountVal < 1.0) {
+          type = "Silver";
+          imageUrl = DEFAULT_IMAGES.Silver;
+      } else if (amountVal >= 1.0) {
+          type = "Gold";
+          imageUrl = DEFAULT_IMAGES.Gold;
+      }
+>>>>>>> fc0bba6cc18f157f15023de4bcfd70cbc8119062
 
       // 1. Prepare Metadata (Strict Format)
       const nowTimestamp = Math.floor(Date.now() / 1000); // Seconds
@@ -118,6 +192,10 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
         name: `Badge de don - ${project.title}`,
         type: type,
         value: `${amount} ETH`, // Strict: "0.1 ETH"
+<<<<<<< HEAD
+=======
+        image: imageUrl,
+>>>>>>> fc0bba6cc18f157f15023de4bcfd70cbc8119062
         hash: "", // Will be filled by upload logic
         previousOwners: [],
         createdAt: nowTimestamp,
@@ -185,9 +263,63 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
     }
   }, [isConnected, step, proceedToDonation]);
 
+<<<<<<< HEAD
   const quickAmounts = [0.1, 0.5, 1, 2, 5];
 
   const handleDonate = async () => {
+=======
+  const [cooldownRemaining, setCooldownRemaining] = useState<number>(0);
+
+  // Check Cooldown on mount/connect
+  useEffect(() => {
+    let isActive = true;
+    const checkCooldown = async () => {
+        if (!account || !isConnected) return;
+        const contract = getBadgeContract();
+        if (!contract) return;
+
+        try {
+            const lastAction = await contract.lastActionTimestamp(account);
+            const lastActionDate = Number(lastAction) * 1000;
+            const now = Date.now();
+            const diffMs = now - lastActionDate;
+            const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
+
+            if (diffMs < COOLDOWN_MS) {
+                const remaining = Math.ceil((COOLDOWN_MS - diffMs) / 1000); // Seconds
+                if (isActive) setCooldownRemaining(remaining);
+            } else {
+                if (isActive) setCooldownRemaining(0);
+            }
+        } catch (e) {
+            console.error("Error checking cooldown", e);
+        }
+    };
+
+    checkCooldown();
+    // Poll every second if cooldown is active to update timer UI
+    const interval = setInterval(() => {
+        if (cooldownRemaining > 0) {
+            setCooldownRemaining(prev => Math.max(0, prev - 1));
+        } else {
+            // Re-check periodically just in case
+            checkCooldown();
+        }
+    }, 1000);
+
+    return () => {
+        isActive = false;
+        clearInterval(interval);
+    };
+  }, [account, isConnected, getBadgeContract, cooldownRemaining]);
+
+
+  const quickAmounts = [0.1, 0.5, 1, 2, 5];
+
+  const handleDonate = async () => {
+    if (cooldownRemaining > 0) return;
+
+>>>>>>> fc0bba6cc18f157f15023de4bcfd70cbc8119062
     const isValidAmount = /^\d*\.?\d+$/.test(amount) && parseFloat(amount) > 0;
 
     if (!isValidAmount) {
@@ -345,6 +477,7 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
               <Button onClick={handleClose} sx={{ color: 'text.secondary' }}>
                 Cancel
               </Button>
+<<<<<<< HEAD
               <Button
                 variant="contained"
                 onClick={handleDonate}
@@ -354,6 +487,21 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
               >
                 Donate Now
               </Button>
+=======
+              <Tooltip title={cooldownRemaining > 0 ? `Cooldown active. Wait ${Math.floor(cooldownRemaining / 60)}m ${cooldownRemaining % 60}s` : ''}>
+                <span>
+                  <Button
+                    variant="contained"
+                    onClick={handleDonate}
+                    startIcon={<AccountBalanceWallet />}
+                    disabled={!amount || parseFloat(amount) <= 0 || cooldownRemaining > 0}
+                    sx={{ px: 4 }}
+                  >
+                    {cooldownRemaining > 0 ? `Wait ${Math.floor(cooldownRemaining / 60)}m ${cooldownRemaining % 60}s` : 'Donate Now'}
+                  </Button>
+                </span>
+              </Tooltip>
+>>>>>>> fc0bba6cc18f157f15023de4bcfd70cbc8119062
             </DialogActions>
           </>
         );

@@ -1,14 +1,8 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client/extension';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
-  async onModuleInit() {
-    await this.$connect();
-    console.log('✅ Database connected');
-  }
-
-  async onModuleDestroy() {
-    await this.$disconnect();
+export class AppService {
+  getHello(): string {
+    return 'Donation Hub Backend is Running!';
   }
 }

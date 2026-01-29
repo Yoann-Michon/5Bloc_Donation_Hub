@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Box, Container, Typography } from '@mui/material';
 import ProjectCardSkeleton from '../component/skeletons/ProjectCardSkeleton';
-import projectsData from '../data/projects.json';
+import { getProjects } from '../utils/api';
 import type { Project } from '../types/project';
 import ProjectStats from '../component/project/ProjectStats';
 import HorizontalFilterBar from '../component/project/HorizontalFilterBar';
@@ -14,17 +14,27 @@ const Projects = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [sortBy, setSortBy] = useState<string>('relevant');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Simulate loading
+  // Fetch projects from API
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(timer);
+    const fetchProjects = async () => {
+      try {
+        const data = await getProjects();
+        setProjects(data);
+      } catch (error) {
+        console.error("Failed to fetch projects", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProjects();
   }, []);
 
   // Filter and sort projects
   const filteredProjects = useMemo(() => {
-    let filtered = (projectsData as unknown as Project[]);
+    let filtered = projects;
 
     // Category filter
     if (selectedCategory !== 'All') {
