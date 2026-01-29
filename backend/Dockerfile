@@ -12,5 +12,11 @@ RUN npx prisma generate
 
 RUN npm run build
 
+# Copier et rendre exécutable le script de démarrage
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 EXPOSE 3000
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/main"]
+
+# Utiliser le script de démarrage
+ENTRYPOINT ["docker-entrypoint.sh"]

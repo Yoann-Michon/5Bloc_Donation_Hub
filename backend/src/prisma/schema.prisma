@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -23,21 +20,56 @@ enum ProjectStatus {
   REJECTED
 }
 
+enum BadgeTier {
+  BRONZE
+  SILVER
+  GOLD
+  LEGENDARY
+}
+
+enum PrivilegeType {
+  VOTE_ON_PROPOSALS
+  EARLY_ACCESS_PROJECTS
+  CREATE_PROPOSALS
+  PARTICIPATE_GOVERNANCE
+  REDUCED_FEES
+  PRIORITY_SUPPORT
+}
+
 model User {
   id               String    @id @default(uuid())
   walletAddress    String    @unique @db.VarChar(42)
   role             UserRole  @default(USER)
   organizationName String?
-  email            String?
+  email            String?   @unique
 
-  // Relations
-  projects         Project[]
-  donations        Donation[]
+  nonce            String    @default(uuid())
+  isActive         Boolean   @default(true)
+  lastLogin        DateTime?
 
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
+  @@index([walletAddress])
+  @@index([role])
   @@map("users")
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  icon        String?
+  color       String?
+
+  projects    Project[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([slug])
+  @@map("categories")
 }
 
 model Project {
@@ -46,24 +78,26 @@ model Project {
   description String        @db.Text
   goal        Decimal       @db.Decimal(18, 4)
   raised      Decimal       @default(0) @db.Decimal(18, 4)
-  category    String
   image       String?
   status      ProjectStatus @default(PENDING)
 
-  // Wallet owner
-  ownerWallet String        @db.VarChar(42)
-  owner       User          @relation(fields: [ownerWallet], references: [walletAddress])
+  categoryId  String
+  category    Category      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
 
-  // Approbation
+  ownerWallet String        @db.VarChar(42)
+
   approvedBy  String?       @db.VarChar(42)
   approvedAt  DateTime?
 
-  // Relations
   donations   Donation[]
 
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
+  @@index([ownerWallet])
+  @@index([categoryId])
+  @@index([status])
+  @@index([status, categoryId])
   @@map("projects")
 }
 
@@ -72,16 +106,21 @@ model Donation {
   amount          Decimal  @db.Decimal(18, 4)
   txHash          String   @unique
 
-  // Donateur
-  donorWallet     String   @db.VarChar(42)
-  donor           User     @relation(fields: [donorWallet], references: [walletAddress])
+  verified        Boolean  @default(false)
+  verifiedAt      DateTime?
+  blockNumber     Int?
 
-  // Projet
+  donorWallet     String   @db.VarChar(42)
+
   projectId       Int
-  project         Project  @relation(fields: [projectId], references: [id])
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   createdAt       DateTime @default(now())
 
+  @@index([donorWallet])
+  @@index([projectId])
+  @@index([txHash])
+  @@index([createdAt])
   @@map("donations")
 }
 
@@ -94,5 +133,37 @@ model RoleChangeLog {
   reason        String?
   timestamp     DateTime @default(now())
 
+  @@index([targetWallet])
+  @@index([timestamp])
   @@map("role_change_logs")
+}
+
+model UserBadge {
+  id           String    @id @default(uuid())
+  walletAddress String   @db.VarChar(42)
+  tokenId      Int
+  tier         BadgeTier
+  metadataUri  String?
+
+  acquiredAt   DateTime  @default(now())
+  lastSyncAt   DateTime  @default(now())
+
+  @@unique([walletAddress, tokenId])
+  @@index([walletAddress])
+  @@index([tier])
+  @@map("user_badges")
+}
+
+model Privilege {
+  id          String        @id @default(uuid())
+  type        PrivilegeType @unique
+  name        String
+  description String?
+  requiredTier BadgeTier
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([requiredTier])
+  @@map("privileges")
 }

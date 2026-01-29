@@ -11,7 +11,7 @@ export class CreateProjectDto {
     description: string;
 
     @IsNotEmpty()
-    goal: string; // Decimal passed as string to avoid precision loss
+    goal: string;
 
     @IsString()
     @IsNotEmpty()
