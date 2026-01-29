@@ -5,30 +5,45 @@ import { BadgeTier } from '@prisma/client';
 @Injectable()
 export class BlockchainService {
   private provider: ethers.JsonRpcProvider;
-  private contract: ethers.Contract;
+  private contract: ethers.Contract | null = null;
+  private contractAddress: string;
 
   constructor() {
     this.provider = new ethers.JsonRpcProvider(
       process.env.BLOCKCHAIN_RPC_URL || 'http://blockchain:8545'
     );
 
-    const contractAddress = process.env.CONTRACT_ADDRESS || '';
-    const contractABI = [
-      'function balanceOf(address owner) view returns (uint256)',
-      'function getTokensByOwner(address owner) view returns (uint256[])',
-      'function tokenURI(uint256 tokenId) view returns (string)',
-    ];
+    this.contractAddress = process.env.CONTRACT_ADDRESS || '';
+  }
 
-    this.contract = new ethers.Contract(
-      contractAddress,
-      contractABI,
-      this.provider
-    );
+  private getContract(): ethers.Contract | null {
+    if (!this.contractAddress) {
+      return null;
+    }
+
+    if (!this.contract) {
+      const contractABI = [
+        'function balanceOf(address owner) view returns (uint256)',
+        'function getTokensByOwner(address owner) view returns (uint256[])',
+        'function tokenURI(uint256 tokenId) view returns (string)',
+      ];
+
+      this.contract = new ethers.Contract(
+        this.contractAddress,
+        contractABI,
+        this.provider
+      );
+    }
+
+    return this.contract;
   }
 
   async getBadgeCount(walletAddress: string): Promise<number> {
     try {
-      const balance = await this.contract.balanceOf(walletAddress);
+      const contract = this.getContract();
+      if (!contract) return 0;
+
+      const balance = await contract.balanceOf(walletAddress);
       return Number(balance);
     } catch (error) {
       return 0;
@@ -37,11 +52,14 @@ export class BlockchainService {
 
   async getUserBadges(walletAddress: string): Promise<Array<{ tokenId: number; metadataUri: string; tier: BadgeTier }>> {
     try {
-      const tokenIds = await this.contract.getTokensByOwner(walletAddress);
+      const contract = this.getContract();
+      if (!contract) return [];
+
+      const tokenIds = await contract.getTokensByOwner(walletAddress);
       const badges = [];
 
       for (const tokenId of tokenIds) {
-        const metadataUri = await this.contract.tokenURI(Number(tokenId));
+        const metadataUri = await contract.tokenURI(Number(tokenId));
         const tier = this.determineTier(Number(tokenId));
 
         badges.push({

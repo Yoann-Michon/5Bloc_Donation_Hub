@@ -8,8 +8,21 @@ export class UsersService {
   constructor(private prisma: PrismaService) { }
 
   async create(createUserDto: CreateUserDto) {
+    const existingUser = await this.prisma.user.findUnique({
+      where: { walletAddress: createUserDto.walletAddress },
+    });
+
+    if (existingUser) {
+      return existingUser;
+    }
+
     return this.prisma.user.create({
-      data: createUserDto,
+      data: {
+        ...createUserDto,
+        role: createUserDto.role || 'USER',
+        isActive: true,
+        lastLogin: new Date(),
+      } as any,
     });
   }
 

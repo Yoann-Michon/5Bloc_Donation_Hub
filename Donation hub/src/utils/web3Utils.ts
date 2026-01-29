@@ -46,7 +46,6 @@ export const formatBalance = (
 
         return num.toFixed(displayDecimals).replace(/\.?0+$/, '');
     } catch (error) {
-        console.error('Error formatting balance:', error);
         return '0';
     }
 };
@@ -119,7 +118,6 @@ export const weiToGwei = (wei: string | number | bigint): string => {
     try {
         return ethers.formatUnits(wei.toString(), 'gwei');
     } catch (error) {
-        console.error('Error converting Wei to Gwei:', error);
         return '0';
     }
 };
@@ -133,7 +131,6 @@ export const ethToWei = (eth: string | number): string => {
     try {
         return ethers.parseEther(eth.toString()).toString();
     } catch (error) {
-        console.error('Error converting ETH to Wei:', error);
         return '0';
     }
 };
@@ -217,14 +214,12 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
                 document.execCommand('copy');
                 return true;
             } catch (error) {
-                console.error('Fallback: Could not copy text: ', error);
                 return false;
             } finally {
                 document.body.removeChild(textArea);
             }
         }
     } catch (error) {
-        console.error('Could not copy text: ', error);
         return false;
     }
 };

@@ -1,20 +1,36 @@
+import { useState, useEffect } from 'react';
 import { Box, Container, Typography, Button } from '@mui/material';
 import { ArrowForward } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import VortexProjectCard from './project/VortexProjectCard';
-import projectsData from '../data/projects.json';
+import ProjectCardSkeleton from './skeletons/ProjectCardSkeleton';
+import { getProjects } from '../utils/api';
 import { type Project } from '../types/project';
 
 const FeaturedProjects = () => {
   const navigate = useNavigate();
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Get first 3 projects
-  const featuredProjects = projectsData.slice(0, 3).map((project) => {
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const data = await getProjects();
+        setProjects(data.slice(0, 3));
+      } catch (error) {
+        // Error handled silently
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProjects();
+  }, []);
+
+  const featuredProjects = projects.map((project) => {
     const p = project as Project;
-    // Determine badge based on funding status
     const percentage = (p.raised / p.goal) * 100;
     let badge: 'Legendary' | 'Rare' | 'Epic' | 'Common' | 'New' = 'Common';
-    let accentColor = '#10B981'; // Emerald
+    let accentColor = '#10B981';
 
     if (percentage >= 90) {
       badge = 'Legendary';
@@ -105,12 +121,18 @@ const FeaturedProjects = () => {
             gap: 4,
           }}
         >
-          {featuredProjects.map((project) => (
-            <VortexProjectCard
-              key={project.id}
-              {...project}
-            />
-          ))}
+          {isLoading ? (
+            Array.from(new Array(3)).map((_, index) => (
+              <ProjectCardSkeleton key={index} />
+            ))
+          ) : (
+            featuredProjects.map((project) => (
+              <VortexProjectCard
+                key={project.id}
+                {...project}
+              />
+            ))
+          )}
         </Box>
       </Container>
     </Box>

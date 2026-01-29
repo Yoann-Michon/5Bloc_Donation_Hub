@@ -2,9 +2,9 @@ import { Box, Typography, Button, Skeleton, Tooltip } from '@mui/material';
 import { MilitaryTech, RocketLaunch, Forest, AccountBalance, Refresh, OpenInNew } from '@mui/icons-material';
 import { useState, useEffect, useCallback } from 'react';
 import BadgeCollectionModal from '../modals/BadgeCollectionModal';
+import BadgeDetailsModal from '../modals/BadgeDetailsModal';
 import { useWallet } from '../../hooks/useWallet';
 
-// Badge interface matching the component structure + Metadata fields
 export interface Badge {
     id: number | string;
     name: string;
@@ -13,7 +13,6 @@ export interface Badge {
     color: string;
     image?: string;
     description?: string;
-    // Metadata fields
     hash?: string;
     type?: string;
     createdAt?: string;
@@ -21,7 +20,6 @@ export interface Badge {
     value?: string;
 }
 
-// Default images for fallback
 const DEFAULT_IMAGES = {
     Bronze: 'https://img.freepik.com/vecteurs-premium/medaille-bronze-realiste-rubans-rouges-coupe-du-gagnant-gravee-badge-premium-pour-gagnants-realisations_88188-4035.jpg',
     Silver: 'https://img.freepik.com/vecteurs-premium/medaille-argent-realiste-rubans-rouges-coupe-du-gagnant-gravee-badge-premium-pour-gagnants-realisations_88188-4037.jpg',
@@ -30,7 +28,6 @@ const DEFAULT_IMAGES = {
 };
 
 const getMetadata = async (tokenId: string, tokenURI: string): Promise<any> => {
-    // 1. Initialize with default/fallback data including the Hash
     let hash = '';
     if (tokenURI.startsWith('ipfs://')) {
         hash = tokenURI.replace('ipfs://', '');
@@ -46,31 +43,22 @@ const getMetadata = async (tokenId: string, tokenURI: string): Promise<any> => {
     };
 
     if (hash) {
-        // 2. Try Local Storage first
         const localData = localStorage.getItem(hash);
 
         if (localData) {
-            console.log(`Loaded metadata from LocalStorage for ${hash}`);
             try {
                 const json = JSON.parse(localData);
-                // Merge local data into our default object
                 metadata = {
                     ...metadata,
-                    ...json, // Overwrite defaults with local data
-                    // Ensure critical fields are present if missing in JSON
+                    ...json,
                     name: json.name || metadata.name,
                     image: json.image || DEFAULT_IMAGES[json.type as keyof typeof DEFAULT_IMAGES] || metadata.image,
-                    hash: hash // Ensure the URI hash is preserved
+                    hash: hash
                 };
             } catch (e) {
-                console.error("Error parsing local metadata", e);
+                // Error handled silently
             }
         } else {
-            // 3. Optional: Real IPFS Fetch (only if not in local storage)
-            // User requested strict localStorage logic, but keeping fetch as a secondary layer is good practice.
-            // However, to strictly follow "Correction MetaData" request: "Si les données n'existent pas, crée un objet par défaut incluant le hash"
-            // The default object created at the start satisfies this.
-
             try {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 3000);
@@ -86,12 +74,10 @@ const getMetadata = async (tokenId: string, tokenURI: string): Promise<any> => {
                         name: json.name || metadata.name,
                         image: json.image || DEFAULT_IMAGES[json.type as keyof typeof DEFAULT_IMAGES] || metadata.image,
                         description: json.description || metadata.description,
-                        hash: hash // Ensure the URI hash is preserved
+                        hash: hash
                     };
                 }
             } catch (ipfsError) {
-                console.warn(`Failed to fetch IPFS metadata for ${hash}`, ipfsError);
-                // We typically just keep the default metadata here
             }
         }
     }
@@ -101,6 +87,8 @@ const getMetadata = async (tokenId: string, tokenURI: string): Promise<any> => {
 
 const BadgeGallery = () => {
     const [collectionOpen, setCollectionOpen] = useState(false);
+    const [detailsOpen, setDetailsOpen] = useState(false);
+    const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null);
     const { account, isConnected, getBadgeContract } = useWallet();
     const [realBadges, setRealBadges] = useState<Badge[]>([]);
     const [loading, setLoading] = useState(false);
@@ -161,14 +149,14 @@ const BadgeGallery = () => {
                     });
 
                 } catch (err) {
-                    console.error(`Error fetching data for token ${tokenId}`, err);
+                    // Error handled silently
                 }
             }
 
             setRealBadges(fetchedBadges);
 
         } catch (error) {
-            console.error("Error fetching badges", error);
+            // Error handled silently
         } finally {
             setLoading(false);
         }
@@ -265,7 +253,10 @@ const BadgeGallery = () => {
                                     borderColor: `${badge.color}80`,
                                 }
                             }}
-                            onClick={() => setCollectionOpen(true)}
+                            onClick={() => {
+                                setSelectedBadge(badge);
+                                setDetailsOpen(true);
+                            }}
                         >
                             <Box
                                 className="badge-card"
@@ -349,6 +340,15 @@ const BadgeGallery = () => {
                 open={collectionOpen}
                 onClose={() => setCollectionOpen(false)}
                 badges={COLLECTION_VIEW.length > 0 ? COLLECTION_VIEW : []}
+            />
+
+            <BadgeDetailsModal
+                open={detailsOpen}
+                onClose={() => {
+                    setDetailsOpen(false);
+                    setSelectedBadge(null);
+                }}
+                badge={selectedBadge}
             />
         </Box>
     );

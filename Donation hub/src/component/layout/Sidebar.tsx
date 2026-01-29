@@ -14,6 +14,11 @@ const Sidebar = () => {
     const location = useLocation();
     const { account, balance, disconnect, isConnected } = useWallet();
 
+    const handleDisconnect = () => {
+        disconnect();
+        navigate('/');
+    };
+
     const navItems = [
         { label: 'Dashboard', icon: <Dashboard />, path: '/dashboard', protected: true },
         { label: 'Explore', icon: <Explore />, path: '/dashboard/projects', protected: false },
@@ -206,7 +211,7 @@ const Sidebar = () => {
                                 variant="outlined"
                                 size="small"
                                 startIcon={<Logout sx={{ fontSize: 16 }} />}
-                                onClick={disconnect}
+                                onClick={handleDisconnect}
                                 sx={{
                                     borderColor: 'rgba(255, 255, 255, 0.1)',
                                     color: 'text.secondary',

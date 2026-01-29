@@ -100,7 +100,6 @@ export const useTransactionStatus = (
             }
 
         } catch (err) {
-            console.error('Error checking transaction:', err);
             setError('Failed to fetch transaction status');
         } finally {
             setIsLoading(false);

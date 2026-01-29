@@ -27,7 +27,7 @@ export const useDonationHistory = () => {
 
         setIsLoading(true);
         setError(null);
-        
+
         try {
             const contract = getBadgeContract();
             if (!contract) return;
@@ -35,7 +35,7 @@ export const useDonationHistory = () => {
             // Get Transfer events (mints)
             const filter = contract.filters.Transfer(null, account);
             const events = await contract.queryFilter(filter);
-            
+
             // Sort by block number descending (newest first)
             const sortedEvents = events.reverse();
 
@@ -45,7 +45,7 @@ export const useDonationHistory = () => {
                 try {
                     const block = await event.getBlock();
                     // const tokenId = (event as any).args[2];
-                    
+
                     // Get transaction details to retrieve the real ETH value sent
                     const tx = await event.getTransaction();
                     const value = formatEther(tx.value);
@@ -62,14 +62,13 @@ export const useDonationHistory = () => {
                         chainId: chainId || 31337
                     });
                 } catch (err) {
-                    console.error("Error processing event", err);
+                    // Error handled silently
                 }
             }
-            
+
             setTransactions(txs);
 
         } catch (err) {
-            console.error("Error fetching history", err);
             setError("Failed to fetch history");
         } finally {
             setIsLoading(false);

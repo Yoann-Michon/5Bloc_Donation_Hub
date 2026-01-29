@@ -156,8 +156,8 @@ const NetworkSwitcher = ({
                     p: 2,
                     background: 'rgba(255, 255, 255, 0.03)',
                     border: `1px solid ${isUnsupported || isWrongNetwork
-                            ? 'rgba(255, 46, 84, 0.5)'
-                            : 'rgba(255, 255, 255, 0.08)'
+                        ? 'rgba(255, 46, 84, 0.5)'
+                        : 'rgba(255, 255, 255, 0.08)'
                         }`,
                     borderRadius: 2,
                     cursor: 'pointer',
@@ -336,39 +336,37 @@ const NetworkMenu = ({
             ))}
 
             {/* Testnets */}
-            {testnets.length > 0 && (
-                <>
-                    <Box sx={{ px: 2, py: 1, mt: 1 }}>
-                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                            TESTNETS
-                        </Typography>
-                    </Box>
-                    {testnets.map((chain) => (
-                        <MenuItem
-                            key={chain.chainId}
-                            onClick={() => onSwitchNetwork(chain.chainId)}
-                            disabled={isSwitching}
-                            sx={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                py: 1.5,
-                                px: 2,
-                                '&:hover': {
-                                    bgcolor: 'rgba(82, 39, 255, 0.1)',
-                                },
-                            }}
-                        >
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                <Circle sx={{ fontSize: 10, color: chain.color }} />
-                                <Typography variant="body2">{chain.displayName}</Typography>
-                            </Box>
-                            {currentChainId === chain.chainId && (
-                                <CheckCircle sx={{ fontSize: 18, color: 'success.main' }} />
-                            )}
-                        </MenuItem>
-                    ))}
-                </>
-            )}
+            {testnets.length > 0 && [
+                <Box key="testnets-header" sx={{ px: 2, py: 1, mt: 1 }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                        TESTNETS
+                    </Typography>
+                </Box>,
+                ...testnets.map((chain) => (
+                    <MenuItem
+                        key={chain.chainId}
+                        onClick={() => onSwitchNetwork(chain.chainId)}
+                        disabled={isSwitching}
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            py: 1.5,
+                            px: 2,
+                            '&:hover': {
+                                bgcolor: 'rgba(82, 39, 255, 0.1)',
+                            },
+                        }}
+                    >
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                            <Circle sx={{ fontSize: 10, color: chain.color }} />
+                            <Typography variant="body2">{chain.displayName}</Typography>
+                        </Box>
+                        {currentChainId === chain.chainId && (
+                            <CheckCircle sx={{ fontSize: 18, color: 'success.main' }} />
+                        )}
+                    </MenuItem>
+                ))
+            ]}
         </Menu>
     );
 };

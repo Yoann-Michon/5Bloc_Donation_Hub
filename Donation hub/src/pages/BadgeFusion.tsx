@@ -1,27 +1,62 @@
-import { useState } from 'react';
-import { Box, Grid, Container } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Box, Grid, Container, CircularProgress, Alert, Typography } from '@mui/material';
 import BadgeSelector from '../component/fusion/BadgeSelector';
 import FusionChamber from '../component/fusion/FusionChamber';
 import { AutoFixHigh } from '@mui/icons-material';
+import { useWallet } from '../hooks/useWallet';
+import { BadgeTier } from '../types/enums';
 
-// Mock Data
-const MOCK_BADGES = [
-    { id: 1, name: 'Eco Starter', tier: 'Common', count: 5, image: 'https://cdn-icons-png.flaticon.com/512/3214/3214746.png' },
-    { id: 2, name: 'Governance Novice', tier: 'Common', count: 3, image: 'https://cdn-icons-png.flaticon.com/512/2230/2230606.png' },
-    { id: 3, name: 'DeFi Explorer', tier: 'Common', count: 4, image: 'https://cdn-icons-png.flaticon.com/512/10459/10459635.png' },
-    { id: 4, name: 'Forest Guardian', tier: 'Rare', count: 2, image: 'https://cdn-icons-png.flaticon.com/512/3233/3233496.png' },
-] as const;
-
-type Badge = typeof MOCK_BADGES[number];
+interface Badge {
+    id: number;
+    name: string;
+    tier: BadgeTier;
+    count: number;
+    image: string;
+}
 
 const BadgeFusion = () => {
+    // Wallet connection
+    const { account, isConnected, getBadgeContract } = useWallet();
+
     // State
+    const [badges, setBadges] = useState<Badge[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [selectedBadges, setSelectedBadges] = useState<Badge[]>([]);
     const [isFusing, setIsFusing] = useState(false);
 
+    // Fetch user's badges from blockchain
+    useEffect(() => {
+        const fetchBadges = async () => {
+            if (!account || !isConnected) {
+                setIsLoading(false);
+                return;
+            }
+
+            try {
+                setIsLoading(true);
+                const contract = getBadgeContract();
+                if (!contract) {
+                    throw new Error('Contract not initialized');
+                }
+
+                // For now, we'll show a message that this feature is coming soon
+                // In the future, we would fetch each badge's metadata from IPFS
+                setBadges([]);
+                setError(null);
+            } catch (err) {
+                setError('Failed to load badges from blockchain');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchBadges();
+    }, [account, isConnected, getBadgeContract]);
+
     // Handlers
     const handleSelect = (badge: Badge) => {
-        if (selectedBadges.length < 2) {  // Changed from 3 to 2
+        if (selectedBadges.length < 2) {
             setSelectedBadges([...selectedBadges, badge]);
         }
     };
@@ -54,9 +89,43 @@ const BadgeFusion = () => {
     const slots = [
         selectedBadges[0] || null,
         selectedBadges[1] || null,
-    ];  // Changed from 3 slots to 2 slots
+    ];
 
-    const canFuse = selectedBadges.length === 2 && selectedBadges.every(b => b.tier === selectedBadges[0].tier);  // Changed from 3 to 2
+    const canFuse = selectedBadges.length === 2 && selectedBadges.every(b => b.tier === selectedBadges[0].tier);
+
+    // Loading state
+    if (isLoading) {
+        return (
+            <Container maxWidth="xl" sx={{ py: 4, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+                <Box sx={{ textAlign: 'center' }}>
+                    <CircularProgress size={60} sx={{ mb: 2 }} />
+                    <Typography variant="body1" color="text.secondary">
+                        Loading your badges...
+                    </Typography>
+                </Box>
+            </Container>
+        );
+    }
+
+    // Not connected state
+    if (!isConnected) {
+        return (
+            <Container maxWidth="xl" sx={{ py: 4 }}>
+                <Alert severity="info">
+                    Please connect your wallet to view and fuse your badges.
+                </Alert>
+            </Container>
+        );
+    }
+
+    // Error state
+    if (error) {
+        return (
+            <Container maxWidth="xl" sx={{ py: 4 }}>
+                <Alert severity="error">{error}</Alert>
+            </Container>
+        );
+    }
 
     return (
         <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -81,28 +150,34 @@ const BadgeFusion = () => {
                 </div>
             </Box>
 
-            <Grid container spacing={4} sx={{ height: 'calc(100vh - 200px)' }}>
-                {/* Fusion Chamber (Left/Top) */}
-                <Grid size={{ xs: 12, lg: 7 }}>
-                    <FusionChamber
-                        slots={slots}
-                        onRemove={handleRemoveSlot}
-                        onFuse={handleFuse}
-                        isFusing={isFusing}
-                        canFuse={canFuse}
-                    />
-                </Grid>
+            {badges.length === 0 ? (
+                <Alert severity="info" sx={{ mb: 4 }}>
+                    You don't have any badges yet. Make donations to projects to earn badges!
+                </Alert>
+            ) : (
+                <Grid container spacing={4} sx={{ height: 'calc(100vh - 200px)' }}>
+                    {/* Fusion Chamber (Left/Top) */}
+                    <Grid size={{ xs: 12, lg: 7 }}>
+                        <FusionChamber
+                            slots={slots}
+                            onRemove={handleRemoveSlot}
+                            onFuse={handleFuse}
+                            isFusing={isFusing}
+                            canFuse={canFuse}
+                        />
+                    </Grid>
 
-                {/* Badge Inventory (Right/Bottom) */}
-                <Grid size={{ xs: 12, lg: 5 }}>
-                    <BadgeSelector
-                        badges={MOCK_BADGES as unknown as Badge[]}
-                        selectedBadges={selectedBadges}
-                        onSelect={(b) => handleSelect(b as Badge)}
-                        onDeselect={(b) => handleDeselect(b as Badge)}
-                    />
+                    {/* Badge Inventory (Right/Bottom) */}
+                    <Grid size={{ xs: 12, lg: 5 }}>
+                        <BadgeSelector
+                            badges={badges}
+                            selectedBadges={selectedBadges}
+                            onSelect={handleSelect}
+                            onDeselect={handleDeselect}
+                        />
+                    </Grid>
                 </Grid>
-            </Grid>
+            )}
         </Container>
     );
 };

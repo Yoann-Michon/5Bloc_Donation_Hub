@@ -22,7 +22,6 @@ const DashboardStats = () => {
                         setBadgeCount(count.toString());
                     }
                 } catch (error) {
-                    console.error("Error fetching badge count:", error);
                     setBadgeCount('0');
                 }
             }
@@ -38,12 +37,12 @@ const DashboardStats = () => {
     // Calculate Total Donated from history
     useEffect(() => {
         if (transactions && transactions.length > 0) {
-             const total = transactions
+            const total = transactions
                 .filter(tx => tx.type === 'mint') // Filter for donation/mint transactions
                 .reduce((acc, tx) => acc + parseFloat(tx.amount || '0'), 0);
-             
-             // Format to max 4 decimals
-             setTotalDonated(total.toFixed(4));
+
+            // Format to max 4 decimals
+            setTotalDonated(total.toFixed(4));
         } else {
             setTotalDonated('0');
         }
@@ -100,7 +99,7 @@ const DashboardStats = () => {
                             <Typography variant="caption" sx={{ color: '#9d9db9', fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase', display: 'block', fontSize: '0.75rem' }}>
                                 {stat.label}
                             </Typography>
-                             <Box sx={{ p: 0.5, borderRadius: 1, bgcolor: 'rgba(255,255,255,0.05)' }}>
+                            <Box sx={{ p: 0.5, borderRadius: 1, bgcolor: 'rgba(255,255,255,0.05)' }}>
                                 {stat.icon}
                             </Box>
                         </Box>
@@ -110,15 +109,15 @@ const DashboardStats = () => {
                                 {stat.value === '...' ? <Skeleton width={60} /> : stat.value}
                             </Typography>
                         </Box>
-                        
+
                         <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                             {stat.change && (
+                            {stat.change && (
                                 <Box sx={{ display: 'flex', alignItems: 'center', color: stat.isPositive ? '#00ff88' : '#ff2e54', fontWeight: 600, fontSize: '0.75rem' }}>
                                     <TrendingUp sx={{ fontSize: 12, mr: 0.5 }} />
                                     {stat.change}
                                 </Box>
                             )}
-                             {stat.subtext && (
+                            {stat.subtext && (
                                 <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 600, fontSize: '0.75rem' }}>
                                     {stat.subtext}
                                 </Typography>

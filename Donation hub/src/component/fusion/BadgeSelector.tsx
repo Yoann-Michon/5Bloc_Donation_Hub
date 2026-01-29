@@ -1,10 +1,11 @@
 import { Box, Typography, Grid, Avatar } from '@mui/material';
 import { Done } from '@mui/icons-material';
+import { BadgeTier } from '../../types/enums';
 
 interface Badge {
     id: number;
     name: string;
-    tier: 'Common' | 'Rare' | 'Epic' | 'Legendary';
+    tier: BadgeTier;
     image: string;
     count: number;
 }
@@ -16,11 +17,11 @@ interface BadgeSelectorProps {
     onDeselect: (badge: Badge) => void;
 }
 
-const tierColors = {
-    Common: '#ffffff',
-    Rare: '#10b981',
-    Epic: '#a855f7',
-    Legendary: '#f59e0b',
+const tierColors: Record<BadgeTier, string> = {
+    [BadgeTier.BRONZE]: '#cd7f32',
+    [BadgeTier.SILVER]: '#c0c0c0',
+    [BadgeTier.GOLD]: '#ffd700',
+    [BadgeTier.LEGENDARY]: '#ff6b35',
 };
 
 const BadgeSelector = ({ badges, selectedBadges, onSelect, onDeselect }: BadgeSelectorProps) => {

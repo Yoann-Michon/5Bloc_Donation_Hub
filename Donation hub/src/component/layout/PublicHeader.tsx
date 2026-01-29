@@ -51,11 +51,12 @@ const PublicHeader = () => {
 
     const handleDisconnect = () => {
         disconnect();
-        handleMenuClose();
+        navigate('/');
     };
 
     const handleGoToDashboard = () => {
         handleMenuClose();
+        setMobileOpen(false);
         navigate('/dashboard');
     };
 

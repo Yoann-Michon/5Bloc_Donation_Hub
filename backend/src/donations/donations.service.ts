@@ -15,7 +15,7 @@ export class DonationsService {
 
   async findAll() {
     return this.prisma.donation.findMany({
-      include: { donor: true, project: true },
+      include: { project: true },
     });
   }
 

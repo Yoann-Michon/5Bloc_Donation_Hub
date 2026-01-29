@@ -7,6 +7,8 @@ import { useState, useCallback, useEffect } from 'react';
 import { getChainConfig, isChainSupported } from '../utils/chainConfig';
 import { BrowserProvider, Contract, type InterfaceAbi, formatEther, type Signer } from 'ethers';
 
+const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000';
+
 export interface WalletState {
     account: string | null;
     chainId: number | null;
@@ -14,6 +16,7 @@ export interface WalletState {
     isConnected: boolean;
     error: string | null;
     balance: string | null;
+    user: any | null; // Added user field
     ensName: string | null;
     avatar: string | null;
     signer: Signer | null;
@@ -22,54 +25,47 @@ export interface WalletState {
 
 export type WalletProvider = 'metamask' | 'walletconnect' | 'coinbase';
 
-// DEV MODE: Set to false to use real wallet connection
-const DEV_MODE = false;
-
-// Mock wallet data for development
-const MOCK_WALLET = {
-    account: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
-    chainId: 31337, // Hardhat Local
-    balance: '0x15af1d78b58c40000', // 1.5 ETH in hex
-};
-
-const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // TO BE FILLED WITH DEPLOYED CONTRACT ADDRESS E.G. "0x..."
-
 const DONATION_BADGE_ABI = [
-  "function donate(uint256 projectId, string memory tokenURI) external payable",
-  "function balanceOf(address owner) view returns (uint256)",
-  "function lastActionTimestamp(address user) view returns (uint256)",
-  "function tokenURI(uint256 tokenId) view returns (string)",
-  "function ownerOf(uint256 tokenId) view returns (address)",
-  "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
+    "function donate(uint256 projectId, string memory tokenURI) external payable",
+    "function balanceOf(address owner) view returns (uint256)",
+    "function lastActionTimestamp(address user) view returns (uint256)",
+    "function tokenURI(uint256 tokenId) view returns (string)",
+    "function ownerOf(uint256 tokenId) view returns (address)",
+    "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
 ];
 
 export const useWallet = () => {
     const [state, setState] = useState<WalletState>({
-        account: DEV_MODE ? MOCK_WALLET.account : null,
-        chainId: DEV_MODE ? MOCK_WALLET.chainId : null,
+        account: null,
+        chainId: null,
         isConnecting: false,
-        isConnected: DEV_MODE,
+        isConnected: false,
         error: null,
-        balance: DEV_MODE ? MOCK_WALLET.balance : null,
+        balance: null,
+        user: null, // Added user field
         ensName: null,
         avatar: null,
         signer: null,
-        isInitialized: DEV_MODE, // Dev mode is instantly initialized
+        isInitialized: false,
     });
 
     /**
      * Initialize wallet and listen to events
      */
     useEffect(() => {
-        // Skip MetaMask initialization in DEV_MODE
-        if (DEV_MODE) {
-            console.log('🔧 DEV MODE: Using mock wallet connection');
-            return;
-        }
-
         const init = async () => {
             if (typeof window.ethereum === 'undefined') {
                 setState(prev => ({ ...prev, isInitialized: true }));
+                return;
+            }
+
+            // Only auto-connect if user has explicitly connected before
+            const wasConnected = localStorage.getItem('wallet_was_connected') === 'true';
+            if (!wasConnected) {
+                // Still check chainId even if not auto-connecting
+                const provider = new BrowserProvider(window.ethereum);
+                const network = await provider.getNetwork();
+                setState(prev => ({ ...prev, chainId: Number(network.chainId), isInitialized: true }));
                 return;
             }
 
@@ -83,6 +79,17 @@ export const useWallet = () => {
                     const network = await provider.getNetwork();
                     const balance = await provider.getBalance(address);
 
+                    localStorage.setItem('wallet_was_connected', 'true');
+
+                    // Register/Login user in backend
+                    try {
+                        const { createUser } = await import('../utils/api');
+                        const userData = await createUser({ walletAddress: address });
+                        setState(prev => ({ ...prev, user: userData }));
+                    } catch (apiError) {
+                        // Silent fail for API registration in init
+                    }
+
                     setState(prev => ({
                         ...prev,
                         account: address,
@@ -92,13 +99,14 @@ export const useWallet = () => {
                         signer: signer,
                     }));
                 } else {
-                     // Check chainId even if not connected
+                    // Reset localStorage if no accounts are actually available in provider
+                    localStorage.removeItem('wallet_was_connected');
                     const network = await provider.getNetwork();
                     setState(prev => ({ ...prev, chainId: Number(network.chainId) }));
                 }
 
             } catch (err) {
-                console.error('Error checking wallet connection:', err);
+                localStorage.removeItem('wallet_was_connected');
             } finally {
                 setState(prev => ({ ...prev, isInitialized: true }));
             }
@@ -125,7 +133,7 @@ export const useWallet = () => {
                     const signer = await provider.getSigner();
                     const address = await signer.getAddress();
                     const balance = await provider.getBalance(address);
-                    
+
                     setState(prev => ({
                         ...prev,
                         account: address,
@@ -178,12 +186,6 @@ export const useWallet = () => {
      * Connect wallet with provider selection
      */
     const connect = async () => {
-        // In DEV_MODE, wallet is already connected
-        if (DEV_MODE) {
-            console.log('🔧 DEV MODE: Wallet already connected');
-            return;
-        }
-
         setState(prev => ({ ...prev, isConnecting: true, error: null }));
 
         if (typeof window.ethereum === 'undefined') {
@@ -199,7 +201,7 @@ export const useWallet = () => {
             const provider = new BrowserProvider(window.ethereum);
             // Request account access
             await provider.send("eth_requestAccounts", []);
-            
+
             const signer = await provider.getSigner();
             const address = await signer.getAddress();
             const network = await provider.getNetwork();
@@ -215,6 +217,18 @@ export const useWallet = () => {
                 error: null,
                 signer: signer,
             }));
+
+            localStorage.setItem('wallet_was_connected', 'true');
+
+            // Register/Login user in backend
+            try {
+                const { createUser } = await import('../utils/api');
+                const userData = await createUser({ walletAddress: address });
+                setState(prev => ({ ...prev, user: userData }));
+            } catch (apiError) {
+                console.error('Failed to register user in backend:', apiError);
+                // We still consider them connected to the wallet
+            }
 
         } catch (err: unknown) {
             const error = err as { message?: string; code?: number };
@@ -240,12 +254,7 @@ export const useWallet = () => {
      * Disconnect wallet
      */
     const disconnect = useCallback(() => {
-        // In DEV_MODE, reset to mock wallet state
-        if (DEV_MODE) {
-            console.log('🔧 DEV MODE: Disconnect simulated (wallet remains connected)');
-            return;
-        }
-
+        localStorage.removeItem('wallet_was_connected');
         setState(prev => ({
             ...prev,
             account: null,
@@ -312,7 +321,7 @@ export const useWallet = () => {
                     return true;
 
                 } catch (addError) {
-                    console.error('Error adding network:', addError);
+                    // Error handled silently
                     setState(prev => ({
                         ...prev,
                         error: 'Failed to add network'
@@ -321,7 +330,7 @@ export const useWallet = () => {
                 }
             }
 
-            console.error('Error switching network:', switchError);
+            // Error handled silently
             setState(prev => ({
                 ...prev,
                 error: 'Failed to switch network'
@@ -351,12 +360,12 @@ export const useWallet = () => {
         if (!state.account || !window.ethereum) return;
 
         try {
-             const provider = new BrowserProvider(window.ethereum);
-             const balance = await provider.getBalance(state.account);
+            const provider = new BrowserProvider(window.ethereum);
+            const balance = await provider.getBalance(state.account);
 
             setState(prev => ({ ...prev, balance: formatEther(balance) }));
         } catch (error) {
-            console.error('Error refreshing balance:', error);
+            // Error handled silently
         }
     }, [state.account]);
 
@@ -368,7 +377,6 @@ export const useWallet = () => {
         try {
             return new Contract(address, abi, state.signer);
         } catch (error) {
-            console.error("Failed to create contract instance", error);
             return null;
         }
     }, [state.signer]);
@@ -381,7 +389,6 @@ export const useWallet = () => {
         try {
             return new Contract(CONTRACT_ADDRESS, DONATION_BADGE_ABI, state.signer);
         } catch (error) {
-            console.error("Failed to create badge contract instance", error);
             return null;
         }
     }, [state.signer]);

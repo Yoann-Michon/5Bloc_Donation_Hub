@@ -12,10 +12,7 @@ import {
   Alert,
   CircularProgress,
   Divider,
-<<<<<<< HEAD
-=======
   Tooltip,
->>>>>>> fc0bba6cc18f157f15023de4bcfd70cbc8119062
 } from '@mui/material';
 import { Close, AccountBalanceWallet, CheckCircle } from '@mui/icons-material';
 import { useWallet } from '../hooks/useWallet';
@@ -24,26 +21,6 @@ import TransactionStatusIndicator from './web3/TransactionStatus';
 import NetworkSwitcher from './web3/NetworkSwitcher';
 import { parseEther } from 'ethers';
 
-<<<<<<< HEAD
-// Helper to simulate IPFS upload using LocalStorage
-const uploadToIPFS = async (metadata: any): Promise<string> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // 1. Generate Fake unique CID
-      const fakeCID = 'Qm' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-      
-      // 2. Add the hash to the metadata itself (optional but good for consistency)
-      const finalMetadata = { ...metadata, hash: fakeCID };
-      
-      console.log("Mock IPFS Upload (saving to localStorage):", fakeCID, finalMetadata);
-
-      // 3. Save to Local Storage to mimic IPFS persistence
-      localStorage.setItem(fakeCID, JSON.stringify(finalMetadata));
-      
-      resolve(`ipfs://${fakeCID}`);
-    }, 1000);
-  });
-=======
 // Replace with your real Pinata JWT
 const PINATA_JWT = import.meta.env.VITE_PINATA_JWT;
 
@@ -51,10 +28,8 @@ const PINATA_JWT = import.meta.env.VITE_PINATA_JWT;
 const uploadToIPFS = async (metadata: any): Promise<string> => {
   try {
     if (!PINATA_JWT) {
-        throw new Error("Pinata JWT not found. Check .env file.");
+      throw new Error("Pinata JWT not found. Check .env file.");
     }
-
-    console.log("Uploading to Pinata... JWT present:", !!PINATA_JWT);
 
     const response = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
       method: 'POST',
@@ -65,7 +40,7 @@ const uploadToIPFS = async (metadata: any): Promise<string> => {
       body: JSON.stringify({
         pinataContent: metadata,
         pinataMetadata: {
-          name: metadata.name || "Donation Badge Metadata"
+          name: metadata.name
         }
       })
     });
@@ -76,17 +51,14 @@ const uploadToIPFS = async (metadata: any): Promise<string> => {
     }
 
     const data = await response.json();
-    console.log("Pinata Upload Success:", data);
-    
+
     // Also save to localStorage for immediate UI availability before IPFS propagates
     localStorage.setItem(data.IpfsHash, JSON.stringify(metadata));
 
     return `ipfs://${data.IpfsHash}`;
   } catch (error) {
-    console.error("IPFS Upload Error Details:", error);
     throw error;
   }
->>>>>>> fc0bba6cc18f157f15023de4bcfd70cbc8119062
 };
 
 interface DonationModalProps {
@@ -115,15 +87,12 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
   const { connect, account, isConnected, error: walletError, getBadgeContract } = useWallet();
   const { showToast } = useToast();
 
-<<<<<<< HEAD
-=======
-const DEFAULT_IMAGES = {
-    Bronze: 'https://img.freepik.com/vecteurs-premium/medaille-bronze-realiste-rubans-rouges-coupe-du-gagnant-gravee-badge-premium-pour-gagnants-realisations_88188-4035.jpg',   
+  const DEFAULT_IMAGES = {
+    Bronze: 'https://img.freepik.com/vecteurs-premium/medaille-bronze-realiste-rubans-rouges-coupe-du-gagnant-gravee-badge-premium-pour-gagnants-realisations_88188-4035.jpg',
     Silver: 'https://img.freepik.com/vecteurs-premium/medaille-argent-realiste-rubans-rouges-coupe-du-gagnant-gravee-badge-premium-pour-gagnants-realisations_88188-4037.jpg',
     Gold: 'https://img.freepik.com/vecteurs-premium/medaille-or-realiste-rubans-rouges-coupe-du-vainqueur-gravee-badge-premium-pour-gagnants-realisations_88188-4043.jpg?w=996',
     Unknown: 'https://placehold.co/200/808080/FFFFFF/png?text=Badge'
-};
->>>>>>> fc0bba6cc18f157f15023de4bcfd70cbc8119062
+  };
   const proceedToDonation = useCallback(async () => {
     if (!account) {
       setModalError("Wallet not connected correctly");
@@ -139,15 +108,15 @@ const DEFAULT_IMAGES = {
       // Check badge balance
       // Note: We catch the error from the contract call or separate check
       try {
-          const balance = await contract.balanceOf(account);
-          if (Number(balance) >= 4) {
-            throw new Error("Limite de 4 badges atteinte");
-          }
+        const balance = await contract.balanceOf(account);
+        if (Number(balance) >= 4) {
+          throw new Error("Limite de 4 badges atteinte");
+        }
       } catch (e: any) {
-           if (e.message.includes("Limite de 4 badges atteinte")) throw e;
-           // If logic is complicated, we might just let the main transaction fail, 
-           // but the prompt asks to handle/display these errors. 
-           // Re-throwing if it matches our custom error.
+        if (e.message.includes("Limite de 4 badges atteinte")) throw e;
+        // If logic is complicated, we might just let the main transaction fail, 
+        // but the prompt asks to handle/display these errors. 
+        // Re-throwing if it matches our custom error.
       }
 
       // Check cooldown
@@ -157,32 +126,27 @@ const DEFAULT_IMAGES = {
       // 5 minutes in ms
       const diffMs = now.getTime() - lastActionDate.getTime();
       const diffMinutes = diffMs / 1000 / 60;
-      
+
       if (Number(lastAction) > 0 && diffMinutes < 5) {
-         throw new Error(`Cooldown de 5 minutes actif`);
+        throw new Error(`Cooldown de 5 minutes actif`);
       }
 
       setStep('uploading');
 
       const amountVal = parseFloat(amount);
-<<<<<<< HEAD
-      const isGold = amountVal >= 1.0;
-      const type = isGold ? "Gold" : "Bronze";
-=======
       let type: "Bronze" | "Silver" | "Gold" | "Unknown" = "Unknown";
       let imageUrl = DEFAULT_IMAGES.Unknown;
-      
+
       if (amountVal < 0.5) {
-          type = "Bronze";
-          imageUrl = DEFAULT_IMAGES.Bronze;
+        type = "Bronze";
+        imageUrl = DEFAULT_IMAGES.Bronze;
       } else if (amountVal >= 0.5 && amountVal < 1.0) {
-          type = "Silver";
-          imageUrl = DEFAULT_IMAGES.Silver;
+        type = "Silver";
+        imageUrl = DEFAULT_IMAGES.Silver;
       } else if (amountVal >= 1.0) {
-          type = "Gold";
-          imageUrl = DEFAULT_IMAGES.Gold;
+        type = "Gold";
+        imageUrl = DEFAULT_IMAGES.Gold;
       }
->>>>>>> fc0bba6cc18f157f15023de4bcfd70cbc8119062
 
       // 1. Prepare Metadata (Strict Format)
       const nowTimestamp = Math.floor(Date.now() / 1000); // Seconds
@@ -192,50 +156,46 @@ const DEFAULT_IMAGES = {
         name: `Badge de don - ${project.title}`,
         type: type,
         value: `${amount} ETH`, // Strict: "0.1 ETH"
-<<<<<<< HEAD
-=======
         image: imageUrl,
->>>>>>> fc0bba6cc18f157f15023de4bcfd70cbc8119062
         hash: "", // Will be filled by upload logic
         previousOwners: [],
         createdAt: nowTimestamp,
-        lastTransferAt: nowTimestamp, 
+        lastTransferAt: nowTimestamp,
         minter: account
       };
 
-      console.log('Generating metadata payload:', metadata);
+      // Generating metadata payload
 
       // 2. Upload to IPFS (Simulated via LocalStorage)
       const tokenURI = await uploadToIPFS(metadata);
-      
+
       setStep('confirming');
 
       // 3. Interact with Smart Contract
       const amountInWei = parseEther(amount);
-      
+
       const tx = await contract.donate(project.id, tokenURI, {
         value: amountInWei
       });
-      
+
       setTxHash(tx.hash);
-      
-      setStep('confirming'); 
+
+      setStep('confirming');
       showToast('Transaction submitted!', 'info');
 
     } catch (err: unknown) {
-      console.error(err);
       setStep('error');
-      
+
       const error = err as { code?: number; reason?: string; message?: string };
       let errorMessage = 'Failed to process donation';
 
       if (error.message && (error.message.includes("Limite de 4 badges atteinte") || error.message.includes("Cooldown"))) {
-          errorMessage = error.message;
+        errorMessage = error.message;
       } else if (error.reason) {
-          errorMessage = error.reason;
+        errorMessage = error.reason;
       } else if (error.message) {
-          // Clean up common ethers error prefixes if needed
-           errorMessage = error.message;
+        // Clean up common ethers error prefixes if needed
+        errorMessage = error.message;
       }
 
       setModalError(errorMessage);
@@ -263,53 +223,48 @@ const DEFAULT_IMAGES = {
     }
   }, [isConnected, step, proceedToDonation]);
 
-<<<<<<< HEAD
-  const quickAmounts = [0.1, 0.5, 1, 2, 5];
-
-  const handleDonate = async () => {
-=======
   const [cooldownRemaining, setCooldownRemaining] = useState<number>(0);
 
   // Check Cooldown on mount/connect
   useEffect(() => {
     let isActive = true;
     const checkCooldown = async () => {
-        if (!account || !isConnected) return;
-        const contract = getBadgeContract();
-        if (!contract) return;
+      if (!account || !isConnected) return;
+      const contract = getBadgeContract();
+      if (!contract) return;
 
-        try {
-            const lastAction = await contract.lastActionTimestamp(account);
-            const lastActionDate = Number(lastAction) * 1000;
-            const now = Date.now();
-            const diffMs = now - lastActionDate;
-            const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
+      try {
+        const lastAction = await contract.lastActionTimestamp(account);
+        const lastActionDate = Number(lastAction) * 1000;
+        const now = Date.now();
+        const diffMs = now - lastActionDate;
+        const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
 
-            if (diffMs < COOLDOWN_MS) {
-                const remaining = Math.ceil((COOLDOWN_MS - diffMs) / 1000); // Seconds
-                if (isActive) setCooldownRemaining(remaining);
-            } else {
-                if (isActive) setCooldownRemaining(0);
-            }
-        } catch (e) {
-            console.error("Error checking cooldown", e);
+        if (diffMs < COOLDOWN_MS) {
+          const remaining = Math.ceil((COOLDOWN_MS - diffMs) / 1000); // Seconds
+          if (isActive) setCooldownRemaining(remaining);
+        } else {
+          if (isActive) setCooldownRemaining(0);
         }
+      } catch (e) {
+        // Error handled silently
+      }
     };
 
     checkCooldown();
     // Poll every second if cooldown is active to update timer UI
     const interval = setInterval(() => {
-        if (cooldownRemaining > 0) {
-            setCooldownRemaining(prev => Math.max(0, prev - 1));
-        } else {
-            // Re-check periodically just in case
-            checkCooldown();
-        }
+      if (cooldownRemaining > 0) {
+        setCooldownRemaining(prev => Math.max(0, prev - 1));
+      } else {
+        // Re-check periodically just in case
+        checkCooldown();
+      }
     }, 1000);
 
     return () => {
-        isActive = false;
-        clearInterval(interval);
+      isActive = false;
+      clearInterval(interval);
     };
   }, [account, isConnected, getBadgeContract, cooldownRemaining]);
 
@@ -319,7 +274,6 @@ const DEFAULT_IMAGES = {
   const handleDonate = async () => {
     if (cooldownRemaining > 0) return;
 
->>>>>>> fc0bba6cc18f157f15023de4bcfd70cbc8119062
     const isValidAmount = /^\d*\.?\d+$/.test(amount) && parseFloat(amount) > 0;
 
     if (!isValidAmount) {
@@ -477,17 +431,6 @@ const DEFAULT_IMAGES = {
               <Button onClick={handleClose} sx={{ color: 'text.secondary' }}>
                 Cancel
               </Button>
-<<<<<<< HEAD
-              <Button
-                variant="contained"
-                onClick={handleDonate}
-                startIcon={<AccountBalanceWallet />}
-                disabled={!amount || parseFloat(amount) <= 0}
-                sx={{ px: 4 }}
-              >
-                Donate Now
-              </Button>
-=======
               <Tooltip title={cooldownRemaining > 0 ? `Cooldown active. Wait ${Math.floor(cooldownRemaining / 60)}m ${cooldownRemaining % 60}s` : ''}>
                 <span>
                   <Button
@@ -501,7 +444,6 @@ const DEFAULT_IMAGES = {
                   </Button>
                 </span>
               </Tooltip>
->>>>>>> fc0bba6cc18f157f15023de4bcfd70cbc8119062
             </DialogActions>
           </>
         );
@@ -520,7 +462,7 @@ const DEFAULT_IMAGES = {
             </Box>
           </DialogContent>
         );
-      
+
       case 'uploading':
         return (
           <DialogContent>
@@ -550,7 +492,7 @@ const DEFAULT_IMAGES = {
                 }}
               />
             ) : (
-               <Box sx={{ textAlign: 'center', py: 4 }}>
+              <Box sx={{ textAlign: 'center', py: 4 }}>
                 <CircularProgress size={60} sx={{ mb: 3 }} />
                 <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
                   Confirm Transaction

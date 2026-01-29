@@ -1,35 +1,35 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Box, Container, Typography } from '@mui/material';
 import ProjectCardSkeleton from '../component/skeletons/ProjectCardSkeleton';
-import { getProjects } from '../utils/api';
+import { getProjects, getCategories } from '../utils/api';
 import type { Project } from '../types/project';
-import ProjectStats from '../component/project/ProjectStats';
 import HorizontalFilterBar from '../component/project/HorizontalFilterBar';
 import VortexProjectCard from '../component/project/VortexProjectCard';
-
-
-const categories = ['Education', 'Environment', 'Health', 'DeFi', 'Gaming', 'Infrastructure'];
 
 const Projects = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [sortBy, setSortBy] = useState<string>('relevant');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [projects, setProjects] = useState<Project[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch projects from API
   useEffect(() => {
-    const fetchProjects = async () => {
+    const fetchData = async () => {
       try {
-        const data = await getProjects();
-        setProjects(data);
+        const [projectsData, categoriesData] = await Promise.all([
+          getProjects(),
+          getCategories(),
+        ]);
+        setProjects(projectsData);
+        setCategories(categoriesData.map((cat: any) => cat.name));
       } catch (error) {
-        console.error("Failed to fetch projects", error);
+        // Handle error silently
       } finally {
         setIsLoading(false);
       }
     };
-    fetchProjects();
+    fetchData();
   }, []);
 
   // Filter and sort projects
@@ -69,8 +69,6 @@ const Projects = () => {
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
-      <ProjectStats />
-
       <HorizontalFilterBar
         categories={categories}
         selectedCategory={selectedCategory}

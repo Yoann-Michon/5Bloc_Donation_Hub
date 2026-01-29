@@ -13,7 +13,6 @@ import type { Project } from '../types/project';
 import ProjectHero from '../component/project/ProjectHero';
 import ProjectMeta from '../component/project/ProjectMeta';
 import ProjectTabs from '../component/project/ProjectTabs';
-import ProjectTimeline from '../component/project/ProjectTimeline';
 import ProjectDonationCard from '../component/project/ProjectDonationCard';
 import ProjectBadges from '../component/project/ProjectBadges';
 import TransparencyLog from '../component/project/TransparencyLog';
@@ -37,7 +36,7 @@ const ProjectView = () => {
         const data = await getProject(Number(id));
         setProject(data);
       } catch (error) {
-        console.error("Failed to fetch project", error);
+        // Error handled silently
       } finally {
         setIsLoading(false);
       }
@@ -87,8 +86,6 @@ const ProjectView = () => {
 
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             <ProjectTabs project={project} />
-
-            <ProjectTimeline />
           </Box>
         </Box>
 

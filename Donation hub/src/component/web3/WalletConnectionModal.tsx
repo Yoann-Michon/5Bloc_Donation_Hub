@@ -25,6 +25,7 @@ import {
 } from '@mui/icons-material';
 import { useWallet, type WalletProvider } from '../../hooks/useWallet';
 import { motion, AnimatePresence } from 'motion/react';
+import { useNavigate } from 'react-router-dom';
 
 interface WalletConnectionModalProps {
     open: boolean;
@@ -47,6 +48,7 @@ const WalletConnectionModal = ({
     onConnect
 }: WalletConnectionModalProps) => {
     const { connect, isConnecting, error, isConnected } = useWallet();
+    const navigate = useNavigate();
     // const [selectedWallet, setSelectedWallet] = useState<WalletProvider | null>(null);
 
     // Wallet options
@@ -89,6 +91,9 @@ const WalletConnectionModal = ({
         if (onConnect) {
             onConnect();
         }
+
+        // Redirect to dashboard now handled by "Get Started" button to avoid accessibility issues
+        // navigate('/dashboard');
     };
 
     const handleClose = () => {
@@ -169,7 +174,10 @@ const WalletConnectionModal = ({
                                 </Typography>
                                 <Button
                                     variant="contained"
-                                    onClick={handleClose}
+                                    onClick={() => {
+                                        handleClose();
+                                        navigate('/dashboard');
+                                    }}
                                     fullWidth
                                     sx={{ maxWidth: 200 }}
                                 >

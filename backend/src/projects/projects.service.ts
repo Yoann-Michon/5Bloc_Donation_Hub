@@ -8,28 +8,36 @@ export class ProjectsService {
   constructor(private prisma: PrismaService) { }
 
   async create(createProjectDto: CreateProjectDto) {
+    const { category, ...data } = createProjectDto;
     return this.prisma.project.create({
-      data: createProjectDto,
+      data: {
+        ...data,
+        categoryId: category,
+      },
     });
   }
 
   async findAll() {
     return this.prisma.project.findMany({
-      include: { owner: true, donations: true },
+      include: { category: true, donations: true },
     });
   }
 
   async findOne(id: number) {
     return this.prisma.project.findUnique({
       where: { id },
-      include: { owner: true, donations: true },
+      include: { category: true, donations: true },
     });
   }
 
   async update(id: number, updateProjectDto: UpdateProjectDto) {
+    const { category, ...data } = updateProjectDto;
     return this.prisma.project.update({
       where: { id },
-      data: updateProjectDto,
+      data: {
+        ...data,
+        ...(category && { categoryId: category }),
+      },
     });
   }
 

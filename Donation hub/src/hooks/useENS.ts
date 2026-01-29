@@ -57,7 +57,6 @@ export const useENS = (address: string | null, chainId: number | null): ENSData 
                 });
 
             } catch (error) {
-                console.error('Error resolving ENS:', error);
                 setData({
                     name: null,
                     avatar: null,
