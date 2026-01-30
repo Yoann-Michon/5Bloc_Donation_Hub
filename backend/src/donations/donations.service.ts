@@ -22,6 +22,34 @@ export class DonationsService {
   async findOne(id: number) {
     return this.prisma.donation.findUnique({
       where: { id: id.toString() },
+      include: { project: true },
+    });
+  }
+
+  async findByDonor(walletAddress: string) {
+    return this.prisma.donation.findMany({
+      where: { donorWallet: walletAddress },
+      include: { project: true },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async findByProject(projectId: number) {
+    return this.prisma.donation.findMany({
+      where: { projectId },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async findReceivedByOwner(ownerWallet: string) {
+    return this.prisma.donation.findMany({
+      where: {
+        project: {
+          ownerWallet,
+        },
+      },
+      include: { project: true },
+      orderBy: { createdAt: 'desc' },
     });
   }
 

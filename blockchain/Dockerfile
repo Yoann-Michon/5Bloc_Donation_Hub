@@ -13,8 +13,8 @@ COPY . .
 
 RUN npx hardhat compile
 
-# Make init script executable
-RUN chmod +x init-docker.sh
+# Ensure Unix line endings and make init script executable
+RUN sed -i 's/\r$//' init-docker.sh && chmod +x init-docker.sh
 
 EXPOSE 8545
 

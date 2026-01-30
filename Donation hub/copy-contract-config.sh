@@ -34,9 +34,17 @@ else
 
   echo "Contract Address: $CONTRACT_ADDRESS"
 
-  # 1. Update .env.local for Vite
-  echo "VITE_CONTRACT_ADDRESS=$CONTRACT_ADDRESS" > "$ENV_LOCAL_FILE"
-  echo ".env.local generated with contract address"
+  # 1. Update .env file for Vite (not .env.local)
+  ENV_FILE="/app/.env"
+  if [ -f "$ENV_FILE" ]; then
+    # Update existing .env file
+    sed -i "s|VITE_CONTRACT_ADDRESS=.*|VITE_CONTRACT_ADDRESS=$CONTRACT_ADDRESS|g" "$ENV_FILE"
+    echo ".env updated with contract address"
+  else
+    # Create .env if it doesn't exist
+    echo "VITE_CONTRACT_ADDRESS=$CONTRACT_ADDRESS" > "$ENV_FILE"
+    echo ".env created with contract address"
+  fi
 
   # 2. Copy ABI file to src
   if [ -f "$SHARED_ABI" ]; then

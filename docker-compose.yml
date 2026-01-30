@@ -51,6 +51,7 @@ services:
     networks:
       - donation_hub_network
     environment:
+      - DATABASE_URL=postgresql://user:password@postgres:5432/donation_hub?schema=public
       - BLOCKCHAIN_RPC_URL=http://blockchain:8545
     volumes:
       - contract_data:/app/shared:ro
@@ -66,8 +67,6 @@ services:
     ports:
       - "5173:5173"
     depends_on:
-      blockchain:
-        condition: service_healthy
       backend:
         condition: service_started
     networks:

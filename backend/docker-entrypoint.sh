@@ -12,6 +12,26 @@ done
 
 echo "✅ Database is ready!"
 
+# Attendre le fichier de configuration du contrat depuis la blockchain
+SHARED_CONFIG="/app/shared/contract-config.json"
+echo "⏳ Waiting for blockchain contract configuration..."
+
+MAX_WAIT=60
+WAITED=0
+while [ ! -f "$SHARED_CONFIG" ] && [ $WAITED -lt $MAX_WAIT ]; do
+  echo "   Waiting for contract deployment... ($WAITED/$MAX_WAIT seconds)"
+  sleep 2
+  WAITED=$((WAITED + 2))
+done
+
+if [ ! -f "$SHARED_CONFIG" ]; then
+  echo "⚠️  WARNING: Contract configuration not found after ${MAX_WAIT} seconds"
+  echo "   Application will use CONTRACT_ADDRESS from .env if available"
+else
+  echo "✅ Contract configuration found!"
+  echo "   Contract address will be loaded by the application at startup"
+fi
+
 # Générer le client Prisma (au cas où)
 echo "🔧 Generating Prisma Client..."
 npx prisma generate
@@ -21,6 +41,12 @@ echo "📦 Syncing database schema..."
 npx prisma db push --accept-data-loss
 
 echo "✅ Database schema synced successfully!"
+
+# Exécuter le seed pour créer les catégories et privilèges
+echo "🌱 Seeding database with initial data..."
+npx ts-node src/prisma/seed.ts || echo "⚠️  Seed already executed or failed (ignoring)"
+
+echo "✅ Database seeding completed!"
 
 # Démarrer l'application
 echo "🚀 Starting NestJS application..."

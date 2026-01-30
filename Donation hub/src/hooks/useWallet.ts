@@ -6,8 +6,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { getChainConfig, isChainSupported } from '../utils/chainConfig';
 import { BrowserProvider, Contract, type InterfaceAbi, formatEther, type Signer } from 'ethers';
-
-const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000';
+import { getContractAddress } from '../contracts/contractLoader';
 
 export interface WalletState {
     account: string | null;
@@ -84,19 +83,6 @@ export const useWallet = () => {
 
                     localStorage.setItem('wallet_was_connected', 'true');
 
-                    // JWT Authentication in init (silent)
-                    try {
-                        const { getNonce, verifySignature } = await import('../utils/api');
-                        const { nonce } = await getNonce(address);
-                        const message = `Sign this nonce to authenticate: ${nonce}`;
-                        const signature = await signer.signMessage(message);
-                        const { accessToken, user } = await verifySignature(address, signature);
-                        localStorage.setItem('jwt_token', accessToken);
-                        setState(prev => ({ ...prev, user }));
-                    } catch (apiError) {
-                        // Silent fail for auto-reconnect
-                    }
-
                     setState(prev => ({
                         ...prev,
                         account: address,
@@ -125,6 +111,9 @@ export const useWallet = () => {
             const handleAccountsChanged = async (args: unknown) => {
                 const accounts = args as string[];
                 if (accounts.length === 0) {
+                    // Déconnexion complète
+                    localStorage.removeItem('wallet_was_connected');
+                    localStorage.removeItem('jwt_token');
                     setState(prev => ({
                         ...prev,
                         account: null,
@@ -133,6 +122,7 @@ export const useWallet = () => {
                         ensName: null,
                         avatar: null,
                         signer: null,
+                        user: null,
                     }));
                 } else {
                     // Re-initialize to get full state
@@ -140,6 +130,13 @@ export const useWallet = () => {
                     const signer = await provider.getSigner();
                     const address = await signer.getAddress();
                     const balance = await provider.getBalance(address);
+
+                    // Si le compte change, invalider le JWT et redemander signature
+                    const currentAccount = state.account;
+                    if (currentAccount && address.toLowerCase() !== currentAccount.toLowerCase()) {
+                        localStorage.removeItem('jwt_token');
+                        // Forcer une nouvelle authentification au prochain connect()
+                    }
 
                     setState(prev => ({
                         ...prev,
@@ -407,9 +404,10 @@ export const useWallet = () => {
      * Get donation badge contract instance
      */
     const getBadgeContract = useCallback(() => {
-        if (!state.signer || !CONTRACT_ADDRESS) return null;
+        const contractAddress = getContractAddress();
+        if (!state.signer || !contractAddress || contractAddress === '0x0000000000000000000000000000000000000000') return null;
         try {
-            return new Contract(CONTRACT_ADDRESS, DONATION_BADGE_ABI, state.signer);
+            return new Contract(contractAddress, DONATION_BADGE_ABI, state.signer);
         } catch (error) {
             return null;
         }

@@ -8,6 +8,7 @@ import { ToastProvider } from './context/ToastContext';
 import Layout from './component/layout/Layout';
 import PublicLayout from './component/layout/PublicLayout';
 import ProtectedRoute from './component/auth/ProtectedRoute';
+import RoleProtectedRoute from './component/auth/RoleProtectedRoute';
 
 const Home = lazy(() => import('./pages/Home'));
 const Projects = lazy(() => import('./pages/Projects'));
@@ -17,6 +18,12 @@ const JoinUs = lazy(() => import('./pages/JoinUs'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const BadgeFusion = lazy(() => import('./pages/BadgeFusion'));
 const AdminWithdrawals = lazy(() => import('./pages/AdminWithdrawals'));
+const AdminProjectsPage = lazy(() => import('./pages/AdminProjectsPage'));
+const AdminUsersPage = lazy(() => import('./pages/AdminUsersPage'));
+const AdminCategoriesPage = lazy(() => import('./pages/AdminCategoriesPage'));
+const CreateProjectPage = lazy(() => import('./pages/CreateProjectPage'));
+const MyProjectsPage = lazy(() => import('./pages/MyProjectsPage'));
+const MyDonationsPage = lazy(() => import('./pages/MyDonationsPage'));
 
 const LoadingFallback = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
@@ -59,11 +66,77 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+
+                {/* User Routes */}
+                <Route
+                  path="/dashboard/my-donations"
+                  element={
+                    <ProtectedRoute>
+                      <MyDonationsPage />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Association Routes */}
+                <Route
+                  path="/dashboard/create-project"
+                  element={
+                    <ProtectedRoute>
+                      <RoleProtectedRoute allowedRoles={['ASSOCIATION', 'ADMIN']}>
+                        <CreateProjectPage />
+                      </RoleProtectedRoute>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/my-projects"
+                  element={
+                    <ProtectedRoute>
+                      <RoleProtectedRoute allowedRoles={['ASSOCIATION', 'ADMIN']}>
+                        <MyProjectsPage />
+                      </RoleProtectedRoute>
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Admin Routes */}
+                <Route
+                  path="/dashboard/admin/projects"
+                  element={
+                    <ProtectedRoute>
+                      <RoleProtectedRoute allowedRoles={['ADMIN']}>
+                        <AdminProjectsPage />
+                      </RoleProtectedRoute>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/admin/users"
+                  element={
+                    <ProtectedRoute>
+                      <RoleProtectedRoute allowedRoles={['ADMIN']}>
+                        <AdminUsersPage />
+                      </RoleProtectedRoute>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/admin/categories"
+                  element={
+                    <ProtectedRoute>
+                      <RoleProtectedRoute allowedRoles={['ADMIN']}>
+                        <AdminCategoriesPage />
+                      </RoleProtectedRoute>
+                    </ProtectedRoute>
+                  }
+                />
                 <Route
                   path="/dashboard/admin/withdrawals"
                   element={
                     <ProtectedRoute>
-                      <AdminWithdrawals />
+                      <RoleProtectedRoute allowedRoles={['ADMIN']}>
+                        <AdminWithdrawals />
+                      </RoleProtectedRoute>
                     </ProtectedRoute>
                   }
                 />

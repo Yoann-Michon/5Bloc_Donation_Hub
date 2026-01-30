@@ -67,8 +67,9 @@ export class AuthService {
           id: user.id,
           walletAddress: user.walletAddress,
           role: user.role,
-          username: user.username,
-          email: user.email,
+          organizationName: user.organizationName || null,
+          email: user.email || null,
+          isActive: user.isActive,
         },
       };
     } catch (error) {

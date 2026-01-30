@@ -24,38 +24,51 @@ import { parseEther } from 'ethers';
 // Replace with your real Pinata JWT
 const PINATA_JWT = import.meta.env.VITE_PINATA_JWT;
 
-// Upload metadata to Pinata (IPFS)
+// Upload metadata to Pinata (IPFS) or use local fallback
 const uploadToIPFS = async (metadata: any): Promise<string> => {
   try {
-    if (!PINATA_JWT) {
-      throw new Error("Pinata JWT not found. Check .env file.");
+    // Si Pinata est configuré, on l'utilise
+    if (PINATA_JWT && PINATA_JWT !== 'your_pinata_jwt_here') {
+      const response = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${PINATA_JWT}`
+        },
+        body: JSON.stringify({
+          pinataContent: metadata,
+          pinataMetadata: {
+            name: metadata.name
+          }
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Pinata upload failed: ${response.status} ${response.statusText} - ${errorText}`);
+      }
+
+      const data = await response.json();
+
+      // Save to localStorage for immediate UI availability
+      localStorage.setItem(data.IpfsHash, JSON.stringify(metadata));
+
+      return `ipfs://${data.IpfsHash}`;
+    } else {
+      // Fallback : génération d'une URI locale pour démo/développement
+      console.warn('⚠️ Pinata JWT not configured. Using local metadata storage.');
+
+      // Génère un hash unique basé sur le timestamp et un random
+      const timestamp = Date.now();
+      const randomId = Math.random().toString(36).substring(2, 15);
+      const localHash = `local-${timestamp}-${randomId}`;
+
+      // Stocke les métadonnées dans localStorage
+      localStorage.setItem(localHash, JSON.stringify(metadata));
+
+      // Retourne une URI locale (le smart contract accepte n'importe quelle string)
+      return `local://${localHash}`;
     }
-
-    const response = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${PINATA_JWT}`
-      },
-      body: JSON.stringify({
-        pinataContent: metadata,
-        pinataMetadata: {
-          name: metadata.name
-        }
-      })
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Pinata upload failed: ${response.status} ${response.statusText} - ${errorText}`);
-    }
-
-    const data = await response.json();
-
-    // Also save to localStorage for immediate UI availability before IPFS propagates
-    localStorage.setItem(data.IpfsHash, JSON.stringify(metadata));
-
-    return `ipfs://${data.IpfsHash}`;
   } catch (error) {
     throw error;
   }

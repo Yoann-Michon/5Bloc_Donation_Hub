@@ -78,9 +78,15 @@ const BadgeFusion = () => {
 
                 setBadges(badgesArray);
                 setError(null);
-            } catch (err) {
+            } catch (err: any) {
                 console.error('Failed to load badges:', err);
-                setError('Failed to load badges from blockchain');
+
+                // Check if error is due to contract not being deployed
+                if (err.code === 'BAD_DATA' || err.message?.includes('could not decode result data')) {
+                    setError('Badge contract not deployed or not accessible. Please ensure the blockchain is running and contracts are deployed.');
+                } else {
+                    setError('Failed to load badges from blockchain');
+                }
             } finally {
                 setIsLoading(false);
             }

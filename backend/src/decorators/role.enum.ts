@@ -1,9 +1,10 @@
 export enum UserRole {
-    USER='USER',
-    ADMIN='ADMIN'
+    USER = 'USER',
+    ASSOCIATION = 'ASSOCIATION',
+    ADMIN = 'ADMIN'
 }
 
 export enum CollectionRole {
-    MODERATOR='MODERATOR',
-    VIEWER='VIEWER'
+    MODERATOR = 'MODERATOR',
+    VIEWER = 'VIEWER'
 }
