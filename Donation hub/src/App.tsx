@@ -16,6 +16,7 @@ const HowItWorks = lazy(() => import('./pages/HowItWorks'));
 const JoinUs = lazy(() => import('./pages/JoinUs'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const BadgeFusion = lazy(() => import('./pages/BadgeFusion'));
+const AdminWithdrawals = lazy(() => import('./pages/AdminWithdrawals'));
 
 const LoadingFallback = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
@@ -55,6 +56,14 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <BadgeFusion />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/admin/withdrawals"
+                  element={
+                    <ProtectedRoute>
+                      <AdminWithdrawals />
                     </ProtectedRoute>
                   }
                 />

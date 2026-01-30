@@ -54,4 +54,18 @@ export class UsersService {
       where: { id: id.toString() },
     });
   }
+
+  async updateNonce(walletAddress: string, nonce: string) {
+    return this.prisma.user.update({
+      where: { walletAddress },
+      data: { nonce },
+    });
+  }
+
+  async updateLastLogin(walletAddress: string) {
+    return this.prisma.user.update({
+      where: { walletAddress },
+      data: { lastLogin: new Date() },
+    });
+  }
 }

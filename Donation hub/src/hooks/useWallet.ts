@@ -31,6 +31,9 @@ const DONATION_BADGE_ABI = [
     "function lastActionTimestamp(address user) view returns (uint256)",
     "function tokenURI(uint256 tokenId) view returns (string)",
     "function ownerOf(uint256 tokenId) view returns (address)",
+    "function getTokensByOwner(address owner) view returns (uint256[])",
+    "function fuseBadges(uint256 tokenId1, uint256 tokenId2, string memory newMetadataURI) external",
+    "function getTierFromTokenId(uint256 tokenId) view returns (uint256)",
     "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
 ];
 
@@ -81,13 +84,17 @@ export const useWallet = () => {
 
                     localStorage.setItem('wallet_was_connected', 'true');
 
-                    // Register/Login user in backend
+                    // JWT Authentication in init (silent)
                     try {
-                        const { createUser } = await import('../utils/api');
-                        const userData = await createUser({ walletAddress: address });
-                        setState(prev => ({ ...prev, user: userData }));
+                        const { getNonce, verifySignature } = await import('../utils/api');
+                        const { nonce } = await getNonce(address);
+                        const message = `Sign this nonce to authenticate: ${nonce}`;
+                        const signature = await signer.signMessage(message);
+                        const { accessToken, user } = await verifySignature(address, signature);
+                        localStorage.setItem('jwt_token', accessToken);
+                        setState(prev => ({ ...prev, user }));
                     } catch (apiError) {
-                        // Silent fail for API registration in init
+                        // Silent fail for auto-reconnect
                     }
 
                     setState(prev => ({
@@ -220,13 +227,26 @@ export const useWallet = () => {
 
             localStorage.setItem('wallet_was_connected', 'true');
 
-            // Register/Login user in backend
+            // JWT Authentication: Get nonce, sign it, verify signature
             try {
-                const { createUser } = await import('../utils/api');
-                const userData = await createUser({ walletAddress: address });
-                setState(prev => ({ ...prev, user: userData }));
+                const { getNonce, verifySignature } = await import('../utils/api');
+
+                // Step 1: Get nonce from backend
+                const { nonce } = await getNonce(address);
+
+                // Step 2: Sign the nonce
+                const message = `Sign this nonce to authenticate: ${nonce}`;
+                const signature = await signer.signMessage(message);
+
+                // Step 3: Verify signature and get JWT
+                const { accessToken, user } = await verifySignature(address, signature);
+
+                // Store JWT token
+                localStorage.setItem('jwt_token', accessToken);
+
+                setState(prev => ({ ...prev, user }));
             } catch (apiError) {
-                console.error('Failed to register user in backend:', apiError);
+                console.error('Failed to authenticate user:', apiError);
                 // We still consider them connected to the wallet
             }
 
@@ -255,6 +275,7 @@ export const useWallet = () => {
      */
     const disconnect = useCallback(() => {
         localStorage.removeItem('wallet_was_connected');
+        localStorage.removeItem('jwt_token');
         setState(prev => ({
             ...prev,
             account: null,
@@ -266,6 +287,7 @@ export const useWallet = () => {
             ensName: null,
             avatar: null,
             signer: null,
+            user: null,
         }));
     }, []);
 

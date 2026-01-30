@@ -8,6 +8,7 @@ import { DonationsModule } from './donations/donations.module';
 import { CategoriesModule } from './categories/categories.module';
 import { BadgesModule } from './badges/badges.module';
 import { PrivilegesModule } from './privileges/privileges.module';
+import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
@@ -16,6 +17,7 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true,
     }),
     PrismaModule,
+    AuthModule,
     UsersModule,
     ProjectsModule,
     DonationsModule,

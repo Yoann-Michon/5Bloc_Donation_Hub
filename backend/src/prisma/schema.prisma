@@ -73,26 +73,30 @@ model Category {
 }
 
 model Project {
-  id          Int           @id @default(autoincrement())
-  title       String
-  description String        @db.Text
-  goal        Decimal       @db.Decimal(18, 4)
-  raised      Decimal       @default(0) @db.Decimal(18, 4)
-  image       String?
-  status      ProjectStatus @default(PENDING)
+  id              Int           @id @default(autoincrement())
+  title           String
+  description     String        @db.Text
+  goal            Decimal       @db.Decimal(18, 4)
+  raised          Decimal       @default(0) @db.Decimal(18, 4)
+  image           String?
+  status          ProjectStatus @default(PENDING)
 
-  categoryId  String
-  category    Category      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  categoryId      String
+  category        Category      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
 
-  ownerWallet String        @db.VarChar(42)
+  ownerWallet     String        @db.VarChar(42)
 
-  approvedBy  String?       @db.VarChar(42)
-  approvedAt  DateTime?
+  approvedBy      String?       @db.VarChar(42)
+  approvedAt      DateTime?
 
-  donations   Donation[]
+  fundsWithdrawn  Boolean       @default(false)
+  withdrawnBy     String?       @db.VarChar(42)
+  withdrawnAt     DateTime?
 
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  donations       Donation[]
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
   @@index([ownerWallet])
   @@index([categoryId])

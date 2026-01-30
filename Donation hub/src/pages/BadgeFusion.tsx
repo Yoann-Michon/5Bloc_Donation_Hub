@@ -40,11 +40,46 @@ const BadgeFusion = () => {
                     throw new Error('Contract not initialized');
                 }
 
-                // For now, we'll show a message that this feature is coming soon
-                // In the future, we would fetch each badge's metadata from IPFS
-                setBadges([]);
+                // Get user's token IDs from contract
+                const tokenIds = await contract.getTokensByOwner(account);
+
+                // Group badges by tier and count them
+                const badgeMap = new Map<BadgeTier, { count: number; tokenIds: number[] }>();
+
+                for (const tokenId of tokenIds) {
+                    const tokenIdNum = Number(tokenId);
+                    let tier: BadgeTier;
+
+                    // Determine tier based on tokenId
+                    if (tokenIdNum < 100) tier = BadgeTier.BRONZE;
+                    else if (tokenIdNum < 500) tier = BadgeTier.SILVER;
+                    else if (tokenIdNum < 1000) tier = BadgeTier.GOLD;
+                    else tier = BadgeTier.LEGENDARY;
+
+                    if (!badgeMap.has(tier)) {
+                        badgeMap.set(tier, { count: 0, tokenIds: [] });
+                    }
+                    const entry = badgeMap.get(tier)!;
+                    entry.count++;
+                    entry.tokenIds.push(tokenIdNum);
+                }
+
+                // Convert to badges array
+                const badgesArray: Badge[] = [];
+                badgeMap.forEach((value, tier) => {
+                    badgesArray.push({
+                        id: tier,
+                        name: `${tier} Badge`,
+                        tier,
+                        count: value.count,
+                        image: `/badges/${tier.toLowerCase()}.png`,
+                    });
+                });
+
+                setBadges(badgesArray);
                 setError(null);
             } catch (err) {
+                console.error('Failed to load badges:', err);
                 setError('Failed to load badges from blockchain');
             } finally {
                 setIsLoading(false);
@@ -76,13 +111,100 @@ const BadgeFusion = () => {
         setSelectedBadges(newSelected);
     };
 
-    const handleFuse = () => {
+    const handleFuse = async () => {
+        if (!canFuse || selectedBadges.length !== 2) return;
+
         setIsFusing(true);
-        setTimeout(() => {
-            setIsFusing(false);
+        try {
+            const contract = getBadgeContract();
+            if (!contract) {
+                throw new Error('Contract not initialized');
+            }
+
+            // Get token IDs from the selected badges
+            // We need to map back from badge to actual tokenIds
+            const badge1 = selectedBadges[0];
+            const badge2 = selectedBadges[1];
+
+            // Fetch actual token IDs again to get the first 2 available
+            const allTokenIds = await contract.getTokensByOwner(account);
+            const tokenIdsOfTier: number[] = [];
+
+            for (const tokenId of allTokenIds) {
+                const tokenIdNum = Number(tokenId);
+                let tier: BadgeTier;
+
+                if (tokenIdNum < 100) tier = BadgeTier.BRONZE;
+                else if (tokenIdNum < 500) tier = BadgeTier.SILVER;
+                else if (tokenIdNum < 1000) tier = BadgeTier.GOLD;
+                else tier = BadgeTier.LEGENDARY;
+
+                if (tier === badge1.tier) {
+                    tokenIdsOfTier.push(tokenIdNum);
+                }
+            }
+
+            if (tokenIdsOfTier.length < 2) {
+                throw new Error('Not enough badges of this tier');
+            }
+
+            const tokenId1 = tokenIdsOfTier[0];
+            const tokenId2 = tokenIdsOfTier[1];
+
+            // Metadata URI for the new badge (can be customized)
+            const newMetadataURI = `ipfs://QmNewBadge${Date.now()}`;
+
+            // Call fuseBadges on the contract
+            const tx = await contract.fuseBadges(tokenId1, tokenId2, newMetadataURI);
+
+            // Wait for transaction to be mined
+            await tx.wait();
+
+            // Sync badges with backend
+            const { syncUserBadges } = await import('../utils/api');
+            await syncUserBadges(account);
+
+            // Reload badges
+            const updatedTokenIds = await contract.getTokensByOwner(account);
+            const badgeMap = new Map<BadgeTier, { count: number; tokenIds: number[] }>();
+
+            for (const tokenId of updatedTokenIds) {
+                const tokenIdNum = Number(tokenId);
+                let tier: BadgeTier;
+
+                if (tokenIdNum < 100) tier = BadgeTier.BRONZE;
+                else if (tokenIdNum < 500) tier = BadgeTier.SILVER;
+                else if (tokenIdNum < 1000) tier = BadgeTier.GOLD;
+                else tier = BadgeTier.LEGENDARY;
+
+                if (!badgeMap.has(tier)) {
+                    badgeMap.set(tier, { count: 0, tokenIds: [] });
+                }
+                const entry = badgeMap.get(tier)!;
+                entry.count++;
+                entry.tokenIds.push(tokenIdNum);
+            }
+
+            const badgesArray: Badge[] = [];
+            badgeMap.forEach((value, tier) => {
+                badgesArray.push({
+                    id: tier,
+                    name: `${tier} Badge`,
+                    tier,
+                    count: value.count,
+                    image: `/badges/${tier.toLowerCase()}.png`,
+                });
+            });
+
+            setBadges(badgesArray);
             setSelectedBadges([]);
-            alert('Fusion Successful! You crafted a Rare Badge!');
-        }, 3000);
+            alert('Fusion Successful! You crafted a higher tier badge!');
+        } catch (err: any) {
+            console.error('Fusion failed:', err);
+            alert(`Fusion failed: ${err.message || 'Unknown error'}`);
+        } finally {
+            setIsFusing(false);
+        }
     };
 
     // Logic

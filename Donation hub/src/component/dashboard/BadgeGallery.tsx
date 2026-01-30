@@ -101,23 +101,16 @@ const BadgeGallery = () => {
             const contract = getBadgeContract();
             if (!contract) return;
 
-            // Query Transfer events to find tokens owned by the user
-            const filter = contract.filters.Transfer(null, account);
-            const events = await contract.queryFilter(filter);
+            // Use getTokensByOwner for better performance
+            const tokenIds = await contract.getTokensByOwner(account);
 
             const fetchedBadges: Badge[] = [];
 
-            // Deduplicate token IDs from events
-            const tokenIds = Array.from(new Set(events.map(e => (e as any).args[2].toString())));
-
             for (const tokenId of tokenIds) {
                 try {
-                    // Check if user still owns it
-                    const owner = await contract.ownerOf(tokenId);
-                    if (owner.toLowerCase() !== account.toLowerCase()) continue;
-
+                    const tokenIdStr = tokenId.toString();
                     const tokenURI = await contract.tokenURI(tokenId);
-                    const metadata = await getMetadata(tokenId, tokenURI);
+                    const metadata = await getMetadata(tokenIdStr, tokenURI);
 
                     // Map Tier to Icon/Color
                     let tierConfig = { icon: <RocketLaunch sx={{ fontSize: 48 }} />, color: '#CD7F32' }; // Common/Unknown default
@@ -134,7 +127,7 @@ const BadgeGallery = () => {
                     }
 
                     fetchedBadges.push({
-                        id: tokenId.toString(),
+                        id: tokenIdStr,
                         name: metadata.name,
                         tier: metadata.type || 'Common',
                         icon: tierConfig.icon,

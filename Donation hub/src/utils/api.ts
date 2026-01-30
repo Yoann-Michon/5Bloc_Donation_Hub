@@ -24,6 +24,33 @@ const api = axios.create({
     },
 });
 
+// JWT Token Interceptor
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('jwt_token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
+// Refresh token on 401
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            // Clear invalid token
+            localStorage.removeItem('jwt_token');
+            // Optionally redirect to login or show notification
+        }
+        return Promise.reject(error);
+    }
+);
+
 const transformProject = (p: any) => ({
     ...p,
     id: Number(p.id),
@@ -134,6 +161,39 @@ export const updateCategory = async (id: string, data: UpdateCategoryDto): Promi
 
 export const deleteCategory = async (id: string): Promise<void> => {
     await api.delete(`/categories/${id}`);
+};
+
+// Auth API
+export const getNonce = async (walletAddress: string): Promise<{ nonce: string }> => {
+    const response = await api.get(`/auth/nonce?walletAddress=${walletAddress}`);
+    return response.data;
+};
+
+export const verifySignature = async (walletAddress: string, signature: string): Promise<{ accessToken: string; user: any }> => {
+    const response = await api.post('/auth/verify', { walletAddress, signature });
+    return response.data;
+};
+
+// Badges API
+export const getUserBadges = async (walletAddress: string) => {
+    const response = await api.get(`/badges/${walletAddress}`);
+    return response.data;
+};
+
+export const syncUserBadges = async (walletAddress: string) => {
+    const response = await api.post(`/badges/${walletAddress}/sync`);
+    return response.data;
+};
+
+export const getUserTier = async (walletAddress: string) => {
+    const response = await api.get(`/badges/${walletAddress}/tier`);
+    return response.data;
+};
+
+// Privileges API
+export const getPrivileges = async () => {
+    const response = await api.get('/privileges');
+    return response.data;
 };
 
 export default api;

@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { DonationsService } from './donations.service';
 import { CreateDonationDto } from './dto/create-donation.dto';
 import { UpdateDonationDto } from './dto/update-donation.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('donations')
+@UseGuards(JwtAuthGuard)
 export class DonationsController {
   constructor(private readonly donationsService: DonationsService) {}
 
