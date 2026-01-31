@@ -18,7 +18,7 @@ const ProjectMeta = ({ author }: ProjectMetaProps) => {
                 bgcolor: 'rgba(255, 255, 255, 0.03)',
                 backdropFilter: 'blur(12px)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: 2,
+                borderRadius: 3,
                 mb: 4,
             }}
         >
@@ -26,7 +26,7 @@ const ProjectMeta = ({ author }: ProjectMetaProps) => {
                 <Box
                     sx={{
                         p: 0.5,
-                        borderRadius: 2,
+                        borderRadius: 3,
                         bgcolor: 'rgba(82, 39, 255, 0.2)',
                     }}
                 >
@@ -38,7 +38,7 @@ const ProjectMeta = ({ author }: ProjectMetaProps) => {
                             bgcolor: 'primary.main',
                             backgroundSize: 'cover',
                             backgroundPosition: 'center',
-                            backgroundImage: 'url("https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?w=150&q=80")',
+                            backgroundImage: 'url("https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?w=150&q=80")', // Placeholder logo
                         }}
                     />
                 </Box>

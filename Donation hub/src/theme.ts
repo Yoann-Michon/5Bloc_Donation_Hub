@@ -66,7 +66,6 @@ const theme = createTheme({
     borderRadius: 8,
   },
   spacing: 8,
-  
   components: {
     MuiCssBaseline: {
       styleOverrides: {
@@ -120,7 +119,7 @@ const theme = createTheme({
           backdropFilter: 'blur(10px)',
           border: '1px solid rgba(255, 255, 255, 0.08)',
           boxShadow: 'none',
-          borderRadius: 16,
+          borderRadius: 8,
         },
       },
     },
@@ -147,7 +146,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: 'none',
-          borderRadius: 16,
+          borderRadius: 8,
         },
       },
     },

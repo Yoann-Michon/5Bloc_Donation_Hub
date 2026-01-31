@@ -26,7 +26,7 @@ import {
 import { formatBalance, formatTimeAgo, formatTxHash, getExplorerUrl } from '../../utils/web3Utils';
 import { motion, AnimatePresence } from 'motion/react';
 
-interface Transaction {
+export interface Transaction {
     hash: string;
     type: 'send' | 'receive' | 'approve' | 'mint' | 'other';
     amount: string;
@@ -52,6 +52,7 @@ const TransactionHistory = ({
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState<string>('all');
 
+    // Filter transactions
     const filteredTransactions = transactions.filter((tx) => {
         const matchesSearch =
             tx.hash.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -97,7 +98,7 @@ const TransactionHistory = ({
                 p: 3,
             }}
         >
-            
+            {/* Header */}
             <Box
                 sx={{
                     display: 'flex',
@@ -128,7 +129,7 @@ const TransactionHistory = ({
                 )}
             </Box>
 
-            
+            {/* Search and Filter */}
             <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
                 <TextField
                     fullWidth
@@ -172,7 +173,7 @@ const TransactionHistory = ({
                 </Button>
             </Box>
 
-            
+            {/* Transaction List */}
             {isLoading ? (
                 <Box sx={{ textAlign: 'center', py: 4 }}>
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>
@@ -205,7 +206,7 @@ const TransactionHistory = ({
                                         },
                                     }}
                                 >
-                                    
+                                    {/* Type Icon */}
                                     <Box
                                         sx={{
                                             width: 40,
@@ -221,7 +222,7 @@ const TransactionHistory = ({
                                         {getTypeIcon(tx.type)}
                                     </Box>
 
-                                    
+                                    {/* Transaction Info */}
                                     <ListItemText
                                         primary={
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
@@ -260,7 +261,7 @@ const TransactionHistory = ({
                                         }
                                     />
 
-                                    
+                                    {/* Amount */}
                                     <Box sx={{ textAlign: 'right', mr: 2 }}>
                                         <Typography
                                             variant="body1"
@@ -274,7 +275,7 @@ const TransactionHistory = ({
                                         </Typography>
                                     </Box>
 
-                                    
+                                    {/* Explorer Link */}
                                     <IconButton
                                         size="small"
                                         onClick={() => {

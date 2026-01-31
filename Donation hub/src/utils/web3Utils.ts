@@ -2,6 +2,12 @@
 
 import { ethers } from 'ethers';
 
+/**
+ * Format Ethereum address to shortened version
+ * @param address - Full Ethereum address
+ * @param chars - Number of characters to show on each side (default: 4)
+ * @returns Formatted address like "0x1234...5678"
+ */
 export const formatAddress = (address: string | null | undefined, chars: number = 4): string => {
     if (!address) return '';
     if (!ethers.isAddress(address)) return address;
@@ -9,6 +15,13 @@ export const formatAddress = (address: string | null | undefined, chars: number 
     return `${address.substring(0, chars + 2)}...${address.substring(address.length - chars)}`;
 };
 
+/**
+ * Format token balance with proper decimals
+ * @param balance - Balance in Wei or smallest unit
+ * @param decimals - Token decimals (default: 18 for ETH)
+ * @param displayDecimals - Number of decimals to display (default: 4)
+ * @returns Formatted balance string
+ */
 export const formatBalance = (
     balance: string | number | bigint,
     decimals: number = 18,
@@ -16,7 +29,13 @@ export const formatBalance = (
 ): string => {
     try {
         const balanceStr = balance.toString();
-        const formatted = ethers.formatUnits(balanceStr, decimals);
+        let formatted = balanceStr;
+
+
+        if (!balanceStr.includes('.')) {
+            formatted = ethers.formatUnits(balanceStr, decimals);
+        }
+
         const num = parseFloat(formatted);
 
         if (num === 0) return '0';
@@ -24,11 +43,16 @@ export const formatBalance = (
 
         return num.toFixed(displayDecimals).replace(/\.?0+$/, '');
     } catch (error) {
-        console.error('Error formatting balance:', error);
         return '0';
     }
 };
 
+/**
+ * Format token amount with commas for thousands
+ * @param amount - Amount to format
+ * @param decimals - Number of decimal places (default: 2)
+ * @returns Formatted amount with commas
+ */
 export const formatTokenAmount = (amount: string | number, decimals: number = 2): string => {
     const num = typeof amount === 'string' ? parseFloat(amount) : amount;
 
@@ -40,6 +64,11 @@ export const formatTokenAmount = (amount: string | number, decimals: number = 2)
     }).format(num);
 };
 
+/**
+ * Format USD value with $ symbol and commas
+ * @param value - USD value
+ * @returns Formatted USD string like "$1,234.56"
+ */
 export const formatUSD = (value: string | number): string => {
     const num = typeof value === 'string' ? parseFloat(value) : value;
 
@@ -53,11 +82,22 @@ export const formatUSD = (value: string | number): string => {
     }).format(num);
 };
 
+/**
+ * Format transaction hash for display
+ * @param hash - Transaction hash
+ * @param chars - Number of characters to show on each side (default: 6)
+ * @returns Formatted hash like "0x123456...abcdef"
+ */
 export const formatTxHash = (hash: string | null | undefined, chars: number = 6): string => {
     if (!hash) return '';
     return `${hash.substring(0, chars + 2)}...${hash.substring(hash.length - chars)}`;
 };
 
+/**
+ * Validate Ethereum address
+ * @param address - Address to validate
+ * @returns True if valid Ethereum address
+ */
 export const isValidAddress = (address: string): boolean => {
     try {
         return ethers.isAddress(address);
@@ -66,24 +106,38 @@ export const isValidAddress = (address: string): boolean => {
     }
 };
 
+/**
+ * Convert Wei to Gwei (for gas prices)
+ * @param wei - Amount in Wei
+ * @returns Amount in Gwei
+ */
 export const weiToGwei = (wei: string | number | bigint): string => {
     try {
         return ethers.formatUnits(wei.toString(), 'gwei');
     } catch (error) {
-        console.error('Error converting Wei to Gwei:', error);
         return '0';
     }
 };
 
+/**
+ * Convert ETH to Wei
+ * @param eth - Amount in ETH
+ * @returns Amount in Wei as string
+ */
 export const ethToWei = (eth: string | number): string => {
     try {
         return ethers.parseEther(eth.toString()).toString();
     } catch (error) {
-        console.error('Error converting ETH to Wei:', error);
         return '0';
     }
 };
 
+/**
+ * Get block explorer URL for a transaction
+ * @param chainId - Network chain ID
+ * @param txHash - Transaction hash
+ * @returns Block explorer URL
+ */
 export const getExplorerUrl = (chainId: number, txHash: string): string => {
     const explorers: Record<number, string> = {
         1: 'https://etherscan.io/tx/',
@@ -100,6 +154,12 @@ export const getExplorerUrl = (chainId: number, txHash: string): string => {
     return `${baseUrl}${txHash}`;
 };
 
+/**
+ * Get block explorer URL for an address
+ * @param chainId - Network chain ID
+ * @param address - Ethereum address
+ * @returns Block explorer URL
+ */
 export const getAddressExplorerUrl = (chainId: number, address: string): string => {
     const explorers: Record<number, string> = {
         1: 'https://etherscan.io/address/',
@@ -116,6 +176,11 @@ export const getAddressExplorerUrl = (chainId: number, address: string): string 
     return `${baseUrl}${address}`;
 };
 
+/**
+ * Calculate estimated transaction time based on gas price
+ * @param gasPrice - Gas price in Gwei
+ * @returns Estimated time string like "~30 seconds"
+ */
 export const estimateTransactionTime = (gasPrice: number): string => {
     if (gasPrice < 20) return '~5 minutes';
     if (gasPrice < 50) return '~2 minutes';
@@ -123,13 +188,18 @@ export const estimateTransactionTime = (gasPrice: number): string => {
     return '~30 seconds';
 };
 
+/**
+ * Copy text to clipboard with fallback
+ * @param text - Text to copy
+ * @returns Promise that resolves when copied
+ */
 export const copyToClipboard = async (text: string): Promise<boolean> => {
     try {
         if (navigator.clipboard && window.isSecureContext) {
             await navigator.clipboard.writeText(text);
             return true;
         } else {
-
+            // Fallback for older browsers
             const textArea = document.createElement('textarea');
             textArea.value = text;
             textArea.style.position = 'fixed';
@@ -141,18 +211,21 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
                 document.execCommand('copy');
                 return true;
             } catch (error) {
-                console.error('Fallback: Could not copy text: ', error);
                 return false;
             } finally {
                 document.body.removeChild(textArea);
             }
         }
     } catch (error) {
-        console.error('Could not copy text: ', error);
         return false;
     }
 };
 
+/**
+ * Format time ago from timestamp
+ * @param timestamp - Unix timestamp in seconds
+ * @returns Human readable time ago string
+ */
 export const formatTimeAgo = (timestamp: number): string => {
     const seconds = Math.floor(Date.now() / 1000 - timestamp);
 
@@ -164,6 +237,12 @@ export const formatTimeAgo = (timestamp: number): string => {
     return new Date(timestamp * 1000).toLocaleDateString();
 };
 
+/**
+ * Debounce function for limiting rapid calls
+ * @param func - Function to debounce
+ * @param wait - Wait time in milliseconds
+ * @returns Debounced function
+ */
 export const debounce = <T extends (...args: unknown[]) => unknown>(
     func: T,
     wait: number

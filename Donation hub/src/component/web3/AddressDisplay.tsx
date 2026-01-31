@@ -153,7 +153,7 @@ const AddressDisplay = ({
                 borderRadius: 2,
             }}
         >
-            
+            {/* Avatar */}
             {showAvatar && (
                 <Avatar
                     src={avatar || undefined}
@@ -169,7 +169,7 @@ const AddressDisplay = ({
                 </Avatar>
             )}
 
-            
+            {/* Address/ENS */}
             <Box>
                 {isLoading ? (
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>
@@ -203,7 +203,7 @@ const AddressDisplay = ({
                 )}
             </Box>
 
-            
+            {/* Actions */}
             <Box sx={{ display: 'flex', gap: 0.5, ml: 'auto' }}>
                 {showCopy && (
                     <Tooltip title={copied ? 'Copied!' : 'Copy address'}>

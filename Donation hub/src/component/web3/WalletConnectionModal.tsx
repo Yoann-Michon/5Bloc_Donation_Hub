@@ -1,6 +1,4 @@
 
-
-import { useState } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -22,6 +20,7 @@ import {
 } from '@mui/icons-material';
 import { useWallet, type WalletProvider } from '../../hooks/useWallet';
 import { motion, AnimatePresence } from 'motion/react';
+import { useNavigate } from 'react-router-dom';
 
 interface WalletConnectionModalProps {
     open: boolean;
@@ -44,7 +43,7 @@ const WalletConnectionModal = ({
     onConnect
 }: WalletConnectionModalProps) => {
     const { connect, isConnecting, error, isConnected } = useWallet();
-    const [selectedWallet, setSelectedWallet] = useState<WalletProvider | null>(null);
+    const navigate = useNavigate();
 
     const walletOptions: WalletOption[] = [
         {
@@ -52,7 +51,7 @@ const WalletConnectionModal = ({
             name: 'MetaMask',
             icon: 'https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg',
             description: 'Most popular Ethereum wallet',
-            isInstalled: typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask,
+            isInstalled: typeof window.ethereum !== 'undefined' && !!window.ethereum.isMetaMask,
             downloadUrl: 'https://metamask.io/download/',
         },
         {
@@ -80,17 +79,16 @@ const WalletConnectionModal = ({
             return;
         }
 
-        setSelectedWallet(walletId);
-        await connect(walletId);
+        await connect();
 
         if (onConnect) {
             onConnect();
         }
+
     };
 
     const handleClose = () => {
         if (!isConnecting) {
-            setSelectedWallet(null);
             onClose();
         }
     };
@@ -106,12 +104,12 @@ const WalletConnectionModal = ({
                     background: 'rgba(11, 0, 26, 0.95)',
                     backdropFilter: 'blur(20px)',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: 2,
+                    borderRadius: 3,
                     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
                 },
             }}
         >
-            
+            {/* Header */}
             <DialogTitle
                 sx={{
                     display: 'flex',
@@ -143,7 +141,6 @@ const WalletConnectionModal = ({
             <DialogContent sx={{ pt: 3, pb: 3 }}>
                 <AnimatePresence mode="wait">
                     {isConnected ? (
-
                         <motion.div
                             key="success"
                             initial={{ opacity: 0, scale: 0.9 }}
@@ -167,7 +164,10 @@ const WalletConnectionModal = ({
                                 </Typography>
                                 <Button
                                     variant="contained"
-                                    onClick={handleClose}
+                                    onClick={() => {
+                                        handleClose();
+                                        navigate('/dashboard');
+                                    }}
                                     fullWidth
                                     sx={{ maxWidth: 200 }}
                                 >
@@ -176,7 +176,6 @@ const WalletConnectionModal = ({
                             </Box>
                         </motion.div>
                     ) : isConnecting ? (
-
                         <motion.div
                             key="loading"
                             initial={{ opacity: 0 }}
@@ -202,14 +201,13 @@ const WalletConnectionModal = ({
                             </Box>
                         </motion.div>
                     ) : (
-
                         <motion.div
                             key="selection"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                         >
-                            
+                            {/* Info Banner */}
                             <Alert
                                 severity="info"
                                 icon={<Warning />}
@@ -223,7 +221,7 @@ const WalletConnectionModal = ({
                                 Choose a wallet to connect and start making donations
                             </Alert>
 
-                            
+                            {/* Error Message */}
                             {error && (
                                 <Alert
                                     severity="error"
@@ -237,7 +235,7 @@ const WalletConnectionModal = ({
                                 </Alert>
                             )}
 
-                            
+                            {/* Wallet Options */}
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                                 {walletOptions.map((wallet, index) => (
                                     <motion.div
@@ -266,7 +264,7 @@ const WalletConnectionModal = ({
                                                 },
                                             }}
                                         >
-                                            
+                                            {/* Wallet Icon */}
                                             <Box
                                                 component="img"
                                                 src={wallet.icon}
@@ -274,13 +272,13 @@ const WalletConnectionModal = ({
                                                 sx={{
                                                     width: 48,
                                                     height: 48,
-                                                    borderRadius: 1,
+                                                    borderRadius: 1.5,
                                                     background: 'rgba(255, 255, 255, 0.05)',
                                                     p: 1,
                                                 }}
                                             />
 
-                                            
+                                            {/* Wallet Info */}
                                             <Box sx={{ flex: 1 }}>
                                                 <Typography
                                                     variant="body1"
@@ -296,7 +294,7 @@ const WalletConnectionModal = ({
                                                 </Typography>
                                             </Box>
 
-                                            
+                                            {/* Status Badge */}
                                             {!wallet.isInstalled && wallet.downloadUrl && (
                                                 <Box
                                                     sx={{
@@ -325,7 +323,7 @@ const WalletConnectionModal = ({
 
                             <Divider sx={{ my: 3, borderColor: 'rgba(255, 255, 255, 0.08)' }} />
 
-                            
+                            {/* Footer Info */}
                             <Box sx={{ textAlign: 'center' }}>
                                 <Typography
                                     variant="caption"

@@ -1,10 +1,8 @@
 import { Box, Container, Typography, Button, TextField, Grid, Card, CardContent } from '@mui/material';
 import { Send, Phone, HowToVote, CheckCircle, Description, Group } from '@mui/icons-material';
-import { useState, type ChangeEvent, type FormEvent } from 'react';
-import { useToast } from '../context/ToastContext';
+import { useState } from 'react';
 
 const JoinUs = () => {
-    const { showToast } = useToast();
 
     const [formData, setFormData] = useState({
         projectName: '',
@@ -18,52 +16,52 @@ const JoinUs = () => {
         website: '',
     });
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value,
         });
     };
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Form submitted:', formData);
-        showToast('Thank you for your submission! We will contact you soon.', 'success');
+        // Form submitted
+        alert('Merci pour votre soumission ! Nous vous contacterons bientôt.');
     };
 
     const submissionSteps = [
         {
             number: '01',
-            title: 'Submit Your Project',
-            description: 'Fill out the form below with all information about your project: name, category, funding goal, duration, and detailed description.',
+            title: 'Soumettez votre projet',
+            description: 'Remplissez le formulaire ci-dessous avec toutes les informations sur votre projet : nom, catégorie, objectif de financement, durée, et description détaillée.',
             icon: <Description sx={{ fontSize: 48 }} />,
         },
         {
             number: '02',
-            title: 'Phone Interview',
-            description: 'Our team will contact you for a phone call to better understand your motivations, vision, and project details.',
+            title: 'Entretien téléphonique',
+            description: 'Notre équipe vous contactera pour un appel téléphonique afin de mieux comprendre vos motivations, votre vision et les détails de votre projet.',
             icon: <Phone sx={{ fontSize: 48 }} />,
         },
         {
             number: '03',
-            title: 'Community Vote',
-            description: 'Every week, token holders vote to decide which projects will be added to the platform. The most voted projects are accepted.',
+            title: 'Vote communautaire',
+            description: 'Chaque semaine, les détenteurs de tokens votent pour décider quels projets seront ajoutés à la plateforme. Les projets les plus votés sont acceptés.',
             icon: <HowToVote sx={{ fontSize: 48 }} />,
         },
     ];
 
     const requirements = [
-        'Project aligned with our values (social, environmental, or technological impact)',
-        'Realistic and well-defined funding goal',
-        'Identifiable team with relevant experience',
-        'Clear development plan with measurable milestones',
-        'Full transparency on fund usage',
-        'Commitment to provide regular updates',
+        'Projet aligné avec nos valeurs (impact social, environnemental, ou technologique)',
+        'Objectif de financement réaliste et bien défini',
+        'Équipe identifiable avec expérience pertinente',
+        'Plan de développement clair avec jalons mesurables',
+        'Transparence totale sur l\'utilisation des fonds',
+        'Engagement à fournir des mises à jour régulières',
     ];
 
     return (
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-            <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Container maxWidth="lg" sx={{ py: 8 }}>
+            <Box sx={{ textAlign: 'center', mb: 8 }}>
                 <Typography
                     variant="h2"
                     sx={{
@@ -75,22 +73,22 @@ const JoinUs = () => {
                         WebkitTextFillColor: 'transparent',
                     }}
                 >
-                    Join Us
+                    Rejoignez-nous
                 </Typography>
                 <Typography variant="h6" sx={{ color: 'text.secondary', maxWidth: 700, mx: 'auto', mb: 4 }}>
-                    Are you a project creator with an innovative vision? Submit your project and join our community of committed creators.
+                    Vous êtes un créateur de projet avec une vision innovante ? Soumettez votre projet et rejoignez notre communauté de créateurs engagés.
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', alignItems: 'center' }}>
                     <Group sx={{ color: 'primary.main', fontSize: 32 }} />
                     <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                        Over <strong style={{ color: '#5227FF' }}>150+ projects</strong> already funded
+                        Plus de <strong style={{ color: '#5227FF' }}>150+ projets</strong> déjà financés
                     </Typography>
                 </Box>
             </Box>
 
-            <Box sx={{ mb: 4 }}>
-                <Typography variant="h4" sx={{ fontWeight: 700, mb: 3, textAlign: 'center' }}>
-                    Submission Process
+            <Box sx={{ mb: 12 }}>
+                <Typography variant="h4" sx={{ fontWeight: 700, mb: 6, textAlign: 'center' }}>
+                    Processus de Soumission
                 </Typography>
                 <Box sx={{ display: 'grid', gap: 4 }}>
                     {submissionSteps.map((step, index) => (
@@ -100,7 +98,7 @@ const JoinUs = () => {
                                 display: 'flex',
                                 gap: 3,
                                 p: 4,
-                                borderRadius: 2,
+                                borderRadius: 3,
                                 bgcolor: 'rgba(255, 255, 255, 0.03)',
                                 border: '1px solid rgba(255, 255, 255, 0.1)',
                                 transition: 'all 0.3s ease',
@@ -151,9 +149,9 @@ const JoinUs = () => {
                 </Box>
             </Box>
 
-            <Box sx={{ mb: 4 }}>
+            <Box sx={{ mb: 8 }}>
                 <Typography variant="h4" sx={{ fontWeight: 700, mb: 4, textAlign: 'center' }}>
-                    Eligibility Criteria
+                    Critères d'Éligibilité
                 </Typography>
                 <Card
                     sx={{
@@ -178,9 +176,9 @@ const JoinUs = () => {
                 </Card>
             </Box>
 
-            <Box sx={{ mb: 4 }}>
+            <Box sx={{ mb: 8 }}>
                 <Typography variant="h4" sx={{ fontWeight: 700, mb: 4, textAlign: 'center' }}>
-                    Submission Form
+                    Formulaire de Soumission
                 </Typography>
                 <Card
                     sx={{
@@ -195,7 +193,7 @@ const JoinUs = () => {
                                     <TextField
                                         fullWidth
                                         required
-                                        label="Project Name"
+                                        label="Nom du Projet"
                                         name="projectName"
                                         value={formData.projectName}
                                         onChange={handleChange}
@@ -206,7 +204,7 @@ const JoinUs = () => {
                                     <TextField
                                         fullWidth
                                         required
-                                        label="Creator Name"
+                                        label="Nom du Créateur"
                                         name="creatorName"
                                         value={formData.creatorName}
                                         onChange={handleChange}
@@ -229,7 +227,7 @@ const JoinUs = () => {
                                     <TextField
                                         fullWidth
                                         required
-                                        label="Phone"
+                                        label="Téléphone"
                                         name="phone"
                                         value={formData.phone}
                                         onChange={handleChange}
@@ -240,19 +238,19 @@ const JoinUs = () => {
                                     <TextField
                                         fullWidth
                                         required
-                                        label="Category"
+                                        label="Catégorie"
                                         name="category"
                                         value={formData.category}
                                         onChange={handleChange}
                                         variant="outlined"
-                                        placeholder="e.g., Education, Environment, Health..."
+                                        placeholder="Ex: Education, Environment, Health..."
                                     />
                                 </Grid>
                                 <Grid size={{ xs: 12, md: 6 }}>
                                     <TextField
                                         fullWidth
                                         required
-                                        label="Funding Goal (ETH)"
+                                        label="Objectif de Financement (ETH)"
                                         name="goal"
                                         value={formData.goal}
                                         onChange={handleChange}
@@ -264,7 +262,7 @@ const JoinUs = () => {
                                     <TextField
                                         fullWidth
                                         required
-                                        label="Project Duration (days)"
+                                        label="Durée du Projet (jours)"
                                         name="duration"
                                         value={formData.duration}
                                         onChange={handleChange}
@@ -275,7 +273,7 @@ const JoinUs = () => {
                                 <Grid size={{ xs: 12, md: 6 }}>
                                     <TextField
                                         fullWidth
-                                        label="Website (optional)"
+                                        label="Site Web (optionnel)"
                                         name="website"
                                         value={formData.website}
                                         onChange={handleChange}
@@ -288,12 +286,12 @@ const JoinUs = () => {
                                         required
                                         multiline
                                         rows={6}
-                                        label="Project Description"
+                                        label="Description du Projet"
                                         name="description"
                                         value={formData.description}
                                         onChange={handleChange}
                                         variant="outlined"
-                                        placeholder="Describe your project in detail: objectives, expected impact, fund usage, milestones..."
+                                        placeholder="Décrivez votre projet en détail : objectifs, impact attendu, utilisation des fonds, jalons..."
                                     />
                                 </Grid>
                                 <Grid size={{ xs: 12 }}>
@@ -303,9 +301,9 @@ const JoinUs = () => {
                                             variant="contained"
                                             size="large"
                                             startIcon={<Send />}
-                                            sx={{ px: 4, py: 1.5 }}
+                                            sx={{ px: 6, py: 1.5 }}
                                         >
-                                            Submit My Project
+                                            Soumettre mon Projet
                                         </Button>
                                     </Box>
                                 </Grid>
@@ -318,17 +316,17 @@ const JoinUs = () => {
             <Box
                 sx={{
                     textAlign: 'center',
-                    p: 3,
-                    borderRadius: 2,
+                    p: 6,
+                    borderRadius: 3,
                     bgcolor: 'rgba(82, 39, 255, 0.1)',
                     border: '1px solid rgba(82, 39, 255, 0.3)',
                 }}
             >
                 <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
-                    Questions?
+                    Des Questions ?
                 </Typography>
                 <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
-                    Our team is here to help you prepare your submission
+                    Notre équipe est là pour vous aider à préparer votre soumission
                 </Typography>
                 <Button
                     variant="outlined"
@@ -336,7 +334,7 @@ const JoinUs = () => {
                     href="mailto:support@donationhub.com"
                     sx={{ px: 4 }}
                 >
-                    Contact Us
+                    Contactez-nous
                 </Button>
             </Box>
         </Container>

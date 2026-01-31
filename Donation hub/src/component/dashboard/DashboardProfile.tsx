@@ -68,7 +68,7 @@ const DashboardProfile = () => {
                         color: 'black',
                         px: 1.5,
                         py: 0.5,
-                        borderRadius: 2,
+                        borderRadius: 10,
                         display: 'flex',
                         alignItems: 'center',
                         gap: 0.5,

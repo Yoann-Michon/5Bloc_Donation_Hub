@@ -22,7 +22,7 @@ const FusionChamber = ({ slots, onRemove, onFuse, isFusing, canFuse }: FusionCha
             sx={{
                 bgcolor: 'rgba(25, 24, 45, 0.6)',
                 backdropFilter: 'blur(12px)',
-                borderRadius: 2,
+                borderRadius: 3,
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 p: 4,
                 display: 'flex',
@@ -34,7 +34,7 @@ const FusionChamber = ({ slots, onRemove, onFuse, isFusing, canFuse }: FusionCha
                 overflow: 'hidden',
             }}
         >
-            
+            {/* Background Effects */}
             <Box
                 sx={{
                     position: 'absolute',
@@ -52,12 +52,12 @@ const FusionChamber = ({ slots, onRemove, onFuse, isFusing, canFuse }: FusionCha
             <Typography variant="h5" sx={{ fontWeight: 700, mb: 1, zIndex: 1, fontFamily: 'Space Grotesk, sans-serif' }}>
                 Fusion Chamber
             </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3, zIndex: 1, textAlign: 'center', maxWidth: 400 }}>
+            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 6, zIndex: 1, textAlign: 'center', maxWidth: 400 }}>
                 Select 2 badges of the same tier to fuse them into a higher tier badge.
             </Typography>
 
-            
-            <Box sx={{ display: 'flex', gap: 4, mb: 3, zIndex: 1, position: 'relative' }}>
+            {/* Slots */}
+            <Box sx={{ display: 'flex', gap: 4, mb: 6, zIndex: 1, position: 'relative' }}>
                 {slots.map((badge, index) => (
                     <Box
                         key={index}
@@ -92,7 +92,7 @@ const FusionChamber = ({ slots, onRemove, onFuse, isFusing, canFuse }: FusionCha
                             <Add sx={{ color: 'text.secondary', opacity: 0.5 }} />
                         )}
 
-                        
+                        {/* Slot Number Label */}
                         <Typography
                             variant="caption"
                             sx={{
@@ -110,7 +110,7 @@ const FusionChamber = ({ slots, onRemove, onFuse, isFusing, canFuse }: FusionCha
                 ))}
             </Box>
 
-            
+            {/* Fuse Button */}
             <Button
                 variant="contained"
                 size="large"
@@ -118,11 +118,11 @@ const FusionChamber = ({ slots, onRemove, onFuse, isFusing, canFuse }: FusionCha
                 onClick={onFuse}
                 startIcon={isFusing ? <CircularProgress size={20} color="inherit" /> : <AutoFixHigh />}
                 sx={{
-                    px: 4,
+                    px: 6,
                     py: 1.5,
                     fontSize: '1.1rem',
                     fontWeight: 700,
-                    borderRadius: 2,
+                    borderRadius: 10,
                     bgcolor: canFuse ? 'primary.main' : 'rgba(255, 255, 255, 0.05)',
                     boxShadow: canFuse ? '0 0 30px rgba(82, 39, 255, 0.4)' : 'none',
                     '&:hover': {

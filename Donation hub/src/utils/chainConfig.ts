@@ -108,6 +108,21 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
         color: '#0052FF',
         isTestnet: false,
     },
+    31337: {
+        chainId: 31337,
+        chainIdHex: '0x7a69',
+        name: 'hardhat',
+        displayName: 'Hardhat Local',
+        nativeCurrency: {
+            name: 'Hardhat Ether',
+            symbol: 'ETH',
+            decimals: 18,
+        },
+        rpcUrls: ['http://127.0.0.1:8545'],
+        blockExplorerUrls: [],
+        color: '#F6851B',
+        isTestnet: true,
+    },
 };
 
 export const getChainConfig = (chainId: number | string): ChainConfig | null => {
@@ -115,23 +130,28 @@ export const getChainConfig = (chainId: number | string): ChainConfig | null => 
     return SUPPORTED_CHAINS[id] || null;
 };
 
+
 export const getChainName = (chainId: number | string): string => {
     const config = getChainConfig(chainId);
     return config?.displayName || 'Unknown Network';
 };
+
 
 export const isChainSupported = (chainId: number | string): boolean => {
     const id = typeof chainId === 'string' ? parseInt(chainId, 16) : chainId;
     return id in SUPPORTED_CHAINS;
 };
 
+
 export const getTestnetChains = (): ChainConfig[] => {
     return Object.values(SUPPORTED_CHAINS).filter(chain => chain.isTestnet);
 };
 
+
 export const getMainnetChains = (): ChainConfig[] => {
     return Object.values(SUPPORTED_CHAINS).filter(chain => !chain.isTestnet);
 };
+
 
 export const chainIdToHex = (chainId: number): string => {
     return `0x${chainId.toString(16)}`;

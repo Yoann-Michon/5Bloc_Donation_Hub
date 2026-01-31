@@ -2,6 +2,8 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { getChainConfig, isChainSupported } from '../utils/chainConfig';
+import { BrowserProvider, Contract, type InterfaceAbi, formatEther, type Signer } from 'ethers';
+import { getContractAddress } from '../contracts/contractLoader';
 
 export interface WalletState {
     account: string | null;
@@ -10,81 +12,113 @@ export interface WalletState {
     isConnected: boolean;
     error: string | null;
     balance: string | null;
+    user: any | null;
     ensName: string | null;
     avatar: string | null;
+    signer: Signer | null;
+    isInitialized: boolean;
 }
 
 export type WalletProvider = 'metamask' | 'walletconnect' | 'coinbase';
 
-const DEV_MODE = true;
-
-const MOCK_WALLET = {
-    account: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
-    chainId: 1,
-    balance: '0x15af1d78b58c40000',
-};
+const DONATION_BADGE_ABI = [
+    "function donate(uint256 projectId, string memory tokenURI) external payable",
+    "function balanceOf(address owner) view returns (uint256)",
+    "function lastActionTimestamp(address user) view returns (uint256)",
+    "function tokenURI(uint256 tokenId) view returns (string)",
+    "function ownerOf(uint256 tokenId) view returns (address)",
+    "function getTokensByOwner(address owner) view returns (uint256[])",
+    "function fuseBadges(uint256 tokenId1, uint256 tokenId2, string memory newMetadataURI) external",
+    "function getTierFromTokenId(uint256 tokenId) view returns (uint256)",
+    "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
+];
 
 export const useWallet = () => {
     const [state, setState] = useState<WalletState>({
-        account: DEV_MODE ? MOCK_WALLET.account : null,
-        chainId: DEV_MODE ? MOCK_WALLET.chainId : null,
+        account: null,
+        chainId: null,
         isConnecting: false,
-        isConnected: DEV_MODE,
+        isConnected: false,
         error: null,
-        balance: DEV_MODE ? MOCK_WALLET.balance : null,
+        balance: null,
+        user: null,
         ensName: null,
         avatar: null,
+        signer: null,
+        isInitialized: false,
     });
 
 
     useEffect(() => {
-
-        if (DEV_MODE) {
-            console.log('🔧 DEV MODE: Using mock wallet connection');
-            return;
-        }
-
         const init = async () => {
-            if (typeof window.ethereum === 'undefined') return;
+            if (typeof window.ethereum === 'undefined') {
+                setState(prev => ({ ...prev, isInitialized: true }));
+                return;
+            }
+
+            const wasConnected = localStorage.getItem('wallet_was_connected') === 'true';
+            if (!wasConnected) {
+                const provider = new BrowserProvider(window.ethereum);
+                const network = await provider.getNetwork();
+                setState(prev => ({ ...prev, chainId: Number(network.chainId), isInitialized: true }));
+                return;
+            }
 
             try {
-                const accounts = await window.ethereum.request({
-                    method: 'eth_accounts'
-                }) as string[];
+                const provider = new BrowserProvider(window.ethereum);
+                const accounts = await provider.listAccounts();
 
                 if (accounts.length > 0) {
+                    const signer = await provider.getSigner();
+                    const address = await signer.getAddress();
+                    const network = await provider.getNetwork();
+                    const balance = await provider.getBalance(address);
+
+                    localStorage.setItem('wallet_was_connected', 'true');
+
                     setState(prev => ({
                         ...prev,
-                        account: accounts[0],
-                        isConnected: true
+                        account: address,
+                        isConnected: true,
+                        chainId: Number(network.chainId),
+                        balance: formatEther(balance),
+                        signer: signer,
                     }));
 
-                    const balance = await window.ethereum.request({
-                        method: 'eth_getBalance',
-                        params: [accounts[0], 'latest'],
-                    }) as string;
-
-                    setState(prev => ({ ...prev, balance }));
+                    // Restore user data from JWT if available
+                    const jwtToken = localStorage.getItem('jwt_token');
+                    if (jwtToken) {
+                        try {
+                            const { getCurrentUser } = await import('../utils/api');
+                            const user = await getCurrentUser();
+                            setState(prev => ({ ...prev, user }));
+                        } catch (apiError) {
+                            console.error('Failed to restore user data:', apiError);
+                            // If JWT is invalid, remove it
+                            localStorage.removeItem('jwt_token');
+                        }
+                    }
+                } else {
+                    localStorage.removeItem('wallet_was_connected');
+                    const network = await provider.getNetwork();
+                    setState(prev => ({ ...prev, chainId: Number(network.chainId) }));
                 }
 
-                const chainIdHex = await window.ethereum.request({
-                    method: 'eth_chainId'
-                }) as string;
-
-                const chainId = parseInt(chainIdHex, 16);
-                setState(prev => ({ ...prev, chainId }));
-
             } catch (err) {
-                console.error('Error checking wallet connection:', err);
+                localStorage.removeItem('wallet_was_connected');
+            } finally {
+                setState(prev => ({ ...prev, isInitialized: true }));
             }
         };
 
         void init();
 
         if (window.ethereum?.on) {
-            const handleAccountsChanged = (args: unknown) => {
+            const handleAccountsChanged = async (args: unknown) => {
                 const accounts = args as string[];
                 if (accounts.length === 0) {
+                    localStorage.removeItem('wallet_was_connected');
+                    localStorage.removeItem('jwt_token');
                     setState(prev => ({
                         ...prev,
                         account: null,
@@ -92,20 +126,27 @@ export const useWallet = () => {
                         balance: null,
                         ensName: null,
                         avatar: null,
+                        signer: null,
+                        user: null,
                     }));
                 } else {
+                    const provider = new BrowserProvider(window.ethereum!);
+                    const signer = await provider.getSigner();
+                    const address = await signer.getAddress();
+                    const balance = await provider.getBalance(address);
+
+                    const currentAccount = state.account;
+                    if (currentAccount && address.toLowerCase() !== currentAccount.toLowerCase()) {
+                        localStorage.removeItem('jwt_token');
+                    }
+
                     setState(prev => ({
                         ...prev,
-                        account: accounts[0],
-                        isConnected: true
+                        account: address,
+                        isConnected: true,
+                        balance: formatEther(balance),
+                        signer: signer,
                     }));
-
-                    window.ethereum?.request({
-                        method: 'eth_getBalance',
-                        params: [accounts[0], 'latest'],
-                    }).then((balance) => {
-                        setState(prev => ({ ...prev, balance: balance as string }));
-                    });
                 }
             };
 
@@ -113,10 +154,12 @@ export const useWallet = () => {
                 const chainIdHex = args as string;
                 const chainId = parseInt(chainIdHex, 16);
                 setState(prev => ({ ...prev, chainId }));
+
             };
 
             const handleDisconnect = () => {
-                setState({
+                setState(prev => ({
+                    ...prev,
                     account: null,
                     chainId: null,
                     isConnecting: false,
@@ -125,7 +168,8 @@ export const useWallet = () => {
                     balance: null,
                     ensName: null,
                     avatar: null,
-                });
+                    signer: null,
+                }));
             };
 
             window.ethereum.on('accountsChanged', handleAccountsChanged);
@@ -144,12 +188,6 @@ export const useWallet = () => {
 
 
     const connect = async () => {
-
-        if (DEV_MODE) {
-            console.log('🔧 DEV MODE: Wallet already connected');
-            return;
-        }
-
         setState(prev => ({ ...prev, isConnecting: true, error: null }));
 
         if (typeof window.ethereum === 'undefined') {
@@ -162,33 +200,44 @@ export const useWallet = () => {
         }
 
         try {
+            const provider = new BrowserProvider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
 
-            const accounts = await window.ethereum.request({
-                method: 'eth_requestAccounts',
-            }) as string[];
+            const signer = await provider.getSigner();
+            const address = await signer.getAddress();
+            const network = await provider.getNetwork();
+            const balance = await provider.getBalance(address);
 
-            if (accounts.length > 0) {
+            setState(prev => ({
+                ...prev,
+                account: address,
+                chainId: Number(network.chainId),
+                balance: formatEther(balance),
+                isConnected: true,
+                isConnecting: false,
+                error: null,
+                signer: signer,
+            }));
 
-                const balance = await window.ethereum.request({
-                    method: 'eth_getBalance',
-                    params: [accounts[0], 'latest'],
-                }) as string;
+            localStorage.setItem('wallet_was_connected', 'true');
 
-                const chainIdHex = await window.ethereum.request({
-                    method: 'eth_chainId'
-                }) as string;
-                const chainId = parseInt(chainIdHex, 16);
+            try {
+                const { getNonce, verifySignature } = await import('../utils/api');
 
-                setState(prev => ({
-                    ...prev,
-                    account: accounts[0],
-                    chainId,
-                    balance,
-                    isConnected: true,
-                    isConnecting: false,
-                    error: null,
-                }));
+                const { nonce } = await getNonce(address);
+
+                const message = `Sign this nonce to authenticate: ${nonce}`;
+                const signature = await signer.signMessage(message);
+
+                const { accessToken, user } = await verifySignature(address, signature);
+
+                localStorage.setItem('jwt_token', accessToken);
+
+                setState(prev => ({ ...prev, user }));
+            } catch (apiError) {
+                console.error('Failed to authenticate user:', apiError);
             }
+
         } catch (err: unknown) {
             const error = err as { message?: string; code?: number };
             let errorMessage = 'Failed to connect wallet';
@@ -209,15 +258,11 @@ export const useWallet = () => {
         }
     };
 
-
     const disconnect = useCallback(() => {
-
-        if (DEV_MODE) {
-            console.log('🔧 DEV MODE: Disconnect simulated (wallet remains connected)');
-            return;
-        }
-
-        setState({
+        localStorage.removeItem('wallet_was_connected');
+        localStorage.removeItem('jwt_token');
+        setState(prev => ({
+            ...prev,
             account: null,
             chainId: null,
             isConnecting: false,
@@ -226,7 +271,9 @@ export const useWallet = () => {
             balance: null,
             ensName: null,
             avatar: null,
-        });
+            signer: null,
+            user: null,
+        }));
     }, []);
 
 
@@ -249,7 +296,6 @@ export const useWallet = () => {
         }
 
         try {
-
             await window.ethereum.request({
                 method: 'wallet_switchEthereumChain',
                 params: [{ chainId: chainConfig.chainIdHex }],
@@ -278,7 +324,6 @@ export const useWallet = () => {
                     return true;
 
                 } catch (addError) {
-                    console.error('Error adding network:', addError);
                     setState(prev => ({
                         ...prev,
                         error: 'Failed to add network'
@@ -287,7 +332,6 @@ export const useWallet = () => {
                 }
             }
 
-            console.error('Error switching network:', switchError);
             setState(prev => ({
                 ...prev,
                 error: 'Failed to switch network'
@@ -311,16 +355,34 @@ export const useWallet = () => {
         if (!state.account || !window.ethereum) return;
 
         try {
-            const balance = await window.ethereum.request({
-                method: 'eth_getBalance',
-                params: [state.account, 'latest'],
-            }) as string;
+            const provider = new BrowserProvider(window.ethereum);
+            const balance = await provider.getBalance(state.account);
 
-            setState(prev => ({ ...prev, balance }));
+            setState(prev => ({ ...prev, balance: formatEther(balance) }));
         } catch (error) {
-            console.error('Error refreshing balance:', error);
         }
     }, [state.account]);
+
+
+    const getContract = useCallback((address: string, abi: InterfaceAbi) => {
+        if (!state.signer) return null;
+        try {
+            return new Contract(address, abi, state.signer);
+        } catch (error) {
+            return null;
+        }
+    }, [state.signer]);
+
+
+    const getBadgeContract = useCallback(() => {
+        const contractAddress = getContractAddress();
+        if (!state.signer || !contractAddress || contractAddress === '0x0000000000000000000000000000000000000000') return null;
+        try {
+            return new Contract(contractAddress, DONATION_BADGE_ABI, state.signer);
+        } catch (error) {
+            return null;
+        }
+    }, [state.signer]);
 
     return {
         ...state,
@@ -330,5 +392,7 @@ export const useWallet = () => {
         isCurrentChainSupported,
         getCurrentChainConfig,
         refreshBalance,
+        getContract,
+        getBadgeContract,
     };
 };

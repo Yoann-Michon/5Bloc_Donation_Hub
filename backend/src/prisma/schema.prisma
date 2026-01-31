@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  ASSOCIATION
+  USER
+}
+
+enum ProjectStatus {
+  PENDING
+  APPROVED
+  FUNDRAISING
+  COMPLETED
+  REJECTED
+}
+
+enum BadgeTier {
+  BRONZE
+  SILVER
+  GOLD
+  LEGENDARY
+}
+
+enum PrivilegeType {
+  VOTE_ON_PROPOSALS
+  EARLY_ACCESS_PROJECTS
+  CREATE_PROPOSALS
+  PARTICIPATE_GOVERNANCE
+  REDUCED_FEES
+  PRIORITY_SUPPORT
+}
+
+model User {
+  id               String    @id @default(uuid())
+  walletAddress    String    @unique @db.VarChar(42)
+  role             UserRole  @default(USER)
+  organizationName String?
+  email            String?   @unique
+
+  nonce            String    @default(uuid())
+  isActive         Boolean   @default(true)
+  lastLogin        DateTime?
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([walletAddress])
+  @@index([role])
+  @@map("users")
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  icon        String?
+  color       String?
+
+  projects    Project[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([slug])
+  @@map("categories")
+}
+
+model Project {
+  id              Int           @id @default(autoincrement())
+  title           String
+  description     String        @db.Text
+  goal            Decimal       @db.Decimal(18, 4)
+  raised          Decimal       @default(0) @db.Decimal(18, 4)
+  image           String?
+  status          ProjectStatus @default(PENDING)
+
+  categoryId      String
+  category        Category      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  ownerWallet     String        @db.VarChar(42)
+
+  approvedBy      String?       @db.VarChar(42)
+  approvedAt      DateTime?
+
+  fundsWithdrawn  Boolean       @default(false)
+  withdrawnBy     String?       @db.VarChar(42)
+  withdrawnAt     DateTime?
+
+  donations       Donation[]
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([ownerWallet])
+  @@index([categoryId])
+  @@index([status])
+  @@index([status, categoryId])
+  @@map("projects")
+}
+
+model Donation {
+  id              String   @id @default(uuid())
+  amount          Decimal  @db.Decimal(18, 4)
+  txHash          String   @unique
+
+  verified        Boolean  @default(false)
+  verifiedAt      DateTime?
+  blockNumber     Int?
+
+  donorWallet     String   @db.VarChar(42)
+
+  projectId       Int
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime @default(now())
+
+  @@index([donorWallet])
+  @@index([projectId])
+  @@index([txHash])
+  @@index([createdAt])
+  @@map("donations")
+}
+
+model RoleChangeLog {
+  id            String   @id @default(uuid())
+  targetWallet  String   @db.VarChar(42)
+  adminWallet   String   @db.VarChar(42)
+  oldRole       UserRole
+  newRole       UserRole
+  reason        String?
+  timestamp     DateTime @default(now())
+
+  @@index([targetWallet])
+  @@index([timestamp])
+  @@map("role_change_logs")
+}
+
+model UserBadge {
+  id           String    @id @default(uuid())
+  walletAddress String   @db.VarChar(42)
+  tokenId      Int
+  tier         BadgeTier
+  metadataUri  String?
+
+  acquiredAt   DateTime  @default(now())
+  lastSyncAt   DateTime  @default(now())
+
+  @@unique([walletAddress, tokenId])
+  @@index([walletAddress])
+  @@index([tier])
+  @@map("user_badges")
+}
+
+model Privilege {
+  id          String        @id @default(uuid())
+  type        PrivilegeType @unique
+  name        String
+  description String?
+  requiredTier BadgeTier
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([requiredTier])
+  @@map("privileges")
+}

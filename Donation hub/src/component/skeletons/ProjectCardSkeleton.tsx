@@ -8,32 +8,32 @@ const ProjectCardSkeleton = () => {
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                borderRadius: 2,
+                borderRadius: 3,
                 border: '1px solid',
                 borderColor: 'divider',
             }}
         >
-            
+            {/* Image Skeleton */}
             <Skeleton variant="rectangular" height={200} />
 
             <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
-                
+                {/* Category & Date */}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                     <Skeleton variant="rounded" width={80} height={24} />
                     <Skeleton variant="text" width={60} />
                 </Box>
 
-                
+                {/* Title */}
                 <Skeleton variant="text" height={32} sx={{ mb: 1 }} />
                 <Skeleton variant="text" width="60%" height={32} sx={{ mb: 2 }} />
 
-                
+                {/* Author */}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
                     <Skeleton variant="circular" width={24} height={24} />
                     <Skeleton variant="text" width={100} />
                 </Box>
 
-                
+                {/* Progress */}
                 <Box sx={{ mb: 1 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                         <Skeleton variant="text" width={40} />

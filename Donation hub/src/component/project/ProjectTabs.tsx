@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import {
     Box,
     Typography,
@@ -13,7 +13,7 @@ import { Favorite } from '@mui/icons-material';
 import type { Project } from '../../types/project';
 
 interface TabPanelProps {
-    children?: ReactNode;
+    children?: React.ReactNode;
     index: number;
     value: number;
 }
@@ -59,14 +59,14 @@ const ProjectTabs = ({ project }: ProjectTabsProps) => {
 
             <TabPanel value={tabValue} index={0}>
                 <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3, mb: 4 }}>
-                    
+                    {/* Project Mission */}
                     <Box
                         sx={{
                             p: 3,
                             bgcolor: 'rgba(255, 255, 255, 0.03)',
                             backdropFilter: 'blur(12px)',
                             border: '1px solid rgba(255, 255, 255, 0.1)',
-                            borderRadius: 2,
+                            borderRadius: 3,
                         }}
                     >
                         <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -77,14 +77,14 @@ const ProjectTabs = ({ project }: ProjectTabsProps) => {
                         </Typography>
                     </Box>
 
-                    
+                    {/* DAO Stats */}
                     <Box
                         sx={{
                             p: 3,
                             bgcolor: 'rgba(255, 255, 255, 0.03)',
                             backdropFilter: 'blur(12px)',
                             border: '1px solid rgba(255, 255, 255, 0.1)',
-                            borderRadius: 2,
+                            borderRadius: 3,
                             display: 'flex',
                             flexDirection: 'column',
                             justifyContent: 'center',

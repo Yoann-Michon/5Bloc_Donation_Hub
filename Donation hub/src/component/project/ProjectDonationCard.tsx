@@ -60,13 +60,13 @@ const ProjectDonationCard = ({ project, percentage, onDonate }: ProjectDonationC
                     <Typography component="span" sx={{ color: 'text.secondary', fontSize: 'inherit' }}>Raised</Typography>
                     <Typography component="span" sx={{ color: 'white', fontSize: 'inherit' }}>{project.raised} ETH / {project.goal} ETH</Typography>
                 </Box>
-                <Box sx={{ width: '100%', height: 8, bgcolor: 'rgba(255,255,255,0.1)', borderRadius: 2, overflow: 'hidden' }}>
+                <Box sx={{ width: '100%', height: 8, bgcolor: 'rgba(255,255,255,0.1)', borderRadius: 4, overflow: 'hidden' }}>
                     <Box
                         sx={{
                             width: `${Math.min(percentage, 100)}%`,
                             height: '100%',
                             bgcolor: 'primary.main',
-                            borderRadius: 2,
+                            borderRadius: 4,
                             position: 'relative',
                             overflow: 'hidden',
                         }}
@@ -97,7 +97,7 @@ const ProjectDonationCard = ({ project, percentage, onDonate }: ProjectDonationC
                                 bgcolor: 'rgba(255,255,255,0.05)',
                                 fontWeight: 700,
                                 fontSize: '0.75rem',
-                                borderRadius: 1,
+                                borderRadius: 1.5,
                                 '&:hover': {
                                     borderColor: 'primary.main',
                                 },
@@ -117,7 +117,7 @@ const ProjectDonationCard = ({ project, percentage, onDonate }: ProjectDonationC
                     }}
                     sx={{
                         '& .MuiOutlinedInput-root': {
-                            borderRadius: 1,
+                            borderRadius: 1.5,
                             bgcolor: 'rgba(255, 255, 255, 0.05)',
                             color: 'white',
                             fontWeight: 700,
@@ -140,7 +140,7 @@ const ProjectDonationCard = ({ project, percentage, onDonate }: ProjectDonationC
                     fontWeight: 900,
                     textTransform: 'uppercase',
                     letterSpacing: '0.1em',
-                    borderRadius: 1,
+                    borderRadius: 1.5,
                     boxShadow: '0 0 20px rgba(82, 39, 255, 0.4)',
                     animation: 'pulse-glow 2s infinite',
                     '@keyframes pulse-glow': {

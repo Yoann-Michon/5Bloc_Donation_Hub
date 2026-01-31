@@ -1,32 +1,47 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Box, Container, Typography } from '@mui/material';
 import ProjectCardSkeleton from '../component/skeletons/ProjectCardSkeleton';
-import projectsData from '../data/projects.json';
+import { getProjects, getCategories } from '../utils/api';
 import type { Project } from '../types/project';
-import ProjectStats from '../component/project/ProjectStats';
 import HorizontalFilterBar from '../component/project/HorizontalFilterBar';
 import VortexProjectCard from '../component/project/VortexProjectCard';
-
-const categories = ['Education', 'Environment', 'Health', 'DeFi', 'Gaming', 'Infrastructure'];
 
 const Projects = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [sortBy, setSortBy] = useState<string>('relevant');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(timer);
+    const fetchData = async () => {
+      try {
+        const [projectsData, categoriesData] = await Promise.all([
+          getProjects(),
+          getCategories(),
+        ]);
+        setProjects(projectsData);
+        setCategories(categoriesData.map((cat: any) => cat.name));
+      } catch (error) {
+        // Handle error silently
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
+  // Filter and sort projects
   const filteredProjects = useMemo(() => {
-    let filtered = (projectsData as unknown as Project[]);
+    let filtered = projects;
 
+    // Category filter
     if (selectedCategory !== 'All') {
       filtered = filtered.filter(p => p.category === selectedCategory);
     }
 
+    // Sort
     switch (sortBy) {
       case 'newest':
         filtered = [...filtered].reverse();
@@ -35,7 +50,7 @@ const Projects = () => {
         filtered = [...filtered].sort((a, b) => (b.raised / b.goal) - (a.raised / a.goal));
         break;
       default:
-
+        // relevant - keep original order
         break;
     }
 
@@ -54,8 +69,6 @@ const Projects = () => {
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
-      <ProjectStats />
-
       <HorizontalFilterBar
         categories={categories}
         selectedCategory={selectedCategory}
@@ -119,7 +132,7 @@ const Projects = () => {
         <Box
           sx={{
             textAlign: 'center',
-            py: 4,
+            py: 8,
           }}
         >
           <Typography variant="h6" sx={{ color: 'text.secondary', mb: 1 }}>

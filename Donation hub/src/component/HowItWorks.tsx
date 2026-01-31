@@ -1,9 +1,8 @@
 import { Box, Container, Typography } from '@mui/material';
 import { AccountBalanceWallet, Search, CurrencyBitcoin, Stars } from '@mui/icons-material';
-import type { ReactNode } from 'react';
 
 interface StepProps {
-  icon: ReactNode;
+  icon: React.ReactNode;
   number: number;
   title: string;
   description: string;
@@ -105,13 +104,13 @@ const HowItWorks = () => {
       component="section"
       sx={{
         bgcolor: 'background.default',
-        py: 4,
+        py: 10,
         borderTop: '1px solid',
         borderColor: 'divider',
       }}
     >
       <Container maxWidth="xl">
-        <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Box sx={{ textAlign: 'center', mb: 8 }}>
           <Typography
             variant="h2"
             sx={{
@@ -136,7 +135,7 @@ const HowItWorks = () => {
         </Box>
 
         <Box sx={{ position: 'relative' }}>
-          
+          {/* Connecting Line (Desktop) */}
           <Box
             sx={{
               display: { xs: 'none', md: 'block' },
@@ -154,7 +153,7 @@ const HowItWorks = () => {
             sx={{
               display: 'grid',
               gridTemplateColumns: { xs: '1fr', md: 'repeat(4, 1fr)' },
-              gap: { xs: 3, md: 2 },
+              gap: { xs: 6, md: 2 },
               position: 'relative',
             }}
           >

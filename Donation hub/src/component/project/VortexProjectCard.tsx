@@ -51,7 +51,7 @@ const VortexProjectCard = ({
                 bgcolor: 'rgba(25, 24, 45, 0.6)',
                 backdropFilter: 'blur(12px)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: 2,
+                borderRadius: 2.5,
                 display: 'flex',
                 flexDirection: 'column',
                 transition: 'all 0.3s ease',
@@ -63,8 +63,8 @@ const VortexProjectCard = ({
                 }
             }}
         >
-            
-            <Box sx={{ position: 'relative', paddingTop: '56.25%', overflow: 'hidden', borderRadius: '16px 16px 0 0' }}>
+            {/* Image Section */}
+            <Box sx={{ position: 'relative', paddingTop: '56.25%', overflow: 'hidden', borderRadius: '20px 20px 0 0' }}>
                 <Box
                     component="img"
                     src={image}
@@ -89,7 +89,7 @@ const VortexProjectCard = ({
                         background: 'linear-gradient(to top, rgba(10, 10, 10, 0.8) 0%, transparent 100%)',
                     }}
                 />
-                
+                {/* Rarity Badge */}
                 <Box
                     sx={{
                         position: 'absolute',
@@ -97,7 +97,7 @@ const VortexProjectCard = ({
                         right: 12,
                         px: 1.5,
                         py: 0.75,
-                        borderRadius: 2,
+                        borderRadius: 12.5,
                         bgcolor: 'rgba(54, 37, 244, 0.2)',
                         border: '1px solid rgba(54, 37, 244, 0.5)',
                         backdropFilter: 'blur(4px)',
@@ -126,7 +126,7 @@ const VortexProjectCard = ({
                 </Box>
             </Box>
 
-            
+            {/* Content */}
             <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', flex: 1 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                     <Typography variant="h6" sx={{ fontWeight: 700, transition: 'color 0.3s', '.group:hover &': { color: 'primary.main' } }}>
@@ -151,13 +151,13 @@ const VortexProjectCard = ({
                         </Box>
                     </Box>
 
-                    <Box sx={{ width: '100%', height: 8, bgcolor: 'rgba(255, 255, 255, 0.05)', borderRadius: 2, overflow: 'hidden' }}>
+                    <Box sx={{ width: '100%', height: 8, bgcolor: 'rgba(255, 255, 255, 0.05)', borderRadius: 4, overflow: 'hidden' }}>
                         <Box
                             sx={{
                                 width: `${percentage}%`,
                                 height: '100%',
                                 bgcolor: config.color,
-                                borderRadius: 2,
+                                borderRadius: 4,
                                 boxShadow: `0 0 10px ${config.color}80`,
                                 transition: 'width 1s ease-in-out'
                             }}
@@ -187,7 +187,7 @@ const VortexProjectCard = ({
                                 fontSize: '0.75rem',
                                 px: 3,
                                 py: 1.5,
-                                borderRadius: 1,
+                                borderRadius: 1.5,
                                 boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                                 '&:hover': {
                                     bgcolor: config.color,

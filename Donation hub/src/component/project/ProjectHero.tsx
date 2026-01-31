@@ -12,13 +12,13 @@ const ProjectHero = ({ image, title }: ProjectHeroProps) => {
             sx={{
                 position: 'relative',
                 height: 400,
-                borderRadius: 2,
+                borderRadius: 3,
                 overflow: 'hidden',
                 boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
                 mb: 4,
             }}
         >
-            
+            {/* Background Image */}
             <Box
                 component="img"
                 src={image}
@@ -29,7 +29,7 @@ const ProjectHero = ({ image, title }: ProjectHeroProps) => {
                     objectFit: 'cover',
                 }}
             />
-            
+            {/* Gradient Overlay */}
             <Box
                 sx={{
                     position: 'absolute',
@@ -38,7 +38,7 @@ const ProjectHero = ({ image, title }: ProjectHeroProps) => {
                 }}
             />
 
-            
+            {/* Holographic Seal */}
             <Box
                 className="hologram-seal"
                 sx={{
@@ -68,7 +68,7 @@ const ProjectHero = ({ image, title }: ProjectHeroProps) => {
                 </Typography>
             </Box>
 
-            
+            {/* Content Overlay */}
             <Box sx={{ position: 'absolute', bottom: 0, left: 0, p: 4 }}>
                 <Box sx={{ display: 'flex', gap: 1.5, mb: 1 }}>
                     <Box
@@ -76,7 +76,7 @@ const ProjectHero = ({ image, title }: ProjectHeroProps) => {
                             bgcolor: 'primary.main',
                             px: 1.5,
                             py: 0.5,
-                            borderRadius: 2,
+                            borderRadius: 10,
                             color: 'white',
                             fontSize: '0.625rem',
                             fontWeight: 900,
@@ -93,7 +93,7 @@ const ProjectHero = ({ image, title }: ProjectHeroProps) => {
                             border: '1px solid rgba(16, 185, 129, 0.3)',
                             px: 1.5,
                             py: 0.5,
-                            borderRadius: 2,
+                            borderRadius: 10,
                             fontSize: '0.625rem',
                             fontWeight: 700,
                             textTransform: 'uppercase',

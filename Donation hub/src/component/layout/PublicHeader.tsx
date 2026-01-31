@@ -1,4 +1,4 @@
-import { useState, type MouseEvent } from 'react';
+import { useState } from 'react';
 import {
     AppBar,
     Toolbar,
@@ -41,7 +41,7 @@ const PublicHeader = () => {
         setMobileOpen((prevState) => !prevState);
     };
 
-    const handleMenuOpen = (event: MouseEvent<HTMLElement>) => {
+    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
 
@@ -51,11 +51,12 @@ const PublicHeader = () => {
 
     const handleDisconnect = () => {
         disconnect();
-        handleMenuClose();
+        navigate('/');
     };
 
     const handleGoToDashboard = () => {
         handleMenuClose();
+        setMobileOpen(false);
         navigate('/dashboard');
     };
 
@@ -189,7 +190,7 @@ const PublicHeader = () => {
                                     variant="contained"
                                     onClick={() => setWalletModalOpen(true)}
                                     startIcon={<AccountBalanceWallet />}
-                                    sx={{ height: 40, px: 3, borderRadius: 1 }}
+                                    sx={{ height: 40, px: 3, borderRadius: 1.5 }}
                                 >
                                     Connect Wallet
                                 </Button>
@@ -204,7 +205,7 @@ const PublicHeader = () => {
                                             alignItems: 'center',
                                             gap: 1,
                                             bgcolor: 'rgba(255,255,255,0.05)',
-                                            borderRadius: 2,
+                                            borderRadius: 12.5,
                                             pl: 0.5,
                                             pr: 2,
                                             py: 0.5,
@@ -238,18 +239,20 @@ const PublicHeader = () => {
                                             }
                                         }}
                                     >
-                                        <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                                            <Typography variant="caption" color="text.secondary">Balance</Typography>
-                                            <Typography variant="h6">{balance ? parseFloat(balance).toFixed(4) : '0.00'} ETH</Typography>
-                                        </Box>
-                                        <MenuItem onClick={handleGoToDashboard} sx={{ mt: 1 }}>
-                                            <DashboardIcon sx={{ mr: 2, fontSize: 20, color: 'primary.main' }} />
-                                            Go to Dashboard
-                                        </MenuItem>
-                                        <MenuItem onClick={handleDisconnect} sx={{ color: 'error.main' }}>
-                                            <Logout sx={{ mr: 2, fontSize: 20 }} />
-                                            Disconnect
-                                        </MenuItem>
+                                        {[
+                                            <Box key="balance" sx={{ px: 2, py: 1.5, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                                                <Typography variant="caption" color="text.secondary">Balance</Typography>
+                                                <Typography variant="h6">{balance ? parseFloat(balance).toFixed(4) : '0.00'} ETH</Typography>
+                                            </Box>,
+                                            <MenuItem key="dashboard" onClick={handleGoToDashboard} sx={{ mt: 1 }}>
+                                                <DashboardIcon sx={{ mr: 2, fontSize: 20, color: 'primary.main' }} />
+                                                Go to Dashboard
+                                            </MenuItem>,
+                                            <MenuItem key="disconnect" onClick={handleDisconnect} sx={{ color: 'error.main' }}>
+                                                <Logout sx={{ mr: 2, fontSize: 20 }} />
+                                                Disconnect
+                                            </MenuItem>
+                                        ]}
                                     </Menu>
                                 </Box>
                             )}

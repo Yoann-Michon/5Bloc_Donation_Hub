@@ -1,40 +1,28 @@
-import { Box, Typography, Button, Avatar, Tooltip, Divider } from '@mui/material';
+import { Box, Typography, Button, Avatar, Tooltip } from '@mui/material';
 import {
     Dashboard,
     Explore,
     Logout,
     AutoFixHigh,
     Lock,
-    AdminPanelSettings,
-    FolderOpen,
-    HowToVote,
-    Gavel,
-    GroupAdd,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useWallet } from '../../hooks/useWallet';
-import { useRole } from '../../context/RoleContext';
-import { type ReactNode } from 'react';
 
 const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { account, balance, disconnect, isConnected } = useWallet();
-    const { isAdmin, isAssociation } = useRole();
-    const isUser = !isAdmin && !isAssociation;
 
-    const mainNavItems = [
+    const handleDisconnect = () => {
+        disconnect();
+        navigate('/');
+    };
+
+    const navItems = [
         { label: 'Dashboard', icon: <Dashboard />, path: '/dashboard', protected: true },
-        ...(isAdmin ? [{ label: 'Admin', icon: <AdminPanelSettings />, path: '/dashboard/admin', protected: true }] : []),
-        ...(isAssociation ? [{ label: 'My Projects', icon: <FolderOpen />, path: '/dashboard/association/projects', protected: true }] : []),
         { label: 'Explore', icon: <Explore />, path: '/dashboard/projects', protected: false },
-        ...(!isAssociation ? [{ label: 'Badge Fusion', icon: <AutoFixHigh />, path: '/dashboard/fusion', protected: true }] : []),
-    ];
-
-    const governanceNavItems = [
-        ...(isUser ? [{ label: 'Apply for Association', icon: <GroupAdd />, path: '/dashboard/governance/apply-association', protected: true }] : []),
-        ...(isAdmin ? [{ label: 'Association Requests', icon: <Gavel />, path: '/dashboard/governance/admin/association-requests', protected: true }] : []),
-        ...(isUser ? [{ label: 'Project Votes', icon: <HowToVote />, path: '/dashboard/governance/project-votes', protected: true }] : []),
+        { label: 'Badge Fusion', icon: <AutoFixHigh />, path: '/dashboard/fusion', protected: true },
     ];
 
     const NavButton = ({
@@ -42,7 +30,7 @@ const Sidebar = () => {
     }: {
         item: {
             label: string;
-            icon: ReactNode;
+            icon: React.ReactNode;
             path: string;
             protected: boolean;
         }
@@ -106,6 +94,7 @@ const Sidebar = () => {
             </Button>
         );
 
+        // Wrap with tooltip if locked
         if (isLocked) {
             return (
                 <Tooltip
@@ -125,11 +114,11 @@ const Sidebar = () => {
         <Box
             component="aside"
             sx={{
-                width: 280,
+                width: 280, // Fixed width 280px (was 288px)
                 display: { xs: 'none', lg: 'flex' },
                 flexDirection: 'column',
                 m: 2,
-                borderRadius: 2,
+                borderRadius: 3,
                 bgcolor: 'rgba(25, 24, 45, 0.6)',
                 backdropFilter: 'blur(12px)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -140,7 +129,7 @@ const Sidebar = () => {
                 top: 0,
             }}
         >
-
+            {/* Logo - Clickable, redirects to Dashboard */}
             <Box
                 onClick={() => navigate('/dashboard')}
                 sx={{
@@ -177,27 +166,16 @@ const Sidebar = () => {
                 </Typography>
             </Box>
 
-
+            {/* Navigation - Cleaned up, removed placeholders and Community section */}
             <Box sx={{ flex: 1, px: 2, py: 3, overflowY: 'auto' }}>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    {mainNavItems.map((item) => (
-                        <NavButton key={item.label} item={item} />
-                    ))}
-                </Box>
-
-                <Divider sx={{ my: 2, borderColor: 'rgba(255, 255, 255, 0.1)' }} />
-
-                <Typography variant="caption" sx={{ px: 3, color: 'text.secondary', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Governance
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1 }}>
-                    {governanceNavItems.map((item) => (
+                    {navItems.map((item) => (
                         <NavButton key={item.label} item={item} />
                     ))}
                 </Box>
             </Box>
 
-
+            {/* User Profile */}
             <Box sx={{ p: 2, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
                 <Box
                     sx={{
@@ -233,7 +211,7 @@ const Sidebar = () => {
                                 variant="outlined"
                                 size="small"
                                 startIcon={<Logout sx={{ fontSize: 16 }} />}
-                                onClick={disconnect}
+                                onClick={handleDisconnect}
                                 sx={{
                                     borderColor: 'rgba(255, 255, 255, 0.1)',
                                     color: 'text.secondary',

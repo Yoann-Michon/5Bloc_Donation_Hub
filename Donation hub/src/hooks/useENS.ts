@@ -10,6 +10,7 @@ interface ENSData {
     error: string | null;
 }
 
+
 export const useENS = (address: string | null, chainId: number | null): ENSData => {
     const [data, setData] = useState<ENSData>({
         name: null,
@@ -28,14 +29,12 @@ export const useENS = (address: string | null, chainId: number | null): ENSData 
             setData(prev => ({ ...prev, isLoading: true, error: null }));
 
             try {
-
                 const provider = new ethers.JsonRpcProvider('https://eth.llamarpc.com');
 
                 const ensName = await provider.lookupAddress(address);
 
                 let avatar = null;
                 if (ensName) {
-
                     const resolver = await provider.getResolver(ensName);
                     if (resolver) {
                         avatar = await resolver.getAvatar();
@@ -50,7 +49,6 @@ export const useENS = (address: string | null, chainId: number | null): ENSData 
                 });
 
             } catch (error) {
-                console.error('Error resolving ENS:', error);
                 setData({
                     name: null,
                     avatar: null,

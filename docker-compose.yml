@@ -1,0 +1,84 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: always
+    container_name: donation_hub_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: donation_hub
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - donation_hub_network
+
+  blockchain:
+    build:
+      context: ./blockchain
+      dockerfile: Dockerfile
+    restart: always
+    container_name: donation_hub_blockchain
+    ports:
+      - "8545:8545"
+    networks:
+      - donation_hub_network
+    volumes:
+      - contract_data:/app/shared
+    healthcheck:
+      test: [ "CMD", "sh", "-c", "test -f /app/shared/contract-config.json" ]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 40s
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    container_name: donation_hub_backend
+    env_file:
+      - ./backend/.env
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_started
+      blockchain:
+        condition: service_healthy
+    networks:
+      - donation_hub_network
+    environment:
+      - DATABASE_URL=postgresql://user:password@postgres:5432/donation_hub?schema=public
+      - BLOCKCHAIN_RPC_URL=http://blockchain:8545
+    volumes:
+      - contract_data:/app/shared:ro
+
+  frontend:
+    build:
+      context: "./Donation hub"
+      dockerfile: Dockerfile
+      args:
+        - WAIT_FOR_CONTRACT=true
+    restart: always
+    container_name: donation_hub_frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      backend:
+        condition: service_started
+    networks:
+      - donation_hub_network
+    volumes:
+      - contract_data:/app/shared:ro
+
+volumes:
+  postgres_data:
+  contract_data:
+
+
+networks:
+  donation_hub_network:
+    driver: bridge

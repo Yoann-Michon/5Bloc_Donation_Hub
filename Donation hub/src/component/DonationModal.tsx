@@ -12,12 +12,59 @@ import {
   Alert,
   CircularProgress,
   Divider,
+  Tooltip,
 } from '@mui/material';
 import { Close, AccountBalanceWallet, CheckCircle } from '@mui/icons-material';
 import { useWallet } from '../hooks/useWallet';
 import { useToast } from '../context/ToastContext';
 import TransactionStatusIndicator from './web3/TransactionStatus';
 import NetworkSwitcher from './web3/NetworkSwitcher';
+import { parseEther } from 'ethers';
+
+const PINATA_JWT = import.meta.env.VITE_PINATA_JWT;
+
+const uploadToIPFS = async (metadata: any): Promise<string> => {
+  try {
+    if (PINATA_JWT && PINATA_JWT !== 'your_pinata_jwt_here') {
+      const response = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${PINATA_JWT}`
+        },
+        body: JSON.stringify({
+          pinataContent: metadata,
+          pinataMetadata: {
+            name: metadata.name
+          }
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Pinata upload failed: ${response.status} ${response.statusText} - ${errorText}`);
+      }
+
+      const data = await response.json();
+
+      localStorage.setItem(data.IpfsHash, JSON.stringify(metadata));
+
+      return `ipfs://${data.IpfsHash}`;
+    } else {
+      console.warn('⚠️ Pinata JWT not configured. Using local metadata storage.');
+
+      const timestamp = Date.now();
+      const randomId = Math.random().toString(36).substring(2, 15);
+      const localHash = `local-${timestamp}-${randomId}`;
+
+      localStorage.setItem(localHash, JSON.stringify(metadata));
+
+      return `local://${localHash}`;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
 
 interface DonationModalProps {
   open: boolean;
@@ -30,7 +77,9 @@ interface DonationModalProps {
   };
 }
 
-type DonationStep = 'amount' | 'connecting' | 'confirming' | 'success' | 'error';
+type DonationStep = 'amount' | 'connecting' | 'uploading' | 'confirming' | 'success' | 'error';
+
+
 
 const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
   const [amount, setAmount] = useState('');
@@ -38,49 +87,118 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
   const [modalError, setModalError] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string>('');
 
-  const { connect, account, isConnected, error: walletError } = useWallet();
+  const { connect, account, isConnected, error: walletError, getBadgeContract } = useWallet();
   const { showToast } = useToast();
 
+  const DEFAULT_IMAGES = {
+    Bronze: 'https://img.freepik.com/vecteurs-premium/medaille-bronze-realiste-rubans-rouges-coupe-du-gagnant-gravee-badge-premium-pour-gagnants-realisations_88188-4035.jpg',
+    Silver: 'https://img.freepik.com/vecteurs-premium/medaille-argent-realiste-rubans-rouges-coupe-du-gagnant-gravee-badge-premium-pour-gagnants-realisations_88188-4037.jpg',
+    Gold: 'https://img.freepik.com/vecteurs-premium/medaille-or-realiste-rubans-rouges-coupe-du-vainqueur-gravee-badge-premium-pour-gagnants-realisations_88188-4043.jpg?w=996',
+    Unknown: 'https://placehold.co/200/808080/FFFFFF/png?text=Badge'
+  };
   const proceedToDonation = useCallback(async () => {
-    if (!window.ethereum || !account) {
+    if (!account) {
       setModalError("Wallet not connected correctly");
       setStep('error');
       return;
     }
 
     try {
+      const contract = getBadgeContract();
+      if (!contract) throw new Error("Contract not initialized. Please checking wallet connection.");
 
-      const amountInWei = (parseFloat(amount) * 1e18).toString(16);
+      try {
+        const balance = await contract.balanceOf(account);
+        if (Number(balance) >= 4) {
+          throw new Error("Limite de 4 badges atteinte");
+        }
+      } catch (e: any) {
+        if (e.message.includes("Limite de 4 badges atteinte")) throw e;
 
-      const transactionHash = await window.ethereum.request({
-        method: 'eth_sendTransaction',
-        params: [{
-          from: account,
-          to: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
-          value: '0x' + amountInWei,
-        }],
-      }) as string;
+      }
 
-      setTxHash(transactionHash);
-      setStep('success');
-      showToast('Donation successful!', 'success');
+
+      const lastAction = await contract.lastActionTimestamp(account);
+      const lastActionDate = new Date(Number(lastAction) * 1000);
+      const now = new Date();
+
+      const diffMs = now.getTime() - lastActionDate.getTime();
+      const diffMinutes = diffMs / 1000 / 60;
+
+      if (Number(lastAction) > 0 && diffMinutes < 5) {
+        throw new Error(`Cooldown de 5 minutes actif`);
+      }
+
+      setStep('uploading');
+
+      const amountVal = parseFloat(amount);
+      let type: "Bronze" | "Silver" | "Gold" | "Unknown" = "Unknown";
+      let imageUrl = DEFAULT_IMAGES.Unknown;
+
+      if (amountVal < 0.5) {
+        type = "Bronze";
+        imageUrl = DEFAULT_IMAGES.Bronze;
+      } else if (amountVal >= 0.5 && amountVal < 1.0) {
+        type = "Silver";
+        imageUrl = DEFAULT_IMAGES.Silver;
+      } else if (amountVal >= 1.0) {
+        type = "Gold";
+        imageUrl = DEFAULT_IMAGES.Gold;
+      }
+
+      const nowTimestamp = Math.floor(Date.now() / 1000);
+
+
+      const metadata = {
+        name: `Badge de don - ${project.title}`,
+        type: type,
+        value: `${amount} ETH`,
+        image: imageUrl,
+        hash: "",
+        previousOwners: [],
+        createdAt: nowTimestamp,
+        lastTransferAt: nowTimestamp,
+        minter: account
+      };
+
+
+      const tokenURI = await uploadToIPFS(metadata);
+
+      setStep('confirming');
+
+
+      const amountInWei = parseEther(amount);
+
+      const tx = await contract.donate(project.id, tokenURI, {
+        value: amountInWei
+      });
+
+      setTxHash(tx.hash);
+
+      setStep('confirming');
+      showToast('Transaction submitted!', 'info');
 
     } catch (err: unknown) {
-      const error = err as { code?: number; message?: string };
       setStep('error');
-      if (error.code === 4001) {
-        setModalError('Transaction rejected by user');
-      } else {
-        const errorMsg = error.message || 'Failed to process donation';
-        setModalError(errorMsg);
-        showToast(errorMsg, 'error');
+
+      const error = err as { code?: number; reason?: string; message?: string };
+      let errorMessage = 'Failed to process donation';
+
+      if (error.message && (error.message.includes("Limite de 4 badges atteinte") || error.message.includes("Cooldown"))) {
+        errorMessage = error.message;
+      } else if (error.reason) {
+        errorMessage = error.reason;
+      } else if (error.message) {
+        errorMessage = error.message;
       }
+
+      setModalError(errorMessage);
+      showToast('Donation failed', 'error');
     }
-  }, [account, amount, showToast]);
+  }, [account, amount, getBadgeContract, project.id, project.title, showToast]);
 
   useEffect(() => {
     if (walletError && step === 'connecting') {
-
       setModalError(walletError);
       setStep('error');
       showToast(walletError, 'error');
@@ -90,16 +208,59 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
   useEffect(() => {
     if (isConnected && step === 'connecting') {
       const timer = setTimeout(() => {
-        setStep('confirming');
         proceedToDonation();
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [isConnected, step, proceedToDonation, showToast]);
+  }, [isConnected, step, proceedToDonation]);
+
+  const [cooldownRemaining, setCooldownRemaining] = useState<number>(0);
+
+  useEffect(() => {
+    let isActive = true;
+    const checkCooldown = async () => {
+      if (!account || !isConnected) return;
+      const contract = getBadgeContract();
+      if (!contract) return;
+
+      try {
+        const lastAction = await contract.lastActionTimestamp(account);
+        const lastActionDate = Number(lastAction) * 1000;
+        const now = Date.now();
+        const diffMs = now - lastActionDate;
+        const COOLDOWN_MS = 5 * 60 * 1000;
+
+        if (diffMs < COOLDOWN_MS) {
+          const remaining = Math.ceil((COOLDOWN_MS - diffMs) / 1000);
+          if (isActive) setCooldownRemaining(remaining);
+        } else {
+          if (isActive) setCooldownRemaining(0);
+        }
+      } catch (e) {
+      }
+    };
+
+    checkCooldown();
+    const interval = setInterval(() => {
+      if (cooldownRemaining > 0) {
+        setCooldownRemaining(prev => Math.max(0, prev - 1));
+      } else {
+        checkCooldown();
+      }
+    }, 1000);
+
+    return () => {
+      isActive = false;
+      clearInterval(interval);
+    };
+  }, [account, isConnected, getBadgeContract, cooldownRemaining]);
+
 
   const quickAmounts = [0.1, 0.5, 1, 2, 5];
 
   const handleDonate = async () => {
+    if (cooldownRemaining > 0) return;
+
     const isValidAmount = /^\d*\.?\d+$/.test(amount) && parseFloat(amount) > 0;
 
     if (!isValidAmount) {
@@ -112,9 +273,7 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
     if (!isConnected) {
       setStep('connecting');
       await connect();
-
     } else {
-      setStep('confirming');
       await proceedToDonation();
     }
   };
@@ -133,7 +292,7 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
         return (
           <>
             <DialogContent>
-              
+              {/* Project Info */}
               <Box
                 sx={{
                   display: 'flex',
@@ -145,7 +304,7 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
                   borderRadius: 2,
                 }}
               >
-                <NetworkSwitcher variant="default" showWarning={true} requiredChainId={1} />
+                <NetworkSwitcher variant="default" showWarning={true} requiredChainId={31337} /> {/* Hardhat Local */}
                 <Box sx={{ mt: 2 }} />
                 <Box
                   component="img"
@@ -174,7 +333,7 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
                 </Alert>
               )}
 
-              
+              {/* Amount Input */}
               <Typography variant="body2" sx={{ fontWeight: 600, mb: 1.5 }}>
                 Enter donation amount (ETH)
               </Typography>
@@ -197,7 +356,7 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
                 }}
               />
 
-              
+              {/* Quick Amount Buttons */}
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
                 {quickAmounts.map((quickAmount) => (
                   <Button
@@ -224,7 +383,7 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
 
               <Divider sx={{ my: 2 }} />
 
-              
+              {/* Fee Info */}
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                   Your donation
@@ -259,15 +418,19 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
               <Button onClick={handleClose} sx={{ color: 'text.secondary' }}>
                 Cancel
               </Button>
-              <Button
-                variant="contained"
-                onClick={handleDonate}
-                startIcon={<AccountBalanceWallet />}
-                disabled={!amount || parseFloat(amount) <= 0}
-                sx={{ px: 4 }}
-              >
-                Donate Now
-              </Button>
+              <Tooltip title={cooldownRemaining > 0 ? `Cooldown active. Wait ${Math.floor(cooldownRemaining / 60)}m ${cooldownRemaining % 60}s` : ''}>
+                <span>
+                  <Button
+                    variant="contained"
+                    onClick={handleDonate}
+                    startIcon={<AccountBalanceWallet />}
+                    disabled={!amount || parseFloat(amount) <= 0 || cooldownRemaining > 0}
+                    sx={{ px: 4 }}
+                  >
+                    {cooldownRemaining > 0 ? `Wait ${Math.floor(cooldownRemaining / 60)}m ${cooldownRemaining % 60}s` : 'Donate Now'}
+                  </Button>
+                </span>
+              </Tooltip>
             </DialogActions>
           </>
         );
@@ -287,13 +450,28 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
           </DialogContent>
         );
 
+      case 'uploading':
+        return (
+          <DialogContent>
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              <CircularProgress size={60} sx={{ mb: 3 }} />
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+                Uploading to IPFS
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                Generating badge metadata and uploading...
+              </Typography>
+            </Box>
+          </DialogContent>
+        );
+
       case 'confirming':
         return (
           <DialogContent>
             {txHash ? (
               <TransactionStatusIndicator
                 txHash={txHash}
-                chainId={1}
+                chainId={31337}
                 onSuccess={() => setStep('success')}
                 onError={() => {
                   setStep('error');

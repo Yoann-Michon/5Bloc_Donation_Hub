@@ -1,5 +1,4 @@
 
-
 import { useState, useEffect, useCallback } from 'react';
 import { ethers } from 'ethers';
 
@@ -28,6 +27,7 @@ interface UseTransactionStatusResult {
     refresh: () => Promise<void>;
 }
 
+
 export const useTransactionStatus = (
     txHash: string | null,
     requiredConfirmations: number = 1
@@ -51,7 +51,6 @@ export const useTransactionStatus = (
             const receipt = await provider.getTransactionReceipt(txHash);
 
             if (!receipt) {
-
                 setTransaction({
                     hash: txHash,
                     status: 'pending',
@@ -63,7 +62,6 @@ export const useTransactionStatus = (
                     error: null,
                 });
             } else {
-
                 const currentBlock = await provider.getBlockNumber();
                 const confirmations = currentBlock - receipt.blockNumber + 1;
 
@@ -91,7 +89,6 @@ export const useTransactionStatus = (
             }
 
         } catch (err) {
-            console.error('Error checking transaction:', err);
             setError('Failed to fetch transaction status');
         } finally {
             setIsLoading(false);

@@ -1,22 +1,142 @@
-import { useState } from 'react';
-import { Box, Grid, Container } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Box, Grid, Container, CircularProgress, Alert, Typography } from '@mui/material';
 import BadgeSelector from '../component/fusion/BadgeSelector';
 import FusionChamber from '../component/fusion/FusionChamber';
 import { AutoFixHigh } from '@mui/icons-material';
+import { useWallet } from '../hooks/useWallet';
+import { BadgeTier } from '../types/enums';
 
-const MOCK_BADGES = [
-    { id: 1, name: 'Eco Starter', tier: 'Common', count: 5, image: 'https://cdn-icons-png.flaticon.com/512/3214/3214746.png' },
-    { id: 2, name: 'Governance Novice', tier: 'Common', count: 3, image: 'https://cdn-icons-png.flaticon.com/512/2230/2230606.png' },
-    { id: 3, name: 'DeFi Explorer', tier: 'Common', count: 4, image: 'https://cdn-icons-png.flaticon.com/512/10459/10459635.png' },
-    { id: 4, name: 'Forest Guardian', tier: 'Rare', count: 2, image: 'https://cdn-icons-png.flaticon.com/512/3233/3233496.png' },
-] as const;
-
-type Badge = typeof MOCK_BADGES[number];
+interface Badge {
+    id: number;
+    name: string;
+    tier: BadgeTier;
+    count: number;
+    image: string;
+}
 
 const BadgeFusion = () => {
 
+    const { account, isConnected, getBadgeContract } = useWallet();
+
+
+    const [badges, setBadges] = useState<Badge[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [selectedBadges, setSelectedBadges] = useState<Badge[]>([]);
     const [isFusing, setIsFusing] = useState(false);
+
+
+    useEffect(() => {
+        const fetchBadges = async () => {
+            if (!account || !isConnected) {
+                setIsLoading(false);
+                return;
+            }
+
+            try {
+                setIsLoading(true);
+                const contract = getBadgeContract();
+                if (!contract) {
+                    throw new Error('Contract not initialized');
+                }
+
+                const tokenIds = await contract.getTokensByOwner(account);
+                const badgesArray: Badge[] = [];
+
+                // Helper function to get metadata (same as dashboard)
+                const getMetadata = async (tokenId: string, tokenURI: string): Promise<any> => {
+                    let hash = '';
+                    if (tokenURI.startsWith('ipfs://')) {
+                        hash = tokenURI.replace('ipfs://', '');
+                    }
+
+                    let metadata: any = {
+                        name: `Badge #${tokenId}`,
+                        type: 'Bronze', // Default
+                        value: '0',
+                        hash: hash,
+                    };
+
+                    if (hash) {
+                        // Try localStorage first
+                        const localData = localStorage.getItem(hash);
+                        if (localData) {
+                            try {
+                                const json = JSON.parse(localData);
+                                metadata = { ...metadata, ...json };
+                            } catch (e) {
+                                console.error('Failed to parse local metadata:', e);
+                            }
+                        } else {
+                            // Try IPFS
+                            try {
+                                const controller = new AbortController();
+                                const timeoutId = setTimeout(() => controller.abort(), 3000);
+                                const response = await fetch(`https://gateway.pinata.cloud/ipfs/${hash}`, { signal: controller.signal });
+                                clearTimeout(timeoutId);
+
+                                if (response.ok) {
+                                    const json = await response.json();
+                                    metadata = { ...metadata, ...json };
+                                    // Cache it
+                                    localStorage.setItem(hash, JSON.stringify(json));
+                                }
+                            } catch (ipfsError) {
+                                console.error('Failed to fetch IPFS metadata:', ipfsError);
+                            }
+                        }
+                    }
+
+                    return metadata;
+                };
+
+                for (const tokenId of tokenIds) {
+                    const tokenIdNum = Number(tokenId);
+                    const tokenIdStr = tokenId.toString();
+
+                    try {
+                        const tokenURI = await contract.tokenURI(tokenId);
+                        const metadata = await getMetadata(tokenIdStr, tokenURI);
+
+                        // Map metadata type to BadgeTier enum
+                        let tier: BadgeTier;
+                        const metadataType = (metadata.type || 'Bronze').toLowerCase();
+
+                        if (metadataType === 'gold') tier = BadgeTier.GOLD;
+                        else if (metadataType === 'silver') tier = BadgeTier.SILVER;
+                        else if (metadataType === 'legendary') tier = BadgeTier.LEGENDARY;
+                        else tier = BadgeTier.BRONZE;
+
+                        badgesArray.push({
+                            id: tokenIdNum,
+                            name: metadata.name || `Badge #${tokenIdNum}`,
+                            tier,
+                            count: 1,
+                            image: `/badges/${tier.toLowerCase()}.png`,
+                        });
+                    } catch (err) {
+                        console.error(`Failed to load badge ${tokenIdNum}:`, err);
+                    }
+                }
+
+                setBadges(badgesArray);
+                setError(null);
+            } catch (err: any) {
+                console.error('Failed to load badges:', err);
+
+                if (err.code === 'BAD_DATA' || err.message?.includes('could not decode result data')) {
+                    setError('Badge contract not deployed or not accessible. Please ensure the blockchain is running and contracts are deployed.');
+                } else {
+                    setError('Failed to load badges from blockchain');
+                }
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchBadges();
+    }, [account, isConnected, getBadgeContract]);
+
 
     const handleSelect = (badge: Badge) => {
         if (selectedBadges.length < 2) {
@@ -39,14 +159,143 @@ const BadgeFusion = () => {
         setSelectedBadges(newSelected);
     };
 
-    const handleFuse = () => {
+    const handleFuse = async () => {
+        if (!canFuse || selectedBadges.length !== 2) return;
+
         setIsFusing(true);
-        setTimeout(() => {
-            setIsFusing(false);
+        try {
+            const contract = getBadgeContract();
+            if (!contract) {
+                throw new Error('Contract not initialized');
+            }
+
+            const badge1 = selectedBadges[0];
+            const badge2 = selectedBadges[1];
+
+
+            const allTokenIds = await contract.getTokensByOwner(account);
+            const tokenIdsOfTier: number[] = [];
+
+            for (const tokenId of allTokenIds) {
+                const tokenIdNum = Number(tokenId);
+                let tier: BadgeTier;
+
+                if (tokenIdNum < 100) tier = BadgeTier.BRONZE;
+                else if (tokenIdNum < 500) tier = BadgeTier.SILVER;
+                else if (tokenIdNum < 1000) tier = BadgeTier.GOLD;
+                else tier = BadgeTier.LEGENDARY;
+
+                if (tier === badge1.tier) {
+                    tokenIdsOfTier.push(tokenIdNum);
+                }
+            }
+
+            if (tokenIdsOfTier.length < 2) {
+                throw new Error('Not enough badges of this tier');
+            }
+
+            const tokenId1 = tokenIdsOfTier[0];
+            const tokenId2 = tokenIdsOfTier[1];
+
+
+            const newMetadataURI = `ipfs://QmNewBadge${Date.now()}`;
+
+
+            const tx = await contract.fuseBadges(tokenId1, tokenId2, newMetadataURI);
+
+
+            await tx.wait();
+
+
+            const { syncUserBadges } = await import('../utils/api');
+            await syncUserBadges(account);
+
+            const updatedTokenIds = await contract.getTokensByOwner(account);
+            const badgesArray: Badge[] = [];
+
+            // Helper function to get metadata (same as initial load)
+            const getMetadata = async (tokenId: string, tokenURI: string): Promise<any> => {
+                let hash = '';
+                if (tokenURI.startsWith('ipfs://')) {
+                    hash = tokenURI.replace('ipfs://', '');
+                }
+
+                let metadata: any = {
+                    name: `Badge #${tokenId}`,
+                    type: 'Bronze',
+                    value: '0',
+                    hash: hash,
+                };
+
+                if (hash) {
+                    const localData = localStorage.getItem(hash);
+                    if (localData) {
+                        try {
+                            const json = JSON.parse(localData);
+                            metadata = { ...metadata, ...json };
+                        } catch (e) {
+                            console.error('Failed to parse local metadata:', e);
+                        }
+                    } else {
+                        try {
+                            const controller = new AbortController();
+                            const timeoutId = setTimeout(() => controller.abort(), 3000);
+                            const response = await fetch(`https://gateway.pinata.cloud/ipfs/${hash}`, { signal: controller.signal });
+                            clearTimeout(timeoutId);
+
+                            if (response.ok) {
+                                const json = await response.json();
+                                metadata = { ...metadata, ...json };
+                                localStorage.setItem(hash, JSON.stringify(json));
+                            }
+                        } catch (ipfsError) {
+                            console.error('Failed to fetch IPFS metadata:', ipfsError);
+                        }
+                    }
+                }
+
+                return metadata;
+            };
+
+            for (const tokenId of updatedTokenIds) {
+                const tokenIdNum = Number(tokenId);
+                const tokenIdStr = tokenId.toString();
+
+                try {
+                    const tokenURI = await contract.tokenURI(tokenId);
+                    const metadata = await getMetadata(tokenIdStr, tokenURI);
+
+                    let tier: BadgeTier;
+                    const metadataType = (metadata.type || 'Bronze').toLowerCase();
+
+                    if (metadataType === 'gold') tier = BadgeTier.GOLD;
+                    else if (metadataType === 'silver') tier = BadgeTier.SILVER;
+                    else if (metadataType === 'legendary') tier = BadgeTier.LEGENDARY;
+                    else tier = BadgeTier.BRONZE;
+
+                    badgesArray.push({
+                        id: tokenIdNum,
+                        name: metadata.name || `Badge #${tokenIdNum}`,
+                        tier,
+                        count: 1,
+                        image: `/badges/${tier.toLowerCase()}.png`,
+                    });
+                } catch (err) {
+                    console.error(`Failed to reload badge ${tokenIdNum}:`, err);
+                }
+            }
+
+            setBadges(badgesArray);
             setSelectedBadges([]);
-            alert('Fusion Successful! You crafted a Rare Badge!');
-        }, 3000);
+            alert('Fusion Successful! You crafted a higher tier badge!');
+        } catch (err: any) {
+            console.error('Fusion failed:', err);
+            alert(`Fusion failed: ${err.message || 'Unknown error'}`);
+        } finally {
+            setIsFusing(false);
+        }
     };
+
 
     const slots = [
         selectedBadges[0] || null,
@@ -54,6 +303,40 @@ const BadgeFusion = () => {
     ];
 
     const canFuse = selectedBadges.length === 2 && selectedBadges.every(b => b.tier === selectedBadges[0].tier);
+
+
+    if (isLoading) {
+        return (
+            <Container maxWidth="xl" sx={{ py: 4, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+                <Box sx={{ textAlign: 'center' }}>
+                    <CircularProgress size={60} sx={{ mb: 2 }} />
+                    <Typography variant="body1" color="text.secondary">
+                        Loading your badges...
+                    </Typography>
+                </Box>
+            </Container>
+        );
+    }
+
+
+    if (!isConnected) {
+        return (
+            <Container maxWidth="xl" sx={{ py: 4 }}>
+                <Alert severity="info">
+                    Please connect your wallet to view and fuse your badges.
+                </Alert>
+            </Container>
+        );
+    }
+
+
+    if (error) {
+        return (
+            <Container maxWidth="xl" sx={{ py: 4 }}>
+                <Alert severity="error">{error}</Alert>
+            </Container>
+        );
+    }
 
     return (
         <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -78,28 +361,34 @@ const BadgeFusion = () => {
                 </div>
             </Box>
 
-            <Grid container spacing={4} sx={{ height: 'calc(100vh - 200px)' }}>
+            {badges.length === 0 ? (
+                <Alert severity="info" sx={{ mb: 4 }}>
+                    You don't have any badges yet. Make donations to projects to earn badges!
+                </Alert>
+            ) : (
+                <Grid container spacing={4} sx={{ height: 'calc(100vh - 200px)' }}>
+                    {/* Fusion Chamber (Left/Top) */}
+                    <Grid size={{ xs: 12, lg: 7 }}>
+                        <FusionChamber
+                            slots={slots}
+                            onRemove={handleRemoveSlot}
+                            onFuse={handleFuse}
+                            isFusing={isFusing}
+                            canFuse={canFuse}
+                        />
+                    </Grid>
 
-                <Grid size={{ xs: 12, lg: 7 }}>
-                    <FusionChamber
-                        slots={slots}
-                        onRemove={handleRemoveSlot}
-                        onFuse={handleFuse}
-                        isFusing={isFusing}
-                        canFuse={canFuse}
-                    />
+                    {/* Badge Inventory (Right/Bottom) */}
+                    <Grid size={{ xs: 12, lg: 5 }}>
+                        <BadgeSelector
+                            badges={badges}
+                            selectedBadges={selectedBadges}
+                            onSelect={handleSelect}
+                            onDeselect={handleDeselect}
+                        />
+                    </Grid>
                 </Grid>
-
-
-                <Grid size={{ xs: 12, lg: 5 }}>
-                    <BadgeSelector
-                        badges={MOCK_BADGES as unknown as Badge[]}
-                        selectedBadges={selectedBadges}
-                        onSelect={(b) => handleSelect(b as Badge)}
-                        onDeselect={(b) => handleDeselect(b as Badge)}
-                    />
-                </Grid>
-            </Grid>
+            )}
         </Container>
     );
 };
