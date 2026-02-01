@@ -8,9 +8,22 @@ export class DonationsService {
   constructor(private prisma: PrismaService) { }
 
   async create(createDonationDto: CreateDonationDto) {
-    return this.prisma.donation.create({
+    // Create the donation
+    const donation = await this.prisma.donation.create({
       data: createDonationDto,
     });
+
+    // Update the project's raised amount
+    await this.prisma.project.update({
+      where: { id: createDonationDto.projectId },
+      data: {
+        raised: {
+          increment: createDonationDto.amount,
+        },
+      },
+    });
+
+    return donation;
   }
 
   async findAll() {

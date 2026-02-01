@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useWallet } from '../../hooks/useWallet';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, CircularProgress } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 interface RoleProtectedRouteProps {
@@ -10,7 +10,16 @@ interface RoleProtectedRouteProps {
 }
 
 const RoleProtectedRoute = ({ children, allowedRoles }: RoleProtectedRouteProps) => {
-    const { isConnected, user } = useWallet();
+    const { isConnected, user, isInitialized } = useWallet();
+
+    // Wait for initialization before evaluating permissions
+    if (!isInitialized) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
 
     if (!isConnected) {
         return <Navigate to="/dashboard" replace />;

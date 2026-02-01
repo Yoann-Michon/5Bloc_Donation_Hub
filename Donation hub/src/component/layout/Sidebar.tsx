@@ -5,6 +5,13 @@ import {
     Logout,
     AutoFixHigh,
     Lock,
+    Add,
+    Folder,
+    AdminPanelSettings,
+    People,
+    Category,
+    AccountBalanceWallet,
+    VolunteerActivism,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useWallet } from '../../hooks/useWallet';
@@ -12,17 +19,40 @@ import { useWallet } from '../../hooks/useWallet';
 const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { account, balance, disconnect, isConnected } = useWallet();
+    const { account, balance, disconnect, isConnected, user } = useWallet();
 
     const handleDisconnect = () => {
         disconnect();
         navigate('/');
     };
 
-    const navItems = [
+    // Base navigation items for all users
+    const baseItems = [
         { label: 'Dashboard', icon: <Dashboard />, path: '/dashboard', protected: true },
         { label: 'Explore', icon: <Explore />, path: '/dashboard/projects', protected: false },
         { label: 'Badge Fusion', icon: <AutoFixHigh />, path: '/dashboard/fusion', protected: true },
+        { label: 'Mes Donations', icon: <VolunteerActivism />, path: '/dashboard/my-donations', protected: true },
+    ];
+
+    // Association-specific items
+    const associationItems = [
+        { label: 'Créer Projet', icon: <Add />, path: '/dashboard/create-project', protected: true },
+        { label: 'Mes Projets', icon: <Folder />, path: '/dashboard/my-projects', protected: true },
+    ];
+
+    // Admin-specific items
+    const adminItems = [
+        { label: 'Admin Projets', icon: <AdminPanelSettings />, path: '/dashboard/admin/projects', protected: true },
+        { label: 'Admin Users', icon: <People />, path: '/dashboard/admin/users', protected: true },
+        { label: 'Admin Catégories', icon: <Category />, path: '/dashboard/admin/categories', protected: true },
+        { label: 'Admin Retraits', icon: <AccountBalanceWallet />, path: '/dashboard/admin/withdrawals', protected: true },
+    ];
+
+    // Build navigation items based on user role
+    const navItems = [
+        ...baseItems,
+        ...(user?.role === 'ASSOCIATION' || user?.role === 'ADMIN' ? associationItems : []),
+        ...(user?.role === 'ADMIN' ? adminItems : []),
     ];
 
     const NavButton = ({

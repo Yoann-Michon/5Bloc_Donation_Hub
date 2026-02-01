@@ -56,6 +56,7 @@ const transformProject = (p: any) => ({
     raised: Number(p.raised),
     goal: Number(p.goal),
     image: p.image || '',
+    category: p.category?.name || p.categoryId || 'Uncategorized',
 });
 
 export const getUsers = async (): Promise<ApiUser[]> => {

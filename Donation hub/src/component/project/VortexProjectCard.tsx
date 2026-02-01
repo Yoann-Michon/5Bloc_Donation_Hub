@@ -17,12 +17,14 @@ interface VortexProjectCardProps {
     accentColor?: string;
 }
 
-const badgeConfig = {
-    Legendary: { color: '#5227FF', animate: 'pulse' },
-    Rare: { color: '#FFD700', animate: 'none' },
-    Epic: { color: '#A855F7', animate: 'ping' },
-    Common: { color: '#10B981', animate: 'none' },
-    New: { color: '#94A3B8', animate: 'none' },
+const categoryConfig: Record<string, { color: string; icon: string }> = {
+    Education: { color: '#3B82F6', icon: '📚' },
+    Environment: { color: '#10B981', icon: '🌍' },
+    Health: { color: '#EF4444', icon: '🏥' },
+    DeFi: { color: '#F59E0B', icon: '💰' },
+    Gaming: { color: '#8B5CF6', icon: '🎮' },
+    Infrastructure: { color: '#6B7280', icon: '🏗️' },
+    Uncategorized: { color: '#94A3B8', icon: '📁' },
 };
 
 const VortexProjectCard = ({
@@ -30,15 +32,15 @@ const VortexProjectCard = ({
     title,
     description,
     image,
+    category,
     raised,
     goal,
     daysLeft,
-    badge = 'Common',
 }: VortexProjectCardProps) => {
     const navigate = useNavigate();
     const location = useLocation();
     const percentage = Math.min(100, Math.round((raised / goal) * 100));
-    const config = badgeConfig[badge] || badgeConfig.Common;
+    const config = categoryConfig[category] || categoryConfig.Uncategorized;
 
     const isDashboard = location.pathname.startsWith('/dashboard');
     const projectPath = isDashboard ? `/dashboard/projects/${id}` : `/projects/${id}`;
@@ -113,15 +115,10 @@ const VortexProjectCard = ({
                             height: 6,
                             borderRadius: '50%',
                             bgcolor: config.color,
-                            animation: config.animate === 'pulse' ? 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' : 'none',
-                            '@keyframes pulse': {
-                                '0%, 100%': { opacity: 1 },
-                                '50%': { opacity: .5 },
-                            }
                         }}
                     />
                     <Typography sx={{ fontSize: '0.625rem', fontWeight: 700, letterSpacing: '0.1em', color: 'white', textTransform: 'uppercase' }}>
-                        {badge}
+                        {config.icon} {category}
                     </Typography>
                 </Box>
             </Box>

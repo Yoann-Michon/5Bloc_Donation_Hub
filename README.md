@@ -65,7 +65,7 @@ Donation Hub est une application Web3 full-stack qui permet des dons transparent
 ```bash
 # Cloner le dépôt
 git clone <repository-url>
-cd 5BLOC_PROJECT
+cd 5Bloc_Donation_Hub
 
 # Démarrer tous les services
 docker-compose up --build
@@ -155,7 +155,7 @@ Combinez deux badges du même niveau pour créer un badge de niveau supérieur :
 ## Structure du Projet
 
 ```
-5BLOC_PROJECT/
+5Bloc_Donation_Hub/
 ├── backend/                 # API NestJS
 │   ├── src/
 │   │   ├── auth/           # Authentification JWT + wallet
@@ -192,9 +192,9 @@ Combinez deux badges du même niveau pour créer un badge de niveau supérieur :
 
 ### Authentification
 ```
-POST   /auth/login          # Connexion par signature wallet
-POST   /auth/register       # Créer un compte utilisateur
-GET    /auth/profile        # Obtenir l'utilisateur actuel
+GET    /auth/nonce?walletAddress=...  # Obtenir le nonce pour signature
+POST   /auth/verify                   # Vérifier la signature wallet (connexion)
+GET    /auth/me                       # Obtenir l'utilisateur actuel
 ```
 
 ### Projets
@@ -213,9 +213,9 @@ PATCH  /projects/:id/reject  # Rejeter un projet (ADMIN)
 ```
 POST   /donations           # Enregistrer un don
 GET    /donations           # Lister tous les dons
-GET    /donations/by-wallet/:wallet  # Dons d'un utilisateur
-GET    /donations/by-project/:id     # Dons d'un projet
-GET    /donations/received  # Dons reçus (ASSOCIATION)
+GET    /donations/by-wallet/:walletAddress  # Dons d'un utilisateur
+GET    /donations/by-project/:projectId     # Dons d'un projet
+GET    /donations/received                  # Dons reçus (ASSOCIATION)
 ```
 
 ### Utilisateurs (ADMIN uniquement)

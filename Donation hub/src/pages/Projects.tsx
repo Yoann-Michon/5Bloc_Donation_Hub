@@ -55,17 +55,7 @@ const Projects = () => {
     }
 
     return filtered;
-  }, [selectedCategory, sortBy]);
-
-  const getProjectVisuals = (id: number) => {
-    const badges = ['Legendary', 'Rare', 'Epic', 'Common', 'New'];
-    const colors = ['#5227FF', '#FFD700', '#A855F7', '#10B981', '#94A3B8'];
-    const index = id % badges.length;
-    return {
-      badge: badges[index] as 'Legendary' | 'Rare' | 'Epic' | 'Common' | 'New',
-      accentColor: colors[index],
-    };
-  };
+  }, [projects, selectedCategory, sortBy]);
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -110,7 +100,6 @@ const Projects = () => {
           }}
         >
           {filteredProjects.map((project) => {
-            const visuals = getProjectVisuals(project.id);
             return (
               <VortexProjectCard
                 key={project.id}
@@ -122,8 +111,6 @@ const Projects = () => {
                 raised={project.raised}
                 goal={project.goal}
                 daysLeft={project.daysLeft}
-                badge={visuals.badge}
-                accentColor={visuals.accentColor}
               />
             );
           })}
