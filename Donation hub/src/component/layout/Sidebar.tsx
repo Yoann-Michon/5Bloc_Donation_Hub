@@ -26,12 +26,17 @@ const Sidebar = () => {
         navigate('/');
     };
 
-    // Base navigation items for all users
+    // Base navigation items
     const baseItems = [
         { label: 'Dashboard', icon: <Dashboard />, path: '/dashboard', protected: true },
         { label: 'Explore', icon: <Explore />, path: '/dashboard/projects', protected: false },
-        { label: 'Badge Fusion', icon: <AutoFixHigh />, path: '/dashboard/fusion', protected: true },
         { label: 'Mes Donations', icon: <VolunteerActivism />, path: '/dashboard/my-donations', protected: true },
+    ];
+
+    // User-only items (Marketplace & Fusion)
+    const userOnlyItems = [
+        { label: 'Badge Fusion', icon: <AutoFixHigh />, path: '/dashboard/fusion', protected: true },
+        { label: 'Marketplace', icon: <People />, path: '/dashboard/marketplace', protected: true },
     ];
 
     // Association-specific items
@@ -51,6 +56,7 @@ const Sidebar = () => {
     // Build navigation items based on user role
     const navItems = [
         ...baseItems,
+        ...(user?.role === 'USER' ? userOnlyItems : []),
         ...(user?.role === 'ASSOCIATION' || user?.role === 'ADMIN' ? associationItems : []),
         ...(user?.role === 'ADMIN' ? adminItems : []),
     ];

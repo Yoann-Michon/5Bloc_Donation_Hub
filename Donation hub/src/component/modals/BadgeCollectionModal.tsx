@@ -1,21 +1,6 @@
 import { Dialog, DialogTitle, DialogContent, Box, Typography, IconButton, Grid, Card, CardContent, Chip, LinearProgress, Divider } from '@mui/material';
 import { Close, EmojiEvents, Lock, Verified, History, Fingerprint, CalendarMonth } from '@mui/icons-material';
-
-interface Badge {
-    id: number;
-    name: string;
-    tier: string;
-    count: number;
-    image: string;
-    description?: string;
-    unlocked: boolean;
-    progress?: number;
-    hash?: string;
-    type?: string;
-    previousOwners?: string[];
-    createdAt?: string;
-    value?: string;
-}
+import type { Badge } from '../../types/badge';
 
 interface BadgeCollectionModalProps {
     open: boolean;
@@ -90,7 +75,7 @@ const BadgeCollectionModal = ({ open, onClose, badges }: BadgeCollectionModalPro
                         <EmojiEvents sx={{ color: 'white', fontSize: 28 }} />
                     </Box>
                     <Box>
-                        <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                        <Typography component="span" variant="h5" sx={{ fontWeight: 700 }}>
                             Badge Collection
                         </Typography>
                         <Typography variant="body2" sx={{ color: 'text.secondary' }}>

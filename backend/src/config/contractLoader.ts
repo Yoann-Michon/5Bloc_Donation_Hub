@@ -8,6 +8,7 @@ import * as path from 'path';
 
 export interface ContractConfig {
     contractAddress: string;
+    marketplaceAddress: string;
     blockchainRpcUrl: string;
 }
 
@@ -23,6 +24,7 @@ export async function loadContractConfig(): Promise<ContractConfig> {
 
     const config: ContractConfig = {
         contractAddress: process.env.CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000',
+        marketplaceAddress: process.env.MARKETPLACE_ADDRESS || '0x0000000000000000000000000000000000000000',
         blockchainRpcUrl: process.env.BLOCKCHAIN_RPC_URL || 'http://blockchain:8545',
     };
 
@@ -34,16 +36,18 @@ export async function loadContractConfig(): Promise<ContractConfig> {
             const fileContent = fs.readFileSync(sharedConfigPath, 'utf-8');
             const jsonConfig = JSON.parse(fileContent);
 
-            if (jsonConfig.contractAddress && jsonConfig.contractAddress !== '0x0000000000000000000000000000000000000000') {
+            if (jsonConfig.contractAddress) {
                 config.contractAddress = jsonConfig.contractAddress;
-                console.log('✅ Loaded CONTRACT_ADDRESS from shared volume:', config.contractAddress);
             }
+            if (jsonConfig.marketplaceAddress) {
+                config.marketplaceAddress = jsonConfig.marketplaceAddress;
+            }
+            console.log('✅ Loaded contract configuration from shared volume');
         } else {
-            console.log('⚠️ Shared config not found, using environment variable:', config.contractAddress);
+            console.log('⚠️ Shared config not found, using environment variables');
         }
     } catch (error) {
         console.warn('⚠️ Failed to load contract config from shared volume:', error.message);
-        console.log('   Using environment variable:', config.contractAddress);
     }
 
     cachedConfig = config;
@@ -51,23 +55,24 @@ export async function loadContractConfig(): Promise<ContractConfig> {
 }
 
 /**
- * Get contract address (must call loadContractConfig first)
+ * Get contract address
  */
 export function getContractAddress(): string {
-    if (!cachedConfig) {
-        throw new Error('Contract config not loaded. Call loadContractConfig() first.');
-    }
-    return cachedConfig.contractAddress;
+    return cachedConfig?.contractAddress || '0x0000000000000000000000000000000000000000';
 }
 
 /**
- * Get blockchain RPC URL (must call loadContractConfig first)
+ * Get marketplace address
+ */
+export function getMarketplaceAddress(): string {
+    return cachedConfig?.marketplaceAddress || '0x0000000000000000000000000000000000000000';
+}
+
+/**
+ * Get blockchain RPC URL
  */
 export function getBlockchainRpcUrl(): string {
-    if (!cachedConfig) {
-        throw new Error('Contract config not loaded. Call loadContractConfig() first.');
-    }
-    return cachedConfig.blockchainRpcUrl;
+    return cachedConfig?.blockchainRpcUrl || 'http://blockchain:8545';
 }
 
 /**

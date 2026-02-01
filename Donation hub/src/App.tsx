@@ -24,6 +24,7 @@ const AdminCategoriesPage = lazy(() => import('./pages/AdminCategoriesPage'));
 const CreateProjectPage = lazy(() => import('./pages/CreateProjectPage'));
 const MyProjectsPage = lazy(() => import('./pages/MyProjectsPage'));
 const MyDonationsPage = lazy(() => import('./pages/MyDonationsPage'));
+const Marketplace = lazy(() => import('./pages/Marketplace'));
 
 const LoadingFallback = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
@@ -62,7 +63,19 @@ function App() {
                   path="/dashboard/fusion"
                   element={
                     <ProtectedRoute>
-                      <BadgeFusion />
+                      <RoleProtectedRoute allowedRoles={['USER']}>
+                        <BadgeFusion />
+                      </RoleProtectedRoute>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/marketplace"
+                  element={
+                    <ProtectedRoute>
+                      <RoleProtectedRoute allowedRoles={['USER']}>
+                        <Marketplace />
+                      </RoleProtectedRoute>
                     </ProtectedRoute>
                   }
                 />

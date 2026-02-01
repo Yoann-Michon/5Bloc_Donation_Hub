@@ -1,6 +1,7 @@
 
 
 export let CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000';
+export let MARKETPLACE_ADDRESS = import.meta.env.VITE_MARKETPLACE_ADDRESS || '0x0000000000000000000000000000000000000000';
 export let BLOCKCHAIN_RPC_URL = import.meta.env.VITE_BLOCKCHAIN_RPC_URL || 'http://localhost:8545';
 
 let configLoaded = false;
@@ -20,6 +21,10 @@ export async function loadContractConfig(): Promise<void> {
                 console.log('✅ Loaded CONTRACT_ADDRESS from config.ts:', CONTRACT_ADDRESS);
             }
 
+            if (config.MARKETPLACE_ADDRESS && config.MARKETPLACE_ADDRESS !== '0x0000000000000000000000000000000000000000') {
+                MARKETPLACE_ADDRESS = config.MARKETPLACE_ADDRESS;
+            }
+
             if (config.BLOCKCHAIN_RPC_URL) {
                 BLOCKCHAIN_RPC_URL = config.BLOCKCHAIN_RPC_URL;
             }
@@ -36,6 +41,10 @@ export async function loadContractConfig(): Promise<void> {
 
 export function getContractAddress(): string {
     return CONTRACT_ADDRESS;
+}
+
+export function getMarketplaceAddress(): string {
+    return MARKETPLACE_ADDRESS;
 }
 
 export function getBlockchainRpcUrl(): string {

@@ -1,9 +1,7 @@
-import { type ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useWallet } from '../../hooks/useWallet';
-import { useState, useEffect } from 'react';
-import WalletConnectionModal from '../web3/WalletConnectionModal';
+import { type ReactNode, useEffect } from 'react';
 import { Box, CircularProgress } from '@mui/material';
+import { useWallet } from '../../hooks/useWallet';
+import { useNavigate } from 'react-router-dom';
 
 interface ProtectedRouteProps {
     children: ReactNode;
@@ -12,35 +10,22 @@ interface ProtectedRouteProps {
 /**
  * ProtectedRoute Component
  * Redirects to home if user is not connected
- * Opens WalletConnectionModal automatically
  */
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     const { isConnected, isInitialized } = useWallet();
-    const [showModal, setShowModal] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (isInitialized && !isConnected) {
-            setShowModal(true);
+            navigate('/', { replace: true });
         }
-    }, [isConnected, isInitialized]);
+    }, [isConnected, isInitialized, navigate]);
 
-    if (!isInitialized) {
+    if (!isInitialized || !isConnected) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
                 <CircularProgress />
             </Box>
-        );
-    }
-
-    if (!isConnected) {
-        return (
-            <>
-                <Navigate to="/" replace />
-                <WalletConnectionModal
-                    open={showModal}
-                    onClose={() => setShowModal(false)}
-                />
-            </>
         );
     }
 

@@ -3,22 +3,10 @@ import { MilitaryTech, RocketLaunch, Forest, AccountBalance, Refresh, OpenInNew 
 import { useState, useEffect, useCallback } from 'react';
 import BadgeCollectionModal from '../modals/BadgeCollectionModal';
 import BadgeDetailsModal from '../modals/BadgeDetailsModal';
+import ListBadgeModal from '../modals/ListBadgeModal';
 import { useWallet } from '../../hooks/useWallet';
-
-export interface Badge {
-    id: number | string;
-    name: string;
-    tier: string;
-    icon?: React.ReactElement;
-    color: string;
-    image?: string;
-    description?: string;
-    hash?: string;
-    type?: string;
-    createdAt?: string;
-    previousOwners?: string[];
-    value?: string;
-}
+import { useMarketplace } from '../../hooks/useMarketplace';
+import type { Badge } from '../../types/badge';
 
 const DEFAULT_IMAGES = {
     Bronze: 'https://img.freepik.com/vecteurs-premium/medaille-bronze-realiste-rubans-rouges-coupe-du-gagnant-gravee-badge-premium-pour-gagnants-realisations_88188-4035.jpg',
@@ -87,10 +75,18 @@ const getMetadata = async (tokenId: string, tokenURI: string): Promise<any> => {
 const BadgeGallery = () => {
     const [collectionOpen, setCollectionOpen] = useState(false);
     const [detailsOpen, setDetailsOpen] = useState(false);
+    const [listModalOpen, setListModalOpen] = useState(false);
     const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null);
-    const { account, isConnected, getBadgeContract } = useWallet();
+    const [selectedListingBadge, setSelectedListingBadge] = useState<Badge | null>(null);
+    const { account, isConnected, getBadgeContract, user } = useWallet();
     const [realBadges, setRealBadges] = useState<Badge[]>([]);
     const [loading, setLoading] = useState(false);
+
+    const handleOpenListModal = (e: React.MouseEvent, badge: Badge) => {
+        e.stopPropagation();
+        setSelectedListingBadge(badge);
+        setListModalOpen(true);
+    };
 
     const fetchBadges = useCallback(async () => {
         if (!account) return;
@@ -315,6 +311,25 @@ const BadgeGallery = () => {
                                         </Button>
                                     </span>
                                 </Tooltip>
+
+                                {user?.role === 'USER' && (
+                                    <Button
+                                        fullWidth
+                                        variant="outlined"
+                                        size="small"
+                                        onClick={(e) => handleOpenListModal(e, badge)}
+                                        sx={{
+                                            mt: 1.5,
+                                            fontSize: '0.7rem',
+                                            borderRadius: 2,
+                                            borderColor: 'primary.main',
+                                            color: 'primary.main',
+                                            fontWeight: 700
+                                        }}
+                                    >
+                                        Mettre en vente
+                                    </Button>
+                                )}
                             </Box>
                         </Box>
                     ))}
@@ -334,6 +349,15 @@ const BadgeGallery = () => {
                     setSelectedBadge(null);
                 }}
                 badge={selectedBadge}
+            />
+
+            <ListBadgeModal
+                open={listModalOpen}
+                onClose={() => {
+                    setListModalOpen(false);
+                    setSelectedListingBadge(null);
+                }}
+                badge={selectedListingBadge}
             />
         </Box>
     );

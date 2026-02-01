@@ -10,7 +10,7 @@ import {
     Avatar,
 } from '@mui/material';
 import { Close, OpenInNew, CalendarToday, Person, Fingerprint } from '@mui/icons-material';
-import type { Badge } from '../dashboard/BadgeGallery';
+import type { Badge } from '../../types/badge';
 
 interface BadgeDetailsModalProps {
     open: boolean;
@@ -55,7 +55,7 @@ const BadgeDetailsModal = ({ open, onClose, badge }: BadgeDetailsModalProps) => 
             }}
         >
             <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}>
-                <Typography variant="h6" sx={{ fontWeight: 700, fontFamily: 'Space Grotesk, sans-serif' }}>
+                <Typography component="span" variant="h6" sx={{ fontWeight: 700, fontFamily: 'Space Grotesk, sans-serif' }}>
                     Badge Details
                 </Typography>
                 <IconButton onClick={onClose} size="small" sx={{ color: 'text.secondary' }}>

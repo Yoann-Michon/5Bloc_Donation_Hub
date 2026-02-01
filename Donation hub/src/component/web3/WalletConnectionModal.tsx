@@ -121,7 +121,7 @@ const WalletConnectionModal = ({
             >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                     <AccountBalanceWallet sx={{ color: 'primary.main', fontSize: 28 }} />
-                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                    <Typography component="span" variant="h6" sx={{ fontWeight: 700 }}>
                         Connect Wallet
                     </Typography>
                 </Box>

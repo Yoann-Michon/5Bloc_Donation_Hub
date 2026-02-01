@@ -23,30 +23,42 @@ if [ ! -f "$SHARED_CONFIG" ]; then
 else
   echo "Contract configuration found!"
 
-  CONTRACT_ADDRESS=$(cat "$SHARED_CONFIG" | grep -o '"contractAddress":"[^"]*"' | cut -d'"' -f4)
+  # Use sed to extract values from JSON (works even if no spaces)
+  BADGE_ADDRESS=$(sed -n 's/.*"contractAddress":"\([^"]*\)".*/\1/p' "$SHARED_CONFIG")
+  MARKETPLACE_ADDRESS=$(sed -n 's/.*"marketplaceAddress":"\([^"]*\)".*/\1/p' "$SHARED_CONFIG")
 
-  if [ -z "$CONTRACT_ADDRESS" ]; then
-    echo "ERROR: Failed to extract contract address"
+  if [ -z "$BADGE_ADDRESS" ] || [ -z "$MARKETPLACE_ADDRESS" ]; then
+    echo "ERROR: Failed to extract contract addresses from $SHARED_CONFIG"
+    cat "$SHARED_CONFIG"
     exit 1
   fi
 
-  echo "Contract Address: $CONTRACT_ADDRESS"
+  echo "Badge Address: $BADGE_ADDRESS"
+  echo "Marketplace Address: $MARKETPLACE_ADDRESS"
 
   ENV_FILE="/app/.env"
   if [ -f "$ENV_FILE" ]; then
-    sed -i "s|VITE_CONTRACT_ADDRESS=.*|VITE_CONTRACT_ADDRESS=$CONTRACT_ADDRESS|g" "$ENV_FILE"
-    echo ".env updated with contract address"
+    sed -i "s|VITE_CONTRACT_ADDRESS=.*|VITE_CONTRACT_ADDRESS=$BADGE_ADDRESS|g" "$ENV_FILE"
+    sed -i "s|VITE_MARKETPLACE_ADDRESS=.*|VITE_MARKETPLACE_ADDRESS=$MARKETPLACE_ADDRESS|g" "$ENV_FILE"
+    echo ".env updated"
   else
-
-    echo "VITE_CONTRACT_ADDRESS=$CONTRACT_ADDRESS" > "$ENV_FILE"
-    echo ".env created with contract address"
+    echo "VITE_CONTRACT_ADDRESS=$BADGE_ADDRESS" > "$ENV_FILE"
+    echo "VITE_MARKETPLACE_ADDRESS=$MARKETPLACE_ADDRESS" >> "$ENV_FILE"
+    echo ".env created"
   fi
 
 
   if [ -f "$SHARED_ABI" ]; then
     mkdir -p "$CONTRACTS_DIR"
     cp "$SHARED_ABI" "$CONTRACTS_DIR/"
-    echo "ABI copied to $CONTRACTS_DIR/DonationBadge.json"
+    echo "Badge ABI copied to $CONTRACTS_DIR/DonationBadge.json"
+  fi
+
+  SHARED_MARKET_ABI="/app/shared/BadgeMarketplace.json"
+  if [ -f "$SHARED_MARKET_ABI" ]; then
+    mkdir -p "$CONTRACTS_DIR"
+    cp "$SHARED_MARKET_ABI" "$CONTRACTS_DIR/"
+    echo "Marketplace ABI copied to $CONTRACTS_DIR/BadgeMarketplace.json"
   fi
 
  
@@ -55,7 +67,8 @@ else
 // Auto-generated contract configuration
 // DO NOT EDIT MANUALLY - Generated during container startup
 
-export const CONTRACT_ADDRESS = "${CONTRACT_ADDRESS}";
+export const CONTRACT_ADDRESS = "${BADGE_ADDRESS}";
+export const MARKETPLACE_ADDRESS = "${MARKETPLACE_ADDRESS}";
 export const BLOCKCHAIN_RPC_URL = "${VITE_BLOCKCHAIN_RPC_URL:-http://localhost:8545}";
 EOF
   echo "TypeScript config generated at $CONTRACTS_DIR/config.ts"

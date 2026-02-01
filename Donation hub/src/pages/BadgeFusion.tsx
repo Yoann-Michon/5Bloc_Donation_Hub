@@ -6,17 +6,11 @@ import { AutoFixHigh } from '@mui/icons-material';
 import { useWallet } from '../hooks/useWallet';
 import { BadgeTier } from '../types/enums';
 
-interface Badge {
-    id: number;
-    name: string;
-    tier: BadgeTier;
-    count: number;
-    image: string;
-}
+import type { Badge } from '../types/badge';
 
 const BadgeFusion = () => {
 
-    const { account, isConnected, getBadgeContract } = useWallet();
+    const { account, isConnected, getBadgeContract, user } = useWallet();
 
 
     const [badges, setBadges] = useState<Badge[]>([]);
@@ -24,6 +18,16 @@ const BadgeFusion = () => {
     const [error, setError] = useState<string | null>(null);
     const [selectedBadges, setSelectedBadges] = useState<Badge[]>([]);
     const [isFusing, setIsFusing] = useState(false);
+
+    if (user && user.role !== 'USER') {
+        return (
+            <Container maxWidth="xl" sx={{ py: 10 }}>
+                <Alert severity="warning">
+                    La fusion de badges est réservée aux utilisateurs.
+                </Alert>
+            </Container>
+        );
+    }
 
 
     useEffect(() => {
