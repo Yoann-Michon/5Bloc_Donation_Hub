@@ -14,7 +14,7 @@ import { UsersModule } from '../users/users.module';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
-        const expiresIn = configService.get<string>('JWT_EXPIRATION') || '7d';
+        const expiresIn = configService.get<string>('JWT_EXPIRATION') || '24h';
         return {
           secret: configService.get<string>('JWT_SECRET') || 'your-secret-key-change-in-production',
           signOptions: {
@@ -29,4 +29,4 @@ import { UsersModule } from '../users/users.module';
   providers: [AuthService, JwtStrategy],
   exports: [AuthService],
 })
-export class AuthModule {}
+export class AuthModule { }

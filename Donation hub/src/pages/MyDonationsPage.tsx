@@ -68,7 +68,7 @@ const MyDonationsPage = () => {
             {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
-                <Grid item xs={12} sm={4}>
+                <Grid size={{ xs: 12, sm: 4 }}>
                     <Card>
                         <CardContent sx={{ textAlign: 'center' }}>
                             <Typography variant="h4" color="primary">{totalDonated.toFixed(4)} ETH</Typography>
@@ -76,7 +76,7 @@ const MyDonationsPage = () => {
                         </CardContent>
                     </Card>
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid size={{ xs: 12, sm: 4 }}>
                     <Card>
                         <CardContent sx={{ textAlign: 'center' }}>
                             <Typography variant="h4" color="primary">{donations.length}</Typography>
@@ -84,7 +84,7 @@ const MyDonationsPage = () => {
                         </CardContent>
                     </Card>
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid size={{ xs: 12, sm: 4 }}>
                     <Card>
                         <CardContent sx={{ textAlign: 'center' }}>
                             <Typography variant="h4" color="primary">{uniqueProjects}</Typography>

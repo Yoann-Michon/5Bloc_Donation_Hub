@@ -95,7 +95,7 @@ const BadgeFusion = () => {
                         name: metadata.name || `Badge #${tokenIdNum}`,
                         tier,
                         count: 1,
-                        image: `/badges/${tier.toLowerCase()}.png`,
+                        image: metadata.image || `/badges/${tier.toLowerCase()}.png`,
                     });
                 } catch (err) {
                     console.error(`Failed to load badge ${tokenIdNum}:`, err);
@@ -124,7 +124,12 @@ const BadgeFusion = () => {
 
     const handleSelect = (badge: Badge) => {
         if (selectedBadges.length < 2) {
-            setSelectedBadges([...selectedBadges, badge]);
+            const isAlreadySelected = selectedBadges.some(b => b.id === badge.id);
+            if (!isAlreadySelected) {
+                setSelectedBadges([...selectedBadges, badge]);
+            } else {
+                alert("This badge is already selected!");
+            }
         }
     };
 
@@ -156,9 +161,21 @@ const BadgeFusion = () => {
             const tokenId1 = selectedBadges[0].id;
             const tokenId2 = selectedBadges[1].id;
 
-            const tierNames = ['Bronze', 'Silver', 'Gold', 'Diamond'];
-            const nextTier = selectedBadges[0].tier + 1;
-            const nextTierName = tierNames[nextTier] || 'Unknown';
+            const TIER_ORDER = [BadgeTier.BRONZE, BadgeTier.SILVER, BadgeTier.GOLD, BadgeTier.DIAMOND];
+            const currentTierIndex = TIER_ORDER.indexOf(selectedBadges[0].tier);
+            const nextTierIndex = currentTierIndex + 1;
+
+            // Map Enum values to display names
+            const tierDisplayNames: Record<BadgeTier, string> = {
+                [BadgeTier.BRONZE]: 'Bronze',
+                [BadgeTier.SILVER]: 'Silver',
+                [BadgeTier.GOLD]: 'Gold',
+                [BadgeTier.DIAMOND]: 'Diamond',
+            };
+
+            const nextTierEnum = TIER_ORDER[nextTierIndex];
+            const nextTierName = nextTierEnum ? tierDisplayNames[nextTierEnum] : 'Unknown';
+            const currentTierName = tierDisplayNames[selectedBadges[0].tier] || 'Unknown';
 
             const BADGE_IMAGES: Record<string, string> = {
                 Bronze: 'https://img.freepik.com/vecteurs-premium/medaille-bronze-realiste-rubans-rouges-coupe-du-gagnant-gravee-badge-premium-pour-gagnants-realisations_88188-4035.jpg',
@@ -174,7 +191,7 @@ const BadgeFusion = () => {
             const metadata = {
                 name: `Fused ${nextTierName} Badge`,
                 type: nextTierName,
-                description: `A powerful ${nextTierName} badge created by fusing two ${tierNames[selectedBadges[0].tier]} badges.`,
+                description: `A powerful ${nextTierName} badge created by fusing two ${currentTierName} badges.`,
                 image: imageUrl,
                 value: 'Fusion',
                 attributes: [

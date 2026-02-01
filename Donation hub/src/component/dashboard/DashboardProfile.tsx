@@ -10,7 +10,6 @@ const DashboardProfile = () => {
             case 'ADMIN': return 'ADMINISTRATOR';
             case 'ASSOCIATION': return 'ASSOCIATION';
             case 'USER': return 'DONOR';
-            default: return '';
         }
     };
 
@@ -19,7 +18,6 @@ const DashboardProfile = () => {
             case 'ADMIN': return '#FF3B3B';
             case 'ASSOCIATION': return '#00ff88';
             case 'USER': return '#FFD700';
-            default: return '#9d9db9';
         }
     };
 

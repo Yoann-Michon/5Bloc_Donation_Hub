@@ -21,6 +21,7 @@ import TransactionStatusIndicator from './web3/TransactionStatus';
 import NetworkSwitcher from './web3/NetworkSwitcher';
 import { parseEther } from 'ethers';
 import { uploadMetadata } from '../utils/ipfs';
+import { createDonation } from '../utils/api';
 
 interface DonationModalProps {
   open: boolean;

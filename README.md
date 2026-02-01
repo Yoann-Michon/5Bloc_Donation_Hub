@@ -607,6 +607,31 @@ Solutions :
 - Vérifier que toutes les variables d'environnement VITE_ requises sont définies
 - Reconstruire le conteneur frontend avec le flag --no-cache
 
+**Problème : Configuration du Smart Contract (.env) incorrecte ou perdue**
+
+Si les fichiers `.env` ne sont pas correctement mis à jour automatiquement ou si vous rencontrez des erreurs de contrat non trouvé :
+
+1. **Vérifier les logs de la blockchain** pour retrouver l'adresse déployée :
+   ```bash
+   docker logs donation_hub_blockchain
+   ```
+   Cherchez une ligne ressemblant à : `DonationBadge deployed to: 0x...`
+
+2. **Mettre à jour manuellement les fichiers .env** :
+   - **Backend** (`backend/.env`) :
+     ```env
+     CONTRACT_ADDRESS=0x[ADRESSE_RECUPEREE]
+     ```
+   - **Frontend** (`Donation hub/.env`) :
+     ```env
+     VITE_CONTRACT_ADDRESS=0x[ADRESSE_RECUPEREE]
+     ```
+
+3. **Redémarrer les services** pour appliquer les changements :
+   ```bash
+   docker-compose restart backend frontend
+   ```
+
 ### Étapes de Vérification
 
 **Vérifier que tous les services fonctionnent :**
@@ -738,10 +763,9 @@ Doit afficher l'adresse du contrat et le JSON de configuration.
    - CDN pour les assets statiques
    - Mise en cache des réponses API le cas échéant
 
-## Licence
 
-Licence MIT - Voir le fichier LICENSE pour les détails
+## Contributors
 
-## Version
-
-**Version** : 1.0.0
+- Yoann Michon
+- Achraf ElHarfi
+- Abdoul Waris Konate
