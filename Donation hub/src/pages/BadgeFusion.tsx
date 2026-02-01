@@ -5,6 +5,7 @@ import FusionChamber from '../component/fusion/FusionChamber';
 import { AutoFixHigh } from '@mui/icons-material';
 import { useWallet } from '../hooks/useWallet';
 import { BadgeTier } from '../types/enums';
+import { fetchFromIPFS, getIPFSUrl, uploadMetadata } from '../utils/ipfs';
 
 import type { Badge } from '../types/badge';
 
@@ -30,12 +31,11 @@ const BadgeFusion = () => {
     }
 
 
+
+
     // Unified Metadata fetcher
     const getMetadata = async (tokenId: string, tokenURI: string): Promise<any> => {
-        let hash = '';
-        if (tokenURI.startsWith('ipfs://')) {
-            hash = tokenURI.replace('ipfs://', '');
-        }
+        const hash = getIPFSUrl(tokenURI);
 
         let metadata: any = {
             name: `Badge #${tokenId}`,
@@ -45,32 +45,13 @@ const BadgeFusion = () => {
         };
 
         if (hash) {
-            // Try localStorage first
-            const localData = localStorage.getItem(hash);
-            if (localData) {
-                try {
-                    const json = JSON.parse(localData);
+            try {
+                const json = await fetchFromIPFS(hash);
+                if (json) {
                     metadata = { ...metadata, ...json };
-                } catch (e) {
-                    console.error('Failed to parse local metadata:', e);
                 }
-            } else {
-                // Try IPFS
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 3000);
-                    const response = await fetch(`https://gateway.pinata.cloud/ipfs/${hash}`, { signal: controller.signal });
-                    clearTimeout(timeoutId);
-
-                    if (response.ok) {
-                        const json = await response.json();
-                        metadata = { ...metadata, ...json };
-                        // Cache it
-                        localStorage.setItem(hash, JSON.stringify(json));
-                    }
-                } catch (ipfsError) {
-                    console.error('Failed to fetch IPFS metadata:', ipfsError);
-                }
+            } catch (error) {
+                console.error('Failed to fetch IPFS metadata:', error);
             }
         }
         return metadata;
@@ -175,7 +156,40 @@ const BadgeFusion = () => {
             const tokenId1 = selectedBadges[0].id;
             const tokenId2 = selectedBadges[1].id;
 
-            const newMetadataURI = `ipfs://QmNewBadge${Date.now()}`;
+            const tierNames = ['Bronze', 'Silver', 'Gold', 'Diamond'];
+            const nextTier = selectedBadges[0].tier + 1;
+            const nextTierName = tierNames[nextTier] || 'Unknown';
+
+            const BADGE_IMAGES: Record<string, string> = {
+                Bronze: 'https://img.freepik.com/vecteurs-premium/medaille-bronze-realiste-rubans-rouges-coupe-du-gagnant-gravee-badge-premium-pour-gagnants-realisations_88188-4035.jpg',
+                Silver: 'https://img.freepik.com/vecteurs-premium/medaille-argent-realiste-rubans-rouges-coupe-du-gagnant-gravee-badge-premium-pour-gagnants-realisations_88188-4037.jpg',
+                Gold: 'https://img.freepik.com/vecteurs-premium/medaille-or-realiste-rubans-rouges-coupe-du-vainqueur-gravee-badge-premium-pour-gagnants-realisations_88188-4043.jpg?w=996',
+                Diamond: 'https://placehold.co/200/00E5FF/FFFFFF/png?text=Diamond+Badge',
+                Unknown: 'https://placehold.co/200/808080/FFFFFF/png?text=Badge'
+            };
+
+            const imageUrl = BADGE_IMAGES[nextTierName] || BADGE_IMAGES.Unknown;
+            const nowTimestamp = Math.floor(Date.now() / 1000);
+
+            const metadata = {
+                name: `Fused ${nextTierName} Badge`,
+                type: nextTierName,
+                description: `A powerful ${nextTierName} badge created by fusing two ${tierNames[selectedBadges[0].tier]} badges.`,
+                image: imageUrl,
+                value: 'Fusion',
+                attributes: [
+                    { trait_type: 'Tier', value: nextTierName },
+                    { trait_type: 'Method', value: 'Fusion' },
+                    { trait_type: 'Parents', value: `#${tokenId1}, #${tokenId2}` }
+                ],
+                hash: "",
+                previousOwners: [],
+                createdAt: nowTimestamp,
+                lastTransferAt: nowTimestamp,
+                minter: account
+            };
+
+            const newMetadataURI = await uploadMetadata(metadata);
 
             const tx = await contract.fuseBadges(tokenId1, tokenId2, newMetadataURI);
             await tx.wait();

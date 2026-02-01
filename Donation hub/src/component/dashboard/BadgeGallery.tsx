@@ -6,6 +6,7 @@ import BadgeDetailsModal from '../modals/BadgeDetailsModal';
 import ListBadgeModal from '../modals/ListBadgeModal';
 import { useWallet } from '../../hooks/useWallet';
 import { useMarketplace } from '../../hooks/useMarketplace';
+import { fetchFromIPFS, getIPFSUrl } from '../../utils/ipfs';
 import type { Badge } from '../../types/badge';
 
 const DEFAULT_IMAGES = {
@@ -17,10 +18,7 @@ const DEFAULT_IMAGES = {
 };
 
 const getMetadata = async (tokenId: string, tokenURI: string): Promise<any> => {
-    let hash = '';
-    if (tokenURI.startsWith('ipfs://')) {
-        hash = tokenURI.replace('ipfs://', '');
-    }
+    const hash = getIPFSUrl(tokenURI);
 
     let metadata: any = {
         name: `Badge #${tokenId}`,
@@ -32,41 +30,20 @@ const getMetadata = async (tokenId: string, tokenURI: string): Promise<any> => {
     };
 
     if (hash) {
-        const localData = localStorage.getItem(hash);
-
-        if (localData) {
-            try {
-                const json = JSON.parse(localData);
+        try {
+            const json = await fetchFromIPFS(hash);
+            if (json) {
                 metadata = {
                     ...metadata,
                     ...json,
                     name: json.name || metadata.name,
                     image: json.image || DEFAULT_IMAGES[json.type as keyof typeof DEFAULT_IMAGES] || metadata.image,
+                    description: json.description || metadata.description,
                     hash: hash
                 };
-            } catch (e) {
             }
-        } else {
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 3000);
-
-                const response = await fetch(`https://gateway.pinata.cloud/ipfs/${hash}`, { signal: controller.signal });
-                clearTimeout(timeoutId);
-
-                if (response.ok) {
-                    const json = await response.json();
-                    metadata = {
-                        ...metadata,
-                        ...json,
-                        name: json.name || metadata.name,
-                        image: json.image || DEFAULT_IMAGES[json.type as keyof typeof DEFAULT_IMAGES] || metadata.image,
-                        description: json.description || metadata.description,
-                        hash: hash
-                    };
-                }
-            } catch (ipfsError) {
-            }
+        } catch (error) {
+            console.error('Failed to fetch IPFS metadata:', error);
         }
     }
 

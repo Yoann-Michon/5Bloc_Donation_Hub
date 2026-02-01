@@ -261,7 +261,7 @@ const Sidebar = () => {
                                                     border: `1px solid ${user.role === 'ADMIN' ? 'rgba(239, 68, 68, 0.3)' : user.role === 'ASSOCIATION' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(16, 185, 129, 0.3)'}`,
                                                 }}
                                             >
-                                                {user.role}
+                                                {user.role === 'USER' ? 'DONOR' : user.role === 'ADMIN' ? 'ADMINISTRATOR' : user.role}
                                             </Box>
                                         )}
                                     </Box>

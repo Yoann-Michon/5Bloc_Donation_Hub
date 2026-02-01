@@ -20,52 +20,7 @@ import { useToast } from '../context/ToastContext';
 import TransactionStatusIndicator from './web3/TransactionStatus';
 import NetworkSwitcher from './web3/NetworkSwitcher';
 import { parseEther } from 'ethers';
-import { createDonation } from '../utils/api';
-
-const PINATA_JWT = import.meta.env.VITE_PINATA_JWT;
-
-const uploadToIPFS = async (metadata: any): Promise<string> => {
-  try {
-    if (PINATA_JWT && PINATA_JWT !== 'your_pinata_jwt_here') {
-      const response = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${PINATA_JWT}`
-        },
-        body: JSON.stringify({
-          pinataContent: metadata,
-          pinataMetadata: {
-            name: metadata.name
-          }
-        })
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Pinata upload failed: ${response.status} ${response.statusText} - ${errorText}`);
-      }
-
-      const data = await response.json();
-
-      localStorage.setItem(data.IpfsHash, JSON.stringify(metadata));
-
-      return `ipfs://${data.IpfsHash}`;
-    } else {
-      console.warn('⚠️ Pinata JWT not configured. Using local metadata storage.');
-
-      const timestamp = Date.now();
-      const randomId = Math.random().toString(36).substring(2, 15);
-      const localHash = `local-${timestamp}-${randomId}`;
-
-      localStorage.setItem(localHash, JSON.stringify(metadata));
-
-      return `local://${localHash}`;
-    }
-  } catch (error) {
-    throw error;
-  }
-};
+import { uploadMetadata } from '../utils/ipfs';
 
 interface DonationModalProps {
   open: boolean;
@@ -167,7 +122,7 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
       };
 
 
-      const tokenURI = await uploadToIPFS(metadata);
+      const tokenURI = await uploadMetadata(metadata);
 
       setStep('confirming');
 

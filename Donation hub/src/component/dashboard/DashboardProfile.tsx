@@ -8,9 +8,9 @@ const DashboardProfile = () => {
     const getRoleLabel = (role: string) => {
         switch (role?.toUpperCase()) {
             case 'ADMIN': return 'ADMINISTRATOR';
-            case 'ASSOCIATION': return 'ORGANIZATION';
+            case 'ASSOCIATION': return 'ASSOCIATION';
             case 'USER': return 'DONOR';
-            default: return 'GUEST';
+            default: return '';
         }
     };
 
@@ -108,7 +108,7 @@ const DashboardProfile = () => {
                     </Typography>
                     {user?.role && (
                         <Chip
-                            label={user.role}
+                            label={getRoleLabel(user.role)}
                             size="small"
                             sx={{
                                 bgcolor: 'rgba(82, 39, 255, 0.2)',
