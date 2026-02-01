@@ -1,5 +1,5 @@
 import { Box, Typography, Button, Skeleton, Tooltip } from '@mui/material';
-import { MilitaryTech, RocketLaunch, Forest, AccountBalance, Refresh, OpenInNew } from '@mui/icons-material';
+import { MilitaryTech, RocketLaunch, Forest, AccountBalance, Refresh, OpenInNew, Diamond } from '@mui/icons-material';
 import { useState, useEffect, useCallback } from 'react';
 import BadgeCollectionModal from '../modals/BadgeCollectionModal';
 import BadgeDetailsModal from '../modals/BadgeDetailsModal';
@@ -12,6 +12,7 @@ const DEFAULT_IMAGES = {
     Bronze: 'https://img.freepik.com/vecteurs-premium/medaille-bronze-realiste-rubans-rouges-coupe-du-gagnant-gravee-badge-premium-pour-gagnants-realisations_88188-4035.jpg',
     Silver: 'https://img.freepik.com/vecteurs-premium/medaille-argent-realiste-rubans-rouges-coupe-du-gagnant-gravee-badge-premium-pour-gagnants-realisations_88188-4037.jpg',
     Gold: 'https://img.freepik.com/vecteurs-premium/medaille-or-realiste-rubans-rouges-coupe-du-vainqueur-gravee-badge-premium-pour-gagnants-realisations_88188-4043.jpg?w=996',
+    Diamond: 'https://placehold.co/200/00E5FF/FFFFFF/png?text=Diamond+Badge',
     Unknown: 'https://placehold.co/200/808080/FFFFFF/png?text=Badge'
 };
 
@@ -108,7 +109,9 @@ const BadgeGallery = () => {
 
                     let tierConfig = { icon: <RocketLaunch sx={{ fontSize: 48 }} />, color: '#CD7F32' };
 
-                    if (metadata.type === 'Gold') {
+                    if (metadata.type === 'Diamond') {
+                        tierConfig = { icon: <Diamond sx={{ fontSize: 48 }} />, color: '#00E5FF' };
+                    } else if (metadata.type === 'Gold') {
                         tierConfig = { icon: <RocketLaunch sx={{ fontSize: 48 }} />, color: '#FFCC00' };
                     } else if (metadata.type === 'Silver') {
                         tierConfig = { icon: <AccountBalance sx={{ fontSize: 48 }} />, color: '#C0C0C0' };

@@ -30,114 +30,113 @@ const BadgeFusion = () => {
     }
 
 
-    useEffect(() => {
-        const fetchBadges = async () => {
-            if (!account || !isConnected) {
-                setIsLoading(false);
-                return;
-            }
+    // Unified Metadata fetcher
+    const getMetadata = async (tokenId: string, tokenURI: string): Promise<any> => {
+        let hash = '';
+        if (tokenURI.startsWith('ipfs://')) {
+            hash = tokenURI.replace('ipfs://', '');
+        }
 
-            try {
-                setIsLoading(true);
-                const contract = getBadgeContract();
-                if (!contract) {
-                    throw new Error('Contract not initialized');
-                }
-
-                const tokenIds = await contract.getTokensByOwner(account);
-                const badgesArray: Badge[] = [];
-
-                // Helper function to get metadata (same as dashboard)
-                const getMetadata = async (tokenId: string, tokenURI: string): Promise<any> => {
-                    let hash = '';
-                    if (tokenURI.startsWith('ipfs://')) {
-                        hash = tokenURI.replace('ipfs://', '');
-                    }
-
-                    let metadata: any = {
-                        name: `Badge #${tokenId}`,
-                        type: 'Bronze', // Default
-                        value: '0',
-                        hash: hash,
-                    };
-
-                    if (hash) {
-                        // Try localStorage first
-                        const localData = localStorage.getItem(hash);
-                        if (localData) {
-                            try {
-                                const json = JSON.parse(localData);
-                                metadata = { ...metadata, ...json };
-                            } catch (e) {
-                                console.error('Failed to parse local metadata:', e);
-                            }
-                        } else {
-                            // Try IPFS
-                            try {
-                                const controller = new AbortController();
-                                const timeoutId = setTimeout(() => controller.abort(), 3000);
-                                const response = await fetch(`https://gateway.pinata.cloud/ipfs/${hash}`, { signal: controller.signal });
-                                clearTimeout(timeoutId);
-
-                                if (response.ok) {
-                                    const json = await response.json();
-                                    metadata = { ...metadata, ...json };
-                                    // Cache it
-                                    localStorage.setItem(hash, JSON.stringify(json));
-                                }
-                            } catch (ipfsError) {
-                                console.error('Failed to fetch IPFS metadata:', ipfsError);
-                            }
-                        }
-                    }
-
-                    return metadata;
-                };
-
-                for (const tokenId of tokenIds) {
-                    const tokenIdNum = Number(tokenId);
-                    const tokenIdStr = tokenId.toString();
-
-                    try {
-                        const tokenURI = await contract.tokenURI(tokenId);
-                        const metadata = await getMetadata(tokenIdStr, tokenURI);
-
-                        // Map metadata type to BadgeTier enum
-                        let tier: BadgeTier;
-                        const metadataType = (metadata.type || 'Bronze').toLowerCase();
-
-                        if (metadataType === 'gold') tier = BadgeTier.GOLD;
-                        else if (metadataType === 'silver') tier = BadgeTier.SILVER;
-                        else if (metadataType === 'legendary') tier = BadgeTier.LEGENDARY;
-                        else tier = BadgeTier.BRONZE;
-
-                        badgesArray.push({
-                            id: tokenIdNum,
-                            name: metadata.name || `Badge #${tokenIdNum}`,
-                            tier,
-                            count: 1,
-                            image: `/badges/${tier.toLowerCase()}.png`,
-                        });
-                    } catch (err) {
-                        console.error(`Failed to load badge ${tokenIdNum}:`, err);
-                    }
-                }
-
-                setBadges(badgesArray);
-                setError(null);
-            } catch (err: any) {
-                console.error('Failed to load badges:', err);
-
-                if (err.code === 'BAD_DATA' || err.message?.includes('could not decode result data')) {
-                    setError('Badge contract not deployed or not accessible. Please ensure the blockchain is running and contracts are deployed.');
-                } else {
-                    setError('Failed to load badges from blockchain');
-                }
-            } finally {
-                setIsLoading(false);
-            }
+        let metadata: any = {
+            name: `Badge #${tokenId}`,
+            type: 'Bronze', // Default
+            value: '0',
+            hash: hash,
         };
 
+        if (hash) {
+            // Try localStorage first
+            const localData = localStorage.getItem(hash);
+            if (localData) {
+                try {
+                    const json = JSON.parse(localData);
+                    metadata = { ...metadata, ...json };
+                } catch (e) {
+                    console.error('Failed to parse local metadata:', e);
+                }
+            } else {
+                // Try IPFS
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 3000);
+                    const response = await fetch(`https://gateway.pinata.cloud/ipfs/${hash}`, { signal: controller.signal });
+                    clearTimeout(timeoutId);
+
+                    if (response.ok) {
+                        const json = await response.json();
+                        metadata = { ...metadata, ...json };
+                        // Cache it
+                        localStorage.setItem(hash, JSON.stringify(json));
+                    }
+                } catch (ipfsError) {
+                    console.error('Failed to fetch IPFS metadata:', ipfsError);
+                }
+            }
+        }
+        return metadata;
+    };
+
+    const fetchBadges = async () => {
+        if (!account || !isConnected) {
+            setIsLoading(false);
+            return;
+        }
+
+        try {
+            setIsLoading(true);
+            const contract = getBadgeContract();
+            if (!contract) {
+                throw new Error('Contract not initialized');
+            }
+
+            const tokenIds = await contract.getTokensByOwner(account);
+            const badgesArray: Badge[] = [];
+
+            for (const tokenId of tokenIds) {
+                const tokenIdNum = Number(tokenId);
+                const tokenIdStr = tokenId.toString();
+
+                try {
+                    const tokenURI = await contract.tokenURI(tokenId);
+                    const metadata = await getMetadata(tokenIdStr, tokenURI);
+
+                    // Map metadata type to BadgeTier enum
+                    let tier: BadgeTier;
+                    const metadataType = (metadata.type || 'Bronze').toLowerCase();
+
+                    if (metadataType === 'gold') tier = BadgeTier.GOLD;
+                    else if (metadataType === 'silver') tier = BadgeTier.SILVER;
+                    else if (metadataType === 'diamond') tier = BadgeTier.DIAMOND;
+                    else tier = BadgeTier.BRONZE;
+
+                    badgesArray.push({
+                        id: tokenIdNum,
+                        name: metadata.name || `Badge #${tokenIdNum}`,
+                        tier,
+                        count: 1,
+                        image: `/badges/${tier.toLowerCase()}.png`,
+                    });
+                } catch (err) {
+                    console.error(`Failed to load badge ${tokenIdNum}:`, err);
+                }
+            }
+
+            setBadges(badgesArray);
+            setError(null);
+        } catch (err: any) {
+            console.error('Failed to load badges:', err);
+
+            if (err.code === 'BAD_DATA' || err.message?.includes('could not decode result data')) {
+                setError('Badge contract not deployed or not accessible. Please ensure the blockchain is running and contracts are deployed.');
+            } else {
+                setError('Failed to load badges from blockchain');
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchBadges();
     }, [account, isConnected, getBadgeContract]);
 
@@ -173,123 +172,20 @@ const BadgeFusion = () => {
                 throw new Error('Contract not initialized');
             }
 
-            const badge1 = selectedBadges[0];
-            const badge2 = selectedBadges[1];
-
-
-            const allTokenIds = await contract.getTokensByOwner(account);
-            const tokenIdsOfTier: number[] = [];
-
-            for (const tokenId of allTokenIds) {
-                const tokenIdNum = Number(tokenId);
-                let tier: BadgeTier;
-
-                if (tokenIdNum < 100) tier = BadgeTier.BRONZE;
-                else if (tokenIdNum < 500) tier = BadgeTier.SILVER;
-                else if (tokenIdNum < 1000) tier = BadgeTier.GOLD;
-                else tier = BadgeTier.LEGENDARY;
-
-                if (tier === badge1.tier) {
-                    tokenIdsOfTier.push(tokenIdNum);
-                }
-            }
-
-            if (tokenIdsOfTier.length < 2) {
-                throw new Error('Not enough badges of this tier');
-            }
-
-            const tokenId1 = tokenIdsOfTier[0];
-            const tokenId2 = tokenIdsOfTier[1];
-
+            const tokenId1 = selectedBadges[0].id;
+            const tokenId2 = selectedBadges[1].id;
 
             const newMetadataURI = `ipfs://QmNewBadge${Date.now()}`;
 
-
             const tx = await contract.fuseBadges(tokenId1, tokenId2, newMetadataURI);
-
-
             await tx.wait();
-
 
             const { syncUserBadges } = await import('../utils/api');
             await syncUserBadges(account);
 
-            const updatedTokenIds = await contract.getTokensByOwner(account);
-            const badgesArray: Badge[] = [];
+            // Refetch badges to update UI
+            await fetchBadges();
 
-            // Helper function to get metadata (same as initial load)
-            const getMetadata = async (tokenId: string, tokenURI: string): Promise<any> => {
-                let hash = '';
-                if (tokenURI.startsWith('ipfs://')) {
-                    hash = tokenURI.replace('ipfs://', '');
-                }
-
-                let metadata: any = {
-                    name: `Badge #${tokenId}`,
-                    type: 'Bronze',
-                    value: '0',
-                    hash: hash,
-                };
-
-                if (hash) {
-                    const localData = localStorage.getItem(hash);
-                    if (localData) {
-                        try {
-                            const json = JSON.parse(localData);
-                            metadata = { ...metadata, ...json };
-                        } catch (e) {
-                            console.error('Failed to parse local metadata:', e);
-                        }
-                    } else {
-                        try {
-                            const controller = new AbortController();
-                            const timeoutId = setTimeout(() => controller.abort(), 3000);
-                            const response = await fetch(`https://gateway.pinata.cloud/ipfs/${hash}`, { signal: controller.signal });
-                            clearTimeout(timeoutId);
-
-                            if (response.ok) {
-                                const json = await response.json();
-                                metadata = { ...metadata, ...json };
-                                localStorage.setItem(hash, JSON.stringify(json));
-                            }
-                        } catch (ipfsError) {
-                            console.error('Failed to fetch IPFS metadata:', ipfsError);
-                        }
-                    }
-                }
-
-                return metadata;
-            };
-
-            for (const tokenId of updatedTokenIds) {
-                const tokenIdNum = Number(tokenId);
-                const tokenIdStr = tokenId.toString();
-
-                try {
-                    const tokenURI = await contract.tokenURI(tokenId);
-                    const metadata = await getMetadata(tokenIdStr, tokenURI);
-
-                    let tier: BadgeTier;
-                    const metadataType = (metadata.type || 'Bronze').toLowerCase();
-
-                    if (metadataType === 'gold') tier = BadgeTier.GOLD;
-                    else if (metadataType === 'silver') tier = BadgeTier.SILVER;
-                    else if (metadataType === 'legendary') tier = BadgeTier.LEGENDARY;
-                    else tier = BadgeTier.BRONZE;
-
-                    badgesArray.push({
-                        id: tokenIdNum,
-                        name: metadata.name || `Badge #${tokenIdNum}`,
-                        tier,
-                        count: 1,
-                        image: `/badges/${tier.toLowerCase()}.png`,
-                    });
-                } catch (err) {
-                    console.error(`Failed to reload badge ${tokenIdNum}:`, err);
-                }
-            }
-
-            setBadges(badgesArray);
             setSelectedBadges([]);
             alert('Fusion Successful! You crafted a higher tier badge!');
         } catch (err: any) {

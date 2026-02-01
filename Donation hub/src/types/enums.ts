@@ -16,7 +16,7 @@ export enum BadgeTier {
     BRONZE = 'BRONZE',
     SILVER = 'SILVER',
     GOLD = 'GOLD',
-    LEGENDARY = 'LEGENDARY',
+    DIAMOND = 'DIAMOND',
 }
 
 export enum PrivilegeType {

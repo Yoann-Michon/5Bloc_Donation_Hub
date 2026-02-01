@@ -28,12 +28,12 @@ const FeaturedProjects = () => {
   const featuredProjects = projects.map((project) => {
     const p = project as Project;
     const percentage = (p.raised / p.goal) * 100;
-    let badge: 'Legendary' | 'Rare' | 'Epic' | 'Common' | 'New' = 'Common';
+    let badge: 'Diamond' | 'Rare' | 'Epic' | 'Common' | 'New' = 'Common';
     let accentColor = '#10B981';
 
     if (percentage >= 90) {
-      badge = 'Legendary';
-      accentColor = '#5227FF';
+      badge = 'Diamond';
+      accentColor = '#00E5FF';
     } else if (percentage >= 70) {
       badge = 'Epic';
       accentColor = '#A855F7';

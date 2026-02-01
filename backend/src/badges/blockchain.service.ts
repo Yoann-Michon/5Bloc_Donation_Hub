@@ -60,7 +60,8 @@ export class BlockchainService {
 
       for (const tokenId of tokenIds) {
         const metadataUri = await contract.tokenURI(Number(tokenId));
-        const tier = this.determineTier(Number(tokenId));
+        const tierIndex = await contract.tokenTiers(Number(tokenId));
+        const tier = this.mapTierIndexToEnum(Number(tierIndex));
 
         badges.push({
           tokenId: Number(tokenId),
@@ -75,11 +76,14 @@ export class BlockchainService {
     }
   }
 
-  private determineTier(tokenId: number): BadgeTier {
-    if (tokenId >= 1000) return BadgeTier.LEGENDARY;
-    if (tokenId >= 500) return BadgeTier.GOLD;
-    if (tokenId >= 100) return BadgeTier.SILVER;
-    return BadgeTier.BRONZE;
+  private mapTierIndexToEnum(index: number): BadgeTier {
+    switch (index) {
+      case 0: return BadgeTier.BRONZE;
+      case 1: return BadgeTier.SILVER;
+      case 2: return BadgeTier.GOLD;
+      case 3: return BadgeTier.DIAMOND;
+      default: return BadgeTier.BRONZE;
+    }
   }
 
   async getHighestTier(walletAddress: string): Promise<BadgeTier | null> {
@@ -87,7 +91,7 @@ export class BlockchainService {
 
     if (badges.length === 0) return null;
 
-    const tierOrder = [BadgeTier.LEGENDARY, BadgeTier.GOLD, BadgeTier.SILVER, BadgeTier.BRONZE];
+    const tierOrder = [BadgeTier.DIAMOND, BadgeTier.GOLD, BadgeTier.SILVER, BadgeTier.BRONZE];
 
     for (const tier of tierOrder) {
       if (badges.some(b => b.tier === tier)) {

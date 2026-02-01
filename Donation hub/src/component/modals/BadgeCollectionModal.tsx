@@ -16,6 +16,7 @@ const tierColors: Record<string, string> = {
     Bronze: '#CD7F32',
     Silver: '#C0C0C0',
     Gold: '#FFCC00',
+    Diamond: '#00E5FF',
 };
 
 const tierGradients: Record<string, string> = {
@@ -26,6 +27,7 @@ const tierGradients: Record<string, string> = {
     Bronze: 'linear-gradient(135deg, #CD7F32 0%, #A0522D 100%)',
     Silver: 'linear-gradient(135deg, #C0C0C0 0%, #B0B0B0 100%)',
     Gold: 'linear-gradient(135deg, #FFCC00 0%, #F4B400 100%)',
+    Diamond: 'linear-gradient(135deg, #00E5FF 0%, #00B0FF 100%)',
 };
 
 const BadgeCollectionModal = ({ open, onClose, badges }: BadgeCollectionModalProps) => {

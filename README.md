@@ -8,7 +8,7 @@ Donation Hub est une application Web3 full-stack qui permet des dons transparent
 
 - **Intégration Blockchain** : Smart contracts sur Ethereum pour les dons et le minting de badges NFT
 - **Contrôle d'Accès par Rôles** : Trois rôles utilisateurs (USER, ASSOCIATION, ADMIN) avec des permissions spécifiques
-- **Système de Badges NFT** : Quatre niveaux (BRONZE, SILVER, GOLD, LEGENDARY) débloquant des privilèges progressifs
+- **Système de Badges NFT** : Quatre niveaux (BRONZE, SILVER, GOLD, DIAMOND) débloquant des privilèges progressifs
 - **Architecture Full-Stack** : Backend NestJS, Frontend React, Base de données PostgreSQL, Blockchain Hardhat
 
 ## Architecture
@@ -127,12 +127,12 @@ Cette commande unique va :
 
 ### Niveaux de Badges
 
-| Niveau | Plage Token ID | Description |
+| Niveau | Seuil de Donation | Description |
 |--------|----------------|-------------|
-| BRONZE | 0-99 | Badge donateur basique |
-| SILVER | 100-499 | Contributeur actif |
-| GOLD | 500-999 | Supporter majeur |
-| LEGENDARY | 1000+ | Bienfaiteur d'élite |
+| BRONZE | 0 - 5 ETH | Badge donateur basique |
+| SILVER | 6 - 10 ETH | Contributeur actif |
+| GOLD | 11 - 20 ETH | Supporter majeur |
+| DIAMOND | 21+ ETH | Bienfaiteur d'élite |
 
 ### Privilèges par Niveau
 
@@ -143,14 +143,14 @@ Cette commande unique va :
 | EARLY_ACCESS_PROJECTS | GOLD | Accès anticipé aux nouveaux projets |
 | CREATE_PROPOSALS | GOLD | Soumettre des propositions de gouvernance |
 | PRIORITY_SUPPORT | GOLD | Support client prioritaire |
-| PARTICIPATE_GOVERNANCE | LEGENDARY | Droits de gouvernance complets |
+| PARTICIPATE_GOVERNANCE | DIAMOND | Droits de gouvernance complets |
 
 ### Fusion de Badges
 
 Combinez deux badges du même niveau pour créer un badge de niveau supérieur :
 - 2x BRONZE → 1x SILVER
 - 2x SILVER → 1x GOLD
-- 2x GOLD → 1x LEGENDARY
+- 2x GOLD → 1x DIAMOND
 
 ## Structure du Projet
 

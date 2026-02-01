@@ -85,7 +85,7 @@ async function main() {
       type: PrivilegeType.PARTICIPATE_GOVERNANCE,
       name: 'Participate in Governance',
       description: 'Full governance rights and decision-making power',
-      requiredTier: BadgeTier.LEGENDARY,
+      requiredTier: BadgeTier.DIAMOND,
     },
     {
       type: PrivilegeType.REDUCED_FEES,

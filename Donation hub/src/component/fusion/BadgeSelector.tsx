@@ -21,7 +21,7 @@ const tierColors: Record<BadgeTier, string> = {
     [BadgeTier.BRONZE]: '#cd7f32',
     [BadgeTier.SILVER]: '#c0c0c0',
     [BadgeTier.GOLD]: '#ffd700',
-    [BadgeTier.LEGENDARY]: '#ff6b35',
+    [BadgeTier.DIAMOND]: '#00E5FF',
 };
 
 const BadgeSelector = ({ badges, selectedBadges, onSelect, onDeselect }: BadgeSelectorProps) => {

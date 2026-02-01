@@ -8,7 +8,7 @@ export class BadgesService {
   constructor(
     private prisma: PrismaService,
     private blockchainService: BlockchainService,
-  ) {}
+  ) { }
 
   async syncUserBadges(walletAddress: string) {
     const badges = await this.blockchainService.getUserBadges(walletAddress);
@@ -72,7 +72,7 @@ export class BadgesService {
     }
 
     const tierOrder = {
-      [BadgeTier.LEGENDARY]: 4,
+      [BadgeTier.DIAMOND]: 4,
       [BadgeTier.GOLD]: 3,
       [BadgeTier.SILVER]: 2,
       [BadgeTier.BRONZE]: 1,
@@ -101,7 +101,7 @@ export class BadgesService {
     if (!privilege) return false;
 
     const tierOrder = {
-      [BadgeTier.LEGENDARY]: 4,
+      [BadgeTier.DIAMOND]: 4,
       [BadgeTier.GOLD]: 3,
       [BadgeTier.SILVER]: 2,
       [BadgeTier.BRONZE]: 1,

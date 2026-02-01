@@ -12,7 +12,7 @@ interface VortexProjectCardProps {
     raised: number;
     goal: number;
     daysLeft: number;
-    badge?: 'Legendary' | 'Rare' | 'Epic' | 'Common' | 'New';
+    badge?: 'Diamond' | 'Rare' | 'Epic' | 'Common' | 'New';
     badgeColor?: string;
     accentColor?: string;
 }

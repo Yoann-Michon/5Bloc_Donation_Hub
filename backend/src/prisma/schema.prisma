@@ -24,7 +24,7 @@ enum BadgeTier {
   BRONZE
   SILVER
   GOLD
-  LEGENDARY
+  DIAMOND
 }
 
 enum PrivilegeType {

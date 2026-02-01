@@ -95,6 +95,7 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
     Bronze: 'https://img.freepik.com/vecteurs-premium/medaille-bronze-realiste-rubans-rouges-coupe-du-gagnant-gravee-badge-premium-pour-gagnants-realisations_88188-4035.jpg',
     Silver: 'https://img.freepik.com/vecteurs-premium/medaille-argent-realiste-rubans-rouges-coupe-du-gagnant-gravee-badge-premium-pour-gagnants-realisations_88188-4037.jpg',
     Gold: 'https://img.freepik.com/vecteurs-premium/medaille-or-realiste-rubans-rouges-coupe-du-vainqueur-gravee-badge-premium-pour-gagnants-realisations_88188-4043.jpg?w=996',
+    Diamond: 'https://placehold.co/200/00E5FF/FFFFFF/png?text=Diamond+Badge',
     Unknown: 'https://placehold.co/200/808080/FFFFFF/png?text=Badge'
   };
   const proceedToDonation = useCallback(async () => {
@@ -133,18 +134,21 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
       setStep('uploading');
 
       const amountVal = parseFloat(amount);
-      let type: "Bronze" | "Silver" | "Gold" | "Unknown" = "Unknown";
+      let type: "Bronze" | "Silver" | "Gold" | "Diamond" | "Unknown" = "Unknown";
       let imageUrl = DEFAULT_IMAGES.Unknown;
 
-      if (amountVal < 0.5) {
+      if (amountVal < 6.0) {
         type = "Bronze";
         imageUrl = DEFAULT_IMAGES.Bronze;
-      } else if (amountVal >= 0.5 && amountVal < 1.0) {
+      } else if (amountVal >= 6.0 && amountVal < 11.0) {
         type = "Silver";
         imageUrl = DEFAULT_IMAGES.Silver;
-      } else if (amountVal >= 1.0) {
+      } else if (amountVal >= 11.0 && amountVal < 21.0) {
         type = "Gold";
         imageUrl = DEFAULT_IMAGES.Gold;
+      } else if (amountVal >= 21.0) {
+        type = "Diamond";
+        imageUrl = DEFAULT_IMAGES.Unknown; // User will provide or keep placeholder
       }
 
       const nowTimestamp = Math.floor(Date.now() / 1000);

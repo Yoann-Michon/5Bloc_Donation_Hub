@@ -56,7 +56,7 @@ export const usePrivileges = () => {
       [BadgeTier.BRONZE]: 1,
       [BadgeTier.SILVER]: 2,
       [BadgeTier.GOLD]: 3,
-      [BadgeTier.LEGENDARY]: 4,
+      [BadgeTier.DIAMOND]: 4,
     };
 
     return tierOrder[tier] >= tierOrder[privilege.requiredTier];
