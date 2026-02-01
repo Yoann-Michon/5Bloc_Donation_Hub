@@ -66,9 +66,9 @@ services:
     container_name: donation_hub_frontend
     ports:
       - "5173:5173"
-    depends_on:
-      backend:
-        condition: service_started
+    #depends_on:
+    #  backend:
+    #    condition: service_started
     networks:
       - donation_hub_network
     volumes:
