@@ -19,7 +19,7 @@ contract DonationBadge is ERC721URIStorage, ERC721Enumerable, Ownable {
     constructor() ERC721("DonationBadge", "DBDG") Ownable(msg.sender) {}
 
     function mintBadge(address recipient, string memory uri, uint256 tier) private {
-        require(balanceOf(msg.sender) < 10, "Limite de 10 badges atteinte"); 
+        // Limit check moved to _update to cover transfers as well 
         require(block.timestamp >= lastActionTimestamp[msg.sender] + 5 minutes || lastActionTimestamp[msg.sender] == 0, "Cooldown de 5 minutes actif");
 
         _tokenIds++;
@@ -112,6 +112,9 @@ contract DonationBadge is ERC721URIStorage, ERC721Enumerable, Ownable {
         override(ERC721, ERC721Enumerable)
         returns (address)
     {
+        if (to != address(0)) {
+            require(balanceOf(to) < 4, "Limite de possession atteinte (4 max)");
+        }
         return super._update(to, tokenId, auth);
     }
 

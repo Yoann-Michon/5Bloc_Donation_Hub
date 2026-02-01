@@ -64,7 +64,7 @@ Donation Hub est une application Web3 full-stack qui permet des dons transparent
 
 ```bash
 # Cloner le dépôt
-git clone <repository-url>
+git clone git@github.com:Yoann-Michon/5Bloc_Donation_Hub.git
 cd 5Bloc_Donation_Hub
 
 # Démarrer tous les services
@@ -145,12 +145,22 @@ Cette commande unique va :
 | PRIORITY_SUPPORT | GOLD | Support client prioritaire |
 | PARTICIPATE_GOVERNANCE | DIAMOND | Droits de gouvernance complets |
 
-### Fusion de Badges
+3. **Fusion de Badges** :
+   Combinez deux badges du même niveau pour créer un badge de niveau supérieur :
+   - 2x BRONZE → 1x SILVER
+   - 2x SILVER → 1x GOLD
+   - 2x GOLD → 1x DIAMOND
 
-Combinez deux badges du même niveau pour créer un badge de niveau supérieur :
-- 2x BRONZE → 1x SILVER
-- 2x SILVER → 1x GOLD
-- 2x GOLD → 1x DIAMOND
+4. **Marketplace de Badges** :
+   Les utilisateurs peuvent acheter et vendre leurs badges contre de l'ETH sur un marché dédié. Cela permet aux donateurs de liquider leurs actifs ou aux collectionneurs d'acquérir des badges rares manquants.
+
+### Contraintes et Sécurité
+
+Pour garantir une économie équitable, le système impose des règles strictes :
+
+- **Limite de Possession (Max 4)** : Un utilisateur ne peut pas posséder plus de 4 badges simultanément. Pour en acquérir de nouveaux, il doit fusionner, vendre ou transférer ses badges existants.
+- **Cooldown (5 minutes)** : Un délai de 5 minutes est imposé entre deux actions (don, achat, transfert) initiées par le même utilisateur pour éviter le spam.
+- **Lock d'Acquisition (10 minutes)** : Lorsqu'un utilisateur reçoit un badge (par don, achat ou transfert), ce badge est verrouillé pendant 10 minutes. Il ne peut pas être transféré ou vendu durant cette période.
 
 ## Structure du Projet
 
@@ -334,182 +344,7 @@ VITE_CONTRACT_ADDRESS=0x...  # Auto-configuré dans Docker
 VITE_PINATA_JWT=votre-jwt-pinata  # Optionnel pour IPFS
 ```
 
-## Détails du Workflow Docker
 
-### Séquence de Démarrage
-
-L'orchestration Docker Compose suit une chaîne de dépendances spécifique pour assurer une initialisation correcte :
-
-**1. PostgreSQL (donation_hub_db)**
-- Démarre en premier sans dépendances
-- Crée automatiquement la base de données donation_hub
-- Expose le port 5432
-
-**2. Blockchain (donation_hub_blockchain)**
-- Attend que PostgreSQL soit prêt
-- Démarre le nœud Hardhat sur le port 8545
-- Compile le smart contract DonationBadge.sol
-- Déploie le contrat et génère contract-config.json
-- Copie l'ABI (DonationBadge.json) vers le volume partagé
-- Devient "healthy" quand contract-config.json existe
-
-**3. Backend (donation_hub_backend)**
-- Dépend de : PostgreSQL (démarré) + Blockchain (healthy)
-- Attend jusqu'à 60 secondes pour contract-config.json
-- Récupère CONTRACT_ADDRESS depuis le conteneur blockchain
-- Exécute Prisma db push pour synchroniser le schéma de base de données
-- Exécute le script seed pour peupler catégories et privilèges
-- Démarre l'API NestJS sur le port 3000
-
-**4. Frontend (donation_hub_frontend)**
-- Dépend de : Blockchain (healthy) + Backend (démarré)
-- Attend jusqu'à 60 secondes pour contract-config.json
-- Récupère CONTRACT_ADDRESS et met à jour le fichier .env
-- Génère src/contracts/config.ts avec l'adresse du contrat
-- Démarre le serveur de développement Vite sur le port 5173
-
-### Configuration Automatique
-
-Le système se configure automatiquement via des volumes partagés et des scripts de démarrage :
-
-**Distribution de l'Adresse du Contrat :**
-- Le conteneur blockchain crée /app/shared/contract-config.json
-- Le backend lit ce fichier et exporte CONTRACT_ADDRESS vers l'environnement
-- Le script copy-contract-config.sh du frontend met à jour .env avec l'adresse
-- Tous les services utilisent la même adresse de contrat déployé
-
-**Peuplement de la Base de Données :**
-Après la synchronisation du schéma, le backend crée automatiquement :
-- 6 catégories de projets (Education, Environnement, Santé, DeFi, Gaming, Infrastructure)
-- 6 types de privilèges avec leurs niveaux de badges requis
-- Utilisateur admin par défaut (si configuré)
-
-### Vérifications de Santé des Services
-
-**Santé Blockchain :**
-- Test : Vérifie si /app/shared/contract-config.json existe
-- Intervalle : Toutes les 10 secondes
-- Tentatives : 30 essais (5 minutes au total)
-- Période de démarrage : 40 secondes de grâce
-
-Cela garantit que les services dépendants ne démarrent qu'après le déploiement du contrat.
-
-### Gestion des Volumes Docker
-
-**postgres_data :**
-- Persiste la base de données PostgreSQL entre les redémarrages de conteneurs
-- Emplacement : Volume géré par Docker
-- Contient toutes les données utilisateurs, projets, dons, badges
-
-**contract_data :**
-- Partagé entre blockchain, backend et frontend
-- Contient contract-config.json et DonationBadge.json (ABI)
-- Lecture seule pour backend et frontend (sécurité)
-
-## Système de Privilèges Approfondi
-
-### Fonctionnement des Privilèges
-
-Le système de privilèges crée une couche de gamification où les permissions utilisateur sont liées à leur collection de badges NFT. Les badges de niveau supérieur débloquent plus de fonctionnalités de la plateforme.
-
-### Détermination du Niveau de Badge
-
-Lorsqu'un utilisateur gagne des badges NFT via des dons, le système suit son niveau le plus élevé :
-- Chaque badge a un tokenId qui détermine son niveau
-- Le backend synchronise les badges depuis la blockchain vers la base de données
-- Niveau effectif de l'utilisateur = son niveau de badge le plus élevé
-- Les privilèges sont accordés en fonction de ce niveau
-
-### Types de Privilèges Expliqués
-
-**VOTE_ON_PROPOSALS (SILVER+)**
-Les utilisateurs peuvent participer à la gouvernance communautaire en votant sur les propositions. Cela inclut les décisions de financement de projets, les changements de plateforme et les initiatives communautaires.
-
-**REDUCED_FEES (SILVER+)**
-Les frais de transaction de la plateforme sont réduits pour les contributeurs actifs. Cela récompense les donateurs réguliers et encourage la participation continue.
-
-**EARLY_ACCESS_PROJECTS (GOLD+)**
-Les supporters majeurs reçoivent des notifications anticipées et un accès aux nouveaux projets avant le lancement public. Cela leur permet de soutenir en premier les initiatives prometteuses.
-
-**CREATE_PROPOSALS (GOLD+)**
-Les membres de confiance de la communauté peuvent soumettre des propositions au vote. Cela inclut la suggestion de nouvelles fonctionnalités, de changements de politique ou de projets spéciaux.
-
-**PRIORITY_SUPPORT (GOLD+)**
-Les utilisateurs de niveau Gold reçoivent des temps de réponse plus rapides et des canaux de support dédiés pour les problèmes ou questions de la plateforme.
-
-**PARTICIPATE_GOVERNANCE (LEGENDARY+)**
-Les bienfaiteurs d'élite ont des droits de gouvernance complets incluant un pouvoir de veto sur les décisions majeures et une influence directe sur l'orientation de la plateforme.
-
-### Mécanisme de Protection Backend
-
-Le backend utilise un système de protection à deux couches :
-
-**Couche 1 : Guards de Rôles**
-- Vérifie si l'utilisateur a le rôle requis (USER, ASSOCIATION, ADMIN)
-- Appliqué au niveau du contrôleur
-- Vérification d'authentification rapide
-
-**Couche 2 : Guards de Privilèges**
-- Vérifie si l'utilisateur a le niveau de badge requis
-- Interroge la base de données pour le badge le plus élevé de l'utilisateur
-- Compare avec les exigences de privilège
-- Appliqué aux routes spécifiques nécessitant un accès basé sur les privilèges
-
-### Intégration Frontend
-
-Le frontend reflète les vérifications backend pour fournir une bonne UX :
-
-**Rendu Conditionnel :**
-Les éléments UI sont affichés/masqués en fonction des privilèges utilisateur. Par exemple, le bouton "Créer une Proposition" n'apparaît que pour les utilisateurs GOLD+.
-
-**Dégradation Gracieuse :**
-Les fonctionnalités nécessitant des privilèges supérieurs affichent des messages informatifs expliquant quel niveau de badge est nécessaire et comment l'obtenir.
-
-**Mises à Jour en Temps Réel :**
-Après avoir gagné un nouveau badge, le frontend se synchronise avec le backend pour débloquer immédiatement les nouvelles fonctionnalités sans nécessiter de déconnexion/reconnexion.
-
-### Synchronisation des Badges
-
-**Synchronisation Automatique :**
-- Déclenchée après chaque transaction de don
-- Le backend appelle la blockchain pour récupérer les badges actuels de l'utilisateur
-- Met à jour la base de données avec les nouveaux badges et niveaux
-- Se produit de manière asynchrone pour éviter de bloquer le flux de don
-
-**Synchronisation Manuelle :**
-Les utilisateurs peuvent déclencher manuellement la synchronisation des badges depuis leur profil s'ils soupçonnent que les badges ne sont pas synchronisés avec la blockchain.
-
-**Processus de Synchronisation :**
-1. Le backend appelle getTokensByOwner(address) du smart contract
-2. Reçoit un tableau de tokenIds possédés par l'utilisateur
-3. Détermine le niveau pour chaque tokenId
-4. Crée/met à jour les enregistrements UserBadge dans la base de données
-5. Calcule et met en cache le niveau le plus élevé
-
-### Considérations de Sécurité
-
-**Double Vérification :**
-Le frontend et le backend vérifient tous deux les privilèges. Les vérifications frontend évitent les appels API inutiles, les vérifications backend appliquent la sécurité.
-
-**Validation du Wallet :**
-Avant de vérifier les badges, le système vérifie que l'adresse du wallet est authentifiée via un token JWT contenant un message signé.
-
-**Limitation de Débit :**
-Les endpoints de synchronisation des badges sont limités en débit pour éviter les abus et les appels RPC blockchain excessifs.
-
-**Repli Blockchain :**
-Si les badges de la base de données sont manquants ou obsolètes, le système peut interroger directement la blockchain comme source de vérité.
-
-### Stratégies d'Optimisation
-
-**Mise en Cache :**
-Le niveau le plus élevé de l'utilisateur est mis en cache pendant 5 minutes pour réduire les requêtes de base de données sur les routes fréquemment accédées.
-
-**Synchronisation par Lots :**
-Plusieurs opérations de badges sont regroupées en appels blockchain uniques pour minimiser la surcharge RPC.
-
-**Chargement Paresseux :**
-Les vérifications de privilèges ne se produisent que lorsque nécessaire, pas à chaque requête.
 
 ## Guide de Dépannage
 
@@ -559,14 +394,15 @@ Solutions :
 - Utiliser un compte MetaMask différent
 - Réinitialiser la blockchain (docker-compose down -v) pour repartir de zéro
 
-**Problème : Message "Cooldown period active"**
+**Problème : Message "Cooldown active" ou "Lock active"**
 
-Cause : L'utilisateur a fait un don dans les 5 dernières minutes
+Cause : 
+- **Cooldown** : Vous avez fait une action il y a moins de 5 minutes.
+- **Lock** : Vous avez reçu un badge il y a moins de 10 minutes.
 
 Solutions :
-- Attendre que le cooldown expire (affiché dans l'UI)
-- Utiliser un compte MetaMask différent
-- C'est une limitation du smart contract pour éviter le spam
+- Attendre l'expiration du délai (indiqué dans le message d'erreur).
+- Ces sécurités sont inamovibles (Smart Contract).
 
 **Problème : Erreurs de connexion à la base de données**
 
@@ -649,119 +485,6 @@ Doit afficher 6 catégories par défaut si le seed a réussi.
 **Vérifier le déploiement du contrat :**
 Doit afficher l'adresse du contrat et le JSON de configuration.
 
-### Optimisation des Performances
-
-**Base de Données :**
-- Le pooling de connexions Prisma est activé par défaut
-- Les index sont créés sur les champs fréquemment interrogés
-- Utiliser db push pour le développement, migrations pour la production
-
-**Blockchain :**
-- Le nœud Hardhat fonctionne en mémoire pour des transactions rapides
-- Pas de délai de minage en mode développement
-- Considérer l'utilisation de Ganache pour des tests plus réalistes
-
-**Frontend :**
-- Vite fournit un HMR (Hot Module Replacement) rapide
-- Le build de production utilise le code splitting
-- Les assets statiques sont mis en cache par le navigateur
-
-**Backend :**
-- NestJS utilise l'injection de dépendances efficace
-- Les guards sont mis en cache par requête
-- Les requêtes de base de données utilisent le moteur de requête optimisé de Prisma
-
-## Checklist de Déploiement en Production
-
-### Sécurité
-
-1. **Changer tous les identifiants par défaut**
-   - Générer un JWT_SECRET fort (min 32 caractères)
-   - Utiliser un mot de passe de base de données sécurisé
-   - Ne jamais commiter les fichiers .env dans le contrôle de version
-
-2. **Activer HTTPS/SSL**
-   - Utiliser Let's Encrypt pour des certificats SSL gratuits
-   - Configurer un reverse proxy (Nginx/Apache)
-   - Forcer les redirections HTTPS
-
-3. **Configurer CORS correctement**
-   - Mettre en liste blanche uniquement votre domaine frontend
-   - Supprimer les origines wildcard (*)
-   - Définir credentials: true seulement si nécessaire
-
-4. **Limitation de débit**
-   - Implémenter la limitation de débit sur tous les endpoints API
-   - Protéger contre les attaques DDoS
-   - Utiliser Redis pour la limitation de débit distribuée
-
-5. **Validation des entrées**
-   - Valider toutes les entrées utilisateur
-   - Assainir les données avant l'insertion en base de données
-   - Utiliser la validation intégrée de Prisma
-
-### Infrastructure
-
-1. **Base de Données**
-   - Utiliser PostgreSQL géré (AWS RDS, Google Cloud SQL)
-   - Activer les sauvegardes automatisées
-   - Configurer des réplicas en lecture pour la mise à l'échelle
-   - Configurer le pooling de connexions
-
-2. **Blockchain**
-   - Déployer le contrat sur mainnet ou testnet (Sepolia, Polygon)
-   - Utiliser Infura ou Alchemy pour les endpoints RPC
-   - Ne jamais utiliser le nœud Hardhat en production
-   - Vérifier le contrat sur Etherscan
-
-3. **Frontend**
-   - Builder le bundle de production (npm run build)
-   - Servir les fichiers statiques via CDN
-   - Activer la compression gzip/brotli
-   - Configurer les en-têtes de cache
-
-4. **Backend**
-   - Utiliser PM2 ou un gestionnaire de processus similaire
-   - Activer le clustering pour l'utilisation multi-cœurs
-   - Configurer des endpoints de vérification de santé
-   - Configurer la journalisation (Winston, Pino)
-
-### Surveillance
-
-1. **Surveillance d'application**
-   - Configurer le suivi des erreurs (Sentry, Rollbar)
-   - Surveiller les temps de réponse API
-   - Suivre les performances des requêtes de base de données
-   - Alerter sur les taux d'erreur élevés
-
-2. **Surveillance d'infrastructure**
-   - Surveiller les ressources serveur (CPU, RAM, disque)
-   - Suivre la santé des conteneurs
-   - Configurer la surveillance de disponibilité
-   - Configurer les alertes (PagerDuty, Slack)
-
-3. **Surveillance blockchain**
-   - Surveiller les événements du contrat
-   - Suivre les prix du gaz
-   - Alerter sur les transactions échouées
-   - Surveiller les soldes des wallets
-
-### Considérations de Mise à l'Échelle
-
-1. **Mise à l'échelle horizontale**
-   - Utiliser un équilibreur de charge pour plusieurs instances backend
-   - Conception API sans état pour une mise à l'échelle facile
-   - Stockage de session dans Redis, pas en mémoire
-
-2. **Mise à l'échelle de la base de données**
-   - Implémenter des réplicas en lecture
-   - Utiliser le pooling de connexions
-   - Considérer le sharding de base de données pour les grands ensembles de données
-
-3. **Stratégie de mise en cache**
-   - Redis pour la mise en cache de session et de données
-   - CDN pour les assets statiques
-   - Mise en cache des réponses API le cas échéant
 
 
 ## Contributors
