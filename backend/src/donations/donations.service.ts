@@ -32,9 +32,9 @@ export class DonationsService {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.prisma.donation.findUnique({
-      where: { id: id.toString() },
+      where: { id },
       include: { project: true },
     });
   }
@@ -66,16 +66,16 @@ export class DonationsService {
     });
   }
 
-  async update(id: number, updateDonationDto: UpdateDonationDto) {
+  async update(id: string, updateDonationDto: UpdateDonationDto) {
     return this.prisma.donation.update({
-      where: { id: id.toString() },
+      where: { id },
       data: updateDonationDto,
     });
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     return this.prisma.donation.delete({
-      where: { id: id.toString() },
+      where: { id },
     });
   }
 }

@@ -1,7 +1,8 @@
-import { Controller, Post, Body, Get, Query, Request } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { VerifySignatureDto } from './dto/verify-signature.dto';
 import { Public } from '../decorators/public.decorator';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -22,6 +23,7 @@ export class AuthController {
     );
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('me')
   async getCurrentUser(@Request() req) {
     return this.authService.getCurrentUser(req.user.walletAddress);

@@ -20,6 +20,7 @@ import { useToast } from '../context/ToastContext';
 import TransactionStatusIndicator from './web3/TransactionStatus';
 import NetworkSwitcher from './web3/NetworkSwitcher';
 import { parseEther } from 'ethers';
+import { createDonation } from '../utils/api';
 
 const PINATA_JWT = import.meta.env.VITE_PINATA_JWT;
 
@@ -472,7 +473,21 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
               <TransactionStatusIndicator
                 txHash={txHash}
                 chainId={31337}
-                onSuccess={() => setStep('success')}
+                onSuccess={async () => {
+                  try {
+                    await createDonation({
+                      amount: amount,
+                      txHash: txHash,
+                      donorWallet: account || '',
+                      projectId: project.id,
+                    });
+                    setStep('success');
+                  } catch (err) {
+                    console.error('Failed to sync donation to backend:', err);
+                    setStep('success'); // Still show success as BC tx confirmed
+                    showToast('Donation confirmed on blockchain but failed to sync to dashboard', 'warning');
+                  }
+                }}
                 onError={() => {
                   setStep('error');
                   setModalError('Transaction failed on-chain');
@@ -621,7 +636,7 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
           pb: 2,
         }}
       >
-        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+        <Typography component="span" variant="h6" sx={{ fontWeight: 700 }}>
           {step === 'success' ? 'Success!' : 'Make a Donation'}
         </Typography>
         {(step === 'amount' || step === 'success') && (

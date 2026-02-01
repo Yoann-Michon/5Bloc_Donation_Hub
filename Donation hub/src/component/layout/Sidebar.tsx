@@ -227,10 +227,38 @@ const Sidebar = () => {
                                         border: '1px solid rgba(255, 255, 255, 0.2)',
                                     }}
                                 />
-                                <Box sx={{ overflow: 'hidden' }}>
-                                    <Typography variant="caption" sx={{ fontFamily: 'monospace', color: 'primary.main', display: 'block' }}>
-                                        {account ? `${account.slice(0, 6)}...${account.slice(-4)}` : 'No Wallet'}
-                                    </Typography>
+                                <Box sx={{ overflow: 'hidden', flex: 1 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Typography variant="caption" sx={{ fontFamily: 'monospace', color: 'primary.main', display: 'block' }}>
+                                            {account ? `${account.slice(0, 6)}...${account.slice(-4)}` : 'No Wallet'}
+                                        </Typography>
+                                        {user?.role && (
+                                            <Box
+                                                sx={{
+                                                    px: 1,
+                                                    py: 0.25,
+                                                    borderRadius: 1,
+                                                    fontSize: '0.6rem',
+                                                    fontWeight: 700,
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '0.05em',
+                                                    bgcolor: user.role === 'ADMIN'
+                                                        ? 'rgba(239, 68, 68, 0.2)'
+                                                        : user.role === 'ASSOCIATION'
+                                                            ? 'rgba(59, 130, 246, 0.2)'
+                                                            : 'rgba(16, 185, 129, 0.2)',
+                                                    color: user.role === 'ADMIN'
+                                                        ? '#EF4444'
+                                                        : user.role === 'ASSOCIATION'
+                                                            ? '#3B82F6'
+                                                            : '#10B981',
+                                                    border: `1px solid ${user.role === 'ADMIN' ? 'rgba(239, 68, 68, 0.3)' : user.role === 'ASSOCIATION' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(16, 185, 129, 0.3)'}`,
+                                                }}
+                                            >
+                                                {user.role}
+                                            </Box>
+                                        )}
+                                    </Box>
                                     <Typography variant="body2" sx={{ fontWeight: 700 }}>
                                         {balance ? parseFloat(balance).toFixed(4) : '0.00'} ETH
                                     </Typography>

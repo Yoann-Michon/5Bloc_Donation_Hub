@@ -3,7 +3,25 @@ import { Share, VolunteerActivism, CalendarToday, Verified, WorkspacePremium } f
 import { useWallet } from '../../hooks/useWallet';
 
 const DashboardProfile = () => {
-    const { account } = useWallet();
+    const { account, user } = useWallet();
+
+    const getRoleLabel = (role: string) => {
+        switch (role?.toUpperCase()) {
+            case 'ADMIN': return 'ADMINISTRATOR';
+            case 'ASSOCIATION': return 'ORGANIZATION';
+            case 'USER': return 'DONOR';
+            default: return 'GUEST';
+        }
+    };
+
+    const getRoleColor = (role: string) => {
+        switch (role?.toUpperCase()) {
+            case 'ADMIN': return '#FF3B3B';
+            case 'ASSOCIATION': return '#00ff88';
+            case 'USER': return '#FFD700';
+            default: return '#9d9db9';
+        }
+    };
 
     return (
         <Box
@@ -51,12 +69,12 @@ const DashboardProfile = () => {
 
             <Box sx={{ position: 'relative', zIndex: 1 }}>
                 <Avatar
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCp0yD1RdlMSdQ517ts7BtXeTMnQpsIWjCnUH-r3Zdm08EPJgtXjoqDNVCp6zBo48uUP7NZ2WDqbh8gkz2qhYoXzK489Mne78VC93oh_-U6ogPG8HiXFfTzIfx5ArIfSzl-1EiW8EzrA8sDs9Y_Oa4Oo7fMal6_kd-4EKKyV4fFzdpttI9qmVf_qxN1JyqYIZPgdirxcneovMBVUTuHuYgiem6EYBZFKdWxxevJUVr1UAdMoJTxM_zBmJ8QnIowEPP2uyp0eQx4IDch"
+                    src={user?.avatar || "https://api.dicebear.com/7.x/pixel-art/svg?seed=" + (account || "default")}
                     sx={{
                         width: 120,
                         height: 120,
                         border: '2px solid rgba(255, 255, 255, 0.2)',
-                        filter: 'blur(0.5px)',
+                        filter: 'blur(0.1px)',
                     }}
                 />
                 <Box
@@ -64,7 +82,7 @@ const DashboardProfile = () => {
                         position: 'absolute',
                         bottom: -16,
                         right: -16,
-                        bgcolor: '#FFD700',
+                        bgcolor: getRoleColor(user?.role),
                         color: 'black',
                         px: 1.5,
                         py: 0.5,
@@ -72,44 +90,48 @@ const DashboardProfile = () => {
                         display: 'flex',
                         alignItems: 'center',
                         gap: 0.5,
-                        boxShadow: '0 0 20px rgba(255, 215, 0, 0.3)',
-                        border: '1px solid rgba(255, 215, 0, 0.5)',
+                        boxShadow: `0 0 20px ${getRoleColor(user?.role)}4d`,
+                        border: `1px solid ${getRoleColor(user?.role)}80`,
                     }}
                 >
                     <WorkspacePremium sx={{ fontSize: 14 }} />
-                    <Typography sx={{ fontSize: '0.75rem', fontWeight: 700 }}>BENEFACTOR</Typography>
+                    <Typography sx={{ fontSize: '0.75rem', fontWeight: 800 }}>
+                        {getRoleLabel(user?.role)}
+                    </Typography>
                 </Box>
             </Box>
 
             <Box sx={{ flex: 1, zIndex: 1, textAlign: { xs: 'center', md: 'left' } }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1, justifyContent: { xs: 'center', md: 'flex-start' }, flexWrap: 'wrap' }}>
-                    <Typography variant="h3" sx={{ fontWeight: 700, fontFamily: 'Space Grotesk, sans-serif' }}>
-                        cryptosage.eth
+                    <Typography variant="h4" sx={{ fontWeight: 700, fontFamily: 'Space Grotesk, sans-serif' }}>
+                        {user?.organizationName || (account ? `${account.slice(0, 6)}...${account.slice(-4)}` : 'Connect Wallet')}
                     </Typography>
-                    <Chip
-                        label="Level 42"
-                        size="small"
-                        sx={{
-                            bgcolor: 'rgba(82, 39, 255, 0.2)',
-                            color: 'primary.main',
-                            border: '1px solid rgba(82, 39, 255, 0.3)',
-                            fontWeight: 700,
-                        }}
-                    />
+                    {user?.role && (
+                        <Chip
+                            label={user.role}
+                            size="small"
+                            sx={{
+                                bgcolor: 'rgba(82, 39, 255, 0.2)',
+                                color: 'primary.main',
+                                border: '1px solid rgba(82, 39, 255, 0.3)',
+                                fontWeight: 700,
+                            }}
+                        />
+                    )}
                 </Box>
 
                 <Typography variant="body1" sx={{ color: '#9d9db9', mb: 3, fontWeight: 500, fontFamily: 'monospace' }}>
-                    {account || '0x71C2465715C49271C2465715C49271C2465739A2'}
+                    {account}
                 </Typography>
 
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, justifyContent: { xs: 'center', md: 'flex-start' }, flexWrap: 'wrap' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#9d9db9' }}>
                         <CalendarToday sx={{ fontSize: 16, color: 'primary.main' }} />
-                        <Typography variant="body2">Joined Nov 2021</Typography>
+                        <Typography variant="body2">Member of BlockDonation</Typography>
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#9d9db9' }}>
                         <Verified sx={{ fontSize: 16, color: '#00ff88' }} />
-                        <Typography variant="body2">KYC Verified (ZKP)</Typography>
+                        <Typography variant="body2">Verified User</Typography>
                     </Box>
                 </Box>
             </Box>

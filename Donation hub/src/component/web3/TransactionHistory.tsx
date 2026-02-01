@@ -259,6 +259,7 @@ const TransactionHistory = ({
                                                 </Typography>
                                             </Box>
                                         }
+                                        secondaryTypographyProps={{ component: 'div' }}
                                     />
 
                                     {/* Amount */}

@@ -46,20 +46,20 @@ export class DonationsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.donationsService.findOne(+id);
+    return this.donationsService.findOne(id);
   }
 
   @Patch(':id')
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)
   update(@Param('id') id: string, @Body() updateDonationDto: UpdateDonationDto) {
-    return this.donationsService.update(+id, updateDonationDto);
+    return this.donationsService.update(id, updateDonationDto);
   }
 
   @Delete(':id')
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)
   remove(@Param('id') id: string) {
-    return this.donationsService.remove(+id);
+    return this.donationsService.remove(id);
   }
 }

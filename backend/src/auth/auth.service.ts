@@ -82,19 +82,24 @@ export class AuthService {
   }
 
   async getCurrentUser(walletAddress: string) {
-    const user = await this.usersService.findByWallet(walletAddress);
+    try {
+      const user = await this.usersService.findByWallet(walletAddress);
 
-    if (!user) {
-      return null;
+      if (!user) {
+        return null;
+      }
+
+      return {
+        id: user.id,
+        walletAddress: user.walletAddress,
+        role: user.role,
+        organizationName: user.organizationName || null,
+        email: user.email || null,
+        isActive: user.isActive,
+      };
+    } catch (error) {
+      console.error(`Error in getCurrentUser for ${walletAddress}:`, error);
+      throw error;
     }
-
-    return {
-      id: user.id,
-      walletAddress: user.walletAddress,
-      role: user.role,
-      organizationName: user.organizationName || null,
-      email: user.email || null,
-      isActive: user.isActive,
-    };
   }
 }
