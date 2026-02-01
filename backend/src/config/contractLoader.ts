@@ -1,10 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-/**
- * Contract Configuration Loader
- * Loads contract address from shared volume before NestJS initialization
- */
+
 
 export interface ContractConfig {
     contractAddress: string;
@@ -14,9 +11,7 @@ export interface ContractConfig {
 
 let cachedConfig: ContractConfig | null = null;
 
-/**
- * Load contract configuration from shared volume or environment
- */
+
 export async function loadContractConfig(): Promise<ContractConfig> {
     if (cachedConfig) {
         return cachedConfig;
@@ -28,7 +23,7 @@ export async function loadContractConfig(): Promise<ContractConfig> {
         blockchainRpcUrl: process.env.BLOCKCHAIN_RPC_URL || 'http://blockchain:8545',
     };
 
-    // Try to load from shared volume (Docker)
+
     const sharedConfigPath = '/app/shared/contract-config.json';
 
     try {
@@ -54,30 +49,22 @@ export async function loadContractConfig(): Promise<ContractConfig> {
     return config;
 }
 
-/**
- * Get contract address
- */
+
 export function getContractAddress(): string {
     return cachedConfig?.contractAddress || '0x0000000000000000000000000000000000000000';
 }
 
-/**
- * Get marketplace address
- */
+
 export function getMarketplaceAddress(): string {
     return cachedConfig?.marketplaceAddress || '0x0000000000000000000000000000000000000000';
 }
 
-/**
- * Get blockchain RPC URL
- */
+
 export function getBlockchainRpcUrl(): string {
     return cachedConfig?.blockchainRpcUrl || 'http://blockchain:8545';
 }
 
-/**
- * Check if config is loaded
- */
+
 export function isConfigLoaded(): boolean {
     return cachedConfig !== null;
 }

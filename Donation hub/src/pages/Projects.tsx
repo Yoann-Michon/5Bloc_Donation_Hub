@@ -24,7 +24,6 @@ const Projects = () => {
         setProjects(projectsData);
         setCategories(categoriesData.map((cat: any) => cat.name));
       } catch (error) {
-        // Handle error silently
       } finally {
         setIsLoading(false);
       }
@@ -32,16 +31,15 @@ const Projects = () => {
     fetchData();
   }, []);
 
-  // Filter and sort projects
   const filteredProjects = useMemo(() => {
     let filtered = projects;
 
-    // Category filter
+
     if (selectedCategory !== 'All') {
       filtered = filtered.filter(p => p.category === selectedCategory);
     }
 
-    // Sort
+
     switch (sortBy) {
       case 'newest':
         filtered = [...filtered].reverse();
@@ -50,7 +48,7 @@ const Projects = () => {
         filtered = [...filtered].sort((a, b) => (b.raised / b.goal) - (a.raised / a.goal));
         break;
       default:
-        // relevant - keep original order
+
         break;
     }
 

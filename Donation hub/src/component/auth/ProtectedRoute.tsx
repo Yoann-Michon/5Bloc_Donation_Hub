@@ -7,10 +7,7 @@ interface ProtectedRouteProps {
     children: ReactNode;
 }
 
-/**
- * ProtectedRoute Component
- * Redirects to home if user is not connected
- */
+
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     const { isConnected, isInitialized } = useWallet();
     const navigate = useNavigate();

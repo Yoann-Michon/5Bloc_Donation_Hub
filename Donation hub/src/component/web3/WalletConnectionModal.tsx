@@ -49,7 +49,7 @@ const WalletConnectionModal = ({
         {
             id: 'metamask',
             name: 'MetaMask',
-            icon: 'https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg',
+            icon: 'https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg',
             description: 'Most popular Ethereum wallet',
             isInstalled: typeof window.ethereum !== 'undefined' && !!window.ethereum.isMetaMask,
             downloadUrl: 'https://metamask.io/download/',
@@ -57,7 +57,7 @@ const WalletConnectionModal = ({
         {
             id: 'walletconnect',
             name: 'WalletConnect',
-            icon: 'https://raw.githubusercontent.com/WalletConnect/walletconnect-assets/master/Icon/Gradient/Icon.svg',
+            icon: 'https://avatars.githubusercontent.com/u/37784886',
             description: 'Connect with mobile wallets',
             isInstalled: true,
         },

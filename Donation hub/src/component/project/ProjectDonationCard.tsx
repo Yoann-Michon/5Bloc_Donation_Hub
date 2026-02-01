@@ -82,53 +82,6 @@ const ProjectDonationCard = ({ project, percentage, onDonate }: ProjectDonationC
                 </Box>
             </Box>
 
-            <Box sx={{ pt: 1 }}>
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', mb: 1, display: 'block' }}>
-                    Select Amount
-                </Typography>
-                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, mb: 2 }}>
-                    {['0.1 ETH', '0.5 ETH', '1.0 ETH'].map((amt) => (
-                        <Button
-                            key={amt}
-                            variant="outlined"
-                            sx={{
-                                color: 'white',
-                                borderColor: 'rgba(255,255,255,0.1)',
-                                bgcolor: 'rgba(255,255,255,0.05)',
-                                fontWeight: 700,
-                                fontSize: '0.75rem',
-                                borderRadius: 1.5,
-                                '&:hover': {
-                                    borderColor: 'primary.main',
-                                },
-                            }}
-                        >
-                            {amt}
-                        </Button>
-                    ))}
-                </Box>
-                <TextField
-                    fullWidth
-                    placeholder="Custom amount..."
-                    type="number"
-                    variant="outlined"
-                    InputProps={{
-                        endAdornment: <InputAdornment position="end"><Typography sx={{ color: 'text.secondary', fontWeight: 700 }}>ETH</Typography></InputAdornment>,
-                    }}
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            borderRadius: 1.5,
-                            bgcolor: 'rgba(255, 255, 255, 0.05)',
-                            color: 'white',
-                            fontWeight: 700,
-                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
-                            '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
-                            '&.Mui-focused fieldset': { borderColor: 'primary.main' },
-                        }
-                    }}
-                />
-            </Box>
-
             <Button
                 variant="contained"
                 fullWidth

@@ -1,9 +1,11 @@
 import { Box, Typography, Button, Avatar, Chip } from '@mui/material';
 import { Share, VolunteerActivism, CalendarToday, Verified, WorkspacePremium } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import { useWallet } from '../../hooks/useWallet';
 
 const DashboardProfile = () => {
     const { account, user } = useWallet();
+    const navigate = useNavigate();
 
     const getRoleLabel = (role: string) => {
         switch (role?.toUpperCase()) {
@@ -155,6 +157,7 @@ const DashboardProfile = () => {
                 <Button
                     variant="contained"
                     startIcon={<VolunteerActivism />}
+                    onClick={() => navigate('/dashboard/projects')}
                     sx={{
                         bgcolor: 'primary.main',
                         color: 'white',

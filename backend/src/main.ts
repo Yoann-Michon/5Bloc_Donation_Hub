@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { loadContractConfig } from './config/contractLoader';
 
 async function bootstrap() {
-  // Load contract configuration before starting the app
+
   try {
     const config = await loadContractConfig();
     console.log('📝 Contract configuration loaded successfully');

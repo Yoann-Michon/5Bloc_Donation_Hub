@@ -28,7 +28,7 @@ const Navbar = () => {
   const [walletModalOpen, setWalletModalOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  // Web3 Hook
+
   const { isConnected, account, chainId, disconnect, balance } = useWallet();
 
   const handleDrawerToggle = () => {

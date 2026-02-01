@@ -74,7 +74,7 @@ export const useMarketplace = () => {
         const price = ethers.parseEther(priceEth);
         const marketAddress = getMarketplaceAddress();
 
-        // Check if already approved
+
         const approved = await badgeContract.getApproved(tokenId);
         const isApprovedAll = await badgeContract.isApprovedForAll(account, marketAddress);
 

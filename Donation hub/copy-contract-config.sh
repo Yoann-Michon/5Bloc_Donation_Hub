@@ -23,7 +23,7 @@ if [ ! -f "$SHARED_CONFIG" ]; then
 else
   echo "Contract configuration found!"
 
-  # Use sed to extract values from JSON (works even if no spaces)
+
   BADGE_ADDRESS=$(sed -n 's/.*"contractAddress":"\([^"]*\)".*/\1/p' "$SHARED_CONFIG")
   MARKETPLACE_ADDRESS=$(sed -n 's/.*"marketplaceAddress":"\([^"]*\)".*/\1/p' "$SHARED_CONFIG")
 

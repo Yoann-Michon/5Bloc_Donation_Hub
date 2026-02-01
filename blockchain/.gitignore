@@ -1,18 +1,18 @@
-# Dependencies
+
 node_modules
 .pnp
 .pnp.js
 
-# Testing
+
 coverage
 coverage.json
 test-results/
 
-# Production
+
 dist
 build
 
-# Misc
+
 .DS_Store
 .env
 .env.local
@@ -25,14 +25,14 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Hardhat
+
 cache
 artifacts/
 typechain-types
 hardhat.config.js.map
 hardhat.config.ts.map
 
-# Editors
+
 .idea
 .vscode
 *.swp

@@ -12,7 +12,6 @@ interface RoleProtectedRouteProps {
 const RoleProtectedRoute = ({ children, allowedRoles }: RoleProtectedRouteProps) => {
     const { isConnected, user, isInitialized } = useWallet();
 
-    // Wait for initialization before evaluating permissions
     if (!isInitialized) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
@@ -25,7 +24,7 @@ const RoleProtectedRoute = ({ children, allowedRoles }: RoleProtectedRouteProps)
         return <Navigate to="/dashboard" replace />;
     }
 
-    // Check user role
+
     if (!user || !allowedRoles.includes(user.role)) {
         return (
             <Box

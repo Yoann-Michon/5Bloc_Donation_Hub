@@ -33,13 +33,12 @@ const BadgeFusion = () => {
 
 
 
-    // Unified Metadata fetcher
     const getMetadata = async (tokenId: string, tokenURI: string): Promise<any> => {
         const hash = getIPFSUrl(tokenURI);
 
         let metadata: any = {
             name: `Badge #${tokenId}`,
-            type: 'Bronze', // Default
+            type: 'Bronze',
             value: '0',
             hash: hash,
         };
@@ -81,7 +80,7 @@ const BadgeFusion = () => {
                     const tokenURI = await contract.tokenURI(tokenId);
                     const metadata = await getMetadata(tokenIdStr, tokenURI);
 
-                    // Map metadata type to BadgeTier enum
+
                     let tier: BadgeTier;
                     const metadataType = (metadata.type || 'Bronze').toLowerCase();
 
@@ -165,7 +164,7 @@ const BadgeFusion = () => {
             const currentTierIndex = TIER_ORDER.indexOf(selectedBadges[0].tier);
             const nextTierIndex = currentTierIndex + 1;
 
-            // Map Enum values to display names
+
             const tierDisplayNames: Record<BadgeTier, string> = {
                 [BadgeTier.BRONZE]: 'Bronze',
                 [BadgeTier.SILVER]: 'Silver',
@@ -214,7 +213,7 @@ const BadgeFusion = () => {
             const { syncUserBadges } = await import('../utils/api');
             await syncUserBadges(account);
 
-            // Refetch badges to update UI
+
             await fetchBadges();
 
             setSelectedBadges([]);

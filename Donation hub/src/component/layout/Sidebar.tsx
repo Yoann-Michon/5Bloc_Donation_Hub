@@ -26,26 +26,25 @@ const Sidebar = () => {
         navigate('/');
     };
 
-    // Base navigation items
+
     const baseItems = [
         { label: 'Dashboard', icon: <Dashboard />, path: '/dashboard', protected: true },
         { label: 'Explore', icon: <Explore />, path: '/dashboard/projects', protected: false },
         { label: 'Mes Donations', icon: <VolunteerActivism />, path: '/dashboard/my-donations', protected: true },
     ];
 
-    // User-only items (Marketplace & Fusion)
+
     const userOnlyItems = [
         { label: 'Badge Fusion', icon: <AutoFixHigh />, path: '/dashboard/fusion', protected: true },
         { label: 'Marketplace', icon: <People />, path: '/dashboard/marketplace', protected: true },
     ];
 
-    // Association-specific items
+
     const associationItems = [
         { label: 'Créer Projet', icon: <Add />, path: '/dashboard/create-project', protected: true },
         { label: 'Mes Projets', icon: <Folder />, path: '/dashboard/my-projects', protected: true },
     ];
 
-    // Admin-specific items
     const adminItems = [
         { label: 'Admin Projets', icon: <AdminPanelSettings />, path: '/dashboard/admin/projects', protected: true },
         { label: 'Admin Users', icon: <People />, path: '/dashboard/admin/users', protected: true },
@@ -53,7 +52,7 @@ const Sidebar = () => {
         { label: 'Admin Retraits', icon: <AccountBalanceWallet />, path: '/dashboard/admin/withdrawals', protected: true },
     ];
 
-    // Build navigation items based on user role
+
     const navItems = [
         ...baseItems,
         ...(user?.role === 'USER' ? userOnlyItems : []),
@@ -130,7 +129,6 @@ const Sidebar = () => {
             </Button>
         );
 
-        // Wrap with tooltip if locked
         if (isLocked) {
             return (
                 <Tooltip
@@ -150,7 +148,7 @@ const Sidebar = () => {
         <Box
             component="aside"
             sx={{
-                width: 280, // Fixed width 280px (was 288px)
+                width: 280,
                 display: { xs: 'none', lg: 'flex' },
                 flexDirection: 'column',
                 m: 2,

@@ -32,7 +32,7 @@ export class ProjectBlockchainService {
         this.wallet,
       );
     } else {
-      // Read-only mode if no private key
+
       this.contract = new ethers.Contract(
         contractAddress,
         DONATION_BADGE_ABI,

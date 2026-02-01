@@ -52,7 +52,7 @@ const TransactionHistory = ({
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState<string>('all');
 
-    // Filter transactions
+
     const filteredTransactions = transactions.filter((tx) => {
         const matchesSearch =
             tx.hash.toLowerCase().includes(searchTerm.toLowerCase()) ||

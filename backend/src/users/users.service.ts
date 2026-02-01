@@ -80,13 +80,13 @@ export class UsersService {
 
     const oldRole = user.role;
 
-    // Update user role
+
     const updatedUser = await this.prisma.user.update({
       where: { walletAddress },
       data: { role: newRole as any },
     });
 
-    // Log the change
+
     await this.prisma.roleChangeLog.create({
       data: {
         targetWallet: walletAddress,

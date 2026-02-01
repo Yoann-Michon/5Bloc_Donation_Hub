@@ -36,7 +36,7 @@ const ProjectView = () => {
         const data = await getProject(Number(id));
         setProject(data);
       } catch (error) {
-        // Error handled silently
+
       } finally {
         setIsLoading(false);
       }

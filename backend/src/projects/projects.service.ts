@@ -112,17 +112,17 @@ export class ProjectsService {
       throw new NotFoundException('Project not found');
     }
 
-    // ADMIN can update any project
+
     if (userRole === 'ADMIN') {
       return this.update(id, updateProjectDto);
     }
 
-    // Owner can only update their own projects
+
     if (project.ownerWallet.toLowerCase() !== userWallet.toLowerCase()) {
       throw new ForbiddenException('You can only update your own projects');
     }
 
-    // Owner can only update PENDING or APPROVED projects
+
     if (!['PENDING', 'APPROVED'].includes(project.status)) {
       throw new BadRequestException('Cannot update project in current status');
     }
@@ -143,17 +143,17 @@ export class ProjectsService {
       throw new NotFoundException('Project not found');
     }
 
-    // ADMIN can delete any project
+
     if (userRole === 'ADMIN') {
       return this.remove(id);
     }
 
-    // Owner can only delete their own projects
+
     if (project.ownerWallet.toLowerCase() !== userWallet.toLowerCase()) {
       throw new ForbiddenException('You can only delete your own projects');
     }
 
-    // Owner can only delete PENDING projects
+
     if (project.status !== 'PENDING') {
       throw new BadRequestException('Only PENDING projects can be deleted');
     }
@@ -193,27 +193,27 @@ export class ProjectsService {
       throw new BadRequestException('Recipient must be project owner');
     }
 
-    // Get balance from blockchain
+
     const balance = await this.blockchainService.getProjectBalance(projectId);
 
     if (parseFloat(balance) === 0) {
       throw new BadRequestException('No funds available on blockchain');
     }
 
-    // Set project owner in contract if not already set
+
     try {
       await this.blockchainService.setProjectOwner(projectId, recipientAddress);
     } catch (error) {
-      // Owner might already be set, continue
+
     }
 
-    // Withdraw funds via blockchain
+
     const txHash = await this.blockchainService.withdrawProjectFunds(
       projectId,
       recipientAddress,
     );
 
-    // Update database
+
     await this.prisma.project.update({
       where: { id: projectId },
       data: {

@@ -104,7 +104,7 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
         imageUrl = DEFAULT_IMAGES.Gold;
       } else if (amountVal >= 21.0) {
         type = "Diamond";
-        imageUrl = DEFAULT_IMAGES.Unknown; // User will provide or keep placeholder
+        imageUrl = DEFAULT_IMAGES.Unknown;
       }
 
       const nowTimestamp = Math.floor(Date.now() / 1000);
@@ -278,11 +278,11 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
                     objectFit: 'cover',
                   }}
                 />
-                <Box sx={{ flex: 1 }}>
-                  <Typography variant="body1" sx={{ fontWeight: 700, mb: 0.5 }}>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Typography variant="body1" noWrap sx={{ fontWeight: 700, mb: 0.5 }}>
                     {project.title}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                  <Typography variant="caption" noWrap sx={{ color: 'text.secondary', display: 'block' }}>
                     By {project.author}
                   </Typography>
                 </Box>
@@ -444,7 +444,7 @@ const DonationModal = ({ open, onClose, project }: DonationModalProps) => {
                     setStep('success');
                   } catch (err) {
                     console.error('Failed to sync donation to backend:', err);
-                    setStep('success'); // Still show success as BC tx confirmed
+                    setStep('success');
                     showToast('Donation confirmed on blockchain but failed to sync to dashboard', 'warning');
                   }
                 }}

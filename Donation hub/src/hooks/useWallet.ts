@@ -85,7 +85,7 @@ export const useWallet = () => {
                         signer: signer,
                     }));
 
-                    // Restore user data from JWT if available
+
                     const jwtToken = localStorage.getItem('jwt_token');
                     if (jwtToken) {
                         try {
@@ -94,7 +94,7 @@ export const useWallet = () => {
                             setState(prev => ({ ...prev, user }));
                         } catch (apiError) {
                             console.error('Failed to restore user data:', apiError);
-                            // If JWT is invalid, remove it
+
                             localStorage.removeItem('jwt_token');
                         }
                     }

@@ -25,7 +25,7 @@ const JoinUs = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Form submitted
+
         alert('Merci pour votre soumission ! Nous vous contacterons bientôt.');
     };
 
